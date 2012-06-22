@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>flatpack-apidoc-maven-plugin</artifactId>
+  <name>API Documentation Plugin</name>
+  <packaging>maven-plugin</packaging>
+
+  <parent>
+    <groupId>com.getperka.flatpack</groupId>
+    <artifactId>flatpack-parent</artifactId>
+    <version>2.5-SNAPSHOT</version>
+  </parent>
+
+  <scm>
+    <connection>scm:git:git@git.getperka.com:flatpack.git</connection>
+    <url>scm:git:git@git.getperka.com:flatpack.git</url>
+    <developerConnection>scm:git:git@git.getperka.com:flatpack.git</developerConnection>
+  </scm>
+
+  <properties>
+    <mavenVersion>2.2.1</mavenVersion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.getperka.flatpack</groupId>
+      <artifactId>flatpack-doclets</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.tautua.markdownpapers</groupId>
+      <artifactId>markdownpapers-core</artifactId>
+      <version>1.2.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>2.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>0.0.7</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.5.15</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,64 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>flatpack-fast</artifactId>
+  <name>FlatPack Automatic Source Tool</name>
+
+  <parent>
+    <groupId>com.getperka.flatpack</groupId>
+    <artifactId>flatpack-parent</artifactId>
+    <version>2.5-SNAPSHOT</version>
+  </parent>
+  <properties>
+    <com.getperka.packed-build-presets.mainClassName>
+      com.getperka.flatpack.fast.FastTool
+    </com.getperka.packed-build-presets.mainClassName>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git@git.getperka.com:flatpack.git</connection>
+    <url>scm:git:git@git.getperka.com:flatpack.git</url>
+    <developerConnection>scm:git:git@git.getperka.com:flatpack.git</developerConnection>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>com.getperka.flatpack</groupId>
+      <artifactId>flatpack-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.getperka.flatpack</groupId>
+      <artifactId>flatpack-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.getperka.flatpack</groupId>
+      <artifactId>flatpack-search</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.getperka.cli</groupId>
+      <artifactId>cli</artifactId>
+      <!-- Managed in parent pom -->
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>ST4</artifactId>
+      <version>4.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
+      <version>1.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>jsr250-api</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,162 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.getperka.flatpack</groupId>
+  <artifactId>flatpack-parent</artifactId>
+  <version>2.5-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Flatpack</name>
+  <description>An entity serialization framework</description>
+  <url>https://github.com/perka/flatpack</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/perka/flatpack</url>
+    <connection>scm:git:git@github.com:perka/flatpack.git</connection>
+    <developerConnection>scm:git:git@github.com:perka/flatpack.git</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <email>bob@getperka.com</email>
+      <name>Bob Vawter</name>
+    </developer>
+    <developer>
+      <email>joe@getperka.com</email>
+      <name>Joe Stelmach</name>
+    </developer>
+  </developers>
+
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
+  <modules>
+    <module>apidoc-plugin</module>
+    <module>fast-plugin</module>
+    <module>doclets</module>
+    <module>flatpack-client</module>
+    <module>flatpack-core</module>
+    <module>flatpack-fast</module>
+    <module>flatpack-jersey</module>
+    <module>flatpack-search</module>
+  </modules>
+
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.getperka.cli</groupId>
+        <artifactId>cli</artifactId>
+        <version>1.13-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.2.1</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+
+  <build>
+    <plugins>
+      <!-- compiler plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <compilerArgument>-proc:none</compilerArgument>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <!-- release plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.3.2</version><!--$NO-MVN-MAN-VER$ -->
+        <configuration>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+          <tagNameFormat>flatpack-@{project.version}</tagNameFormat>
+          <arguments>-Psonatype-oss-release -Pperka-release</arguments>
+        </configuration>
+      </plugin>
+
+      <!-- Disallow use of transitive dependencies without declaring them. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <ignoreNonCompile>true</ignoreNonCompile>
+          <failOnWarning>true</failOnWarning>
+          <outputXML>true</outputXML>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>analyze-only</goal>
+            </goals>
+            <phase>test</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <!-- Activated by the release-plugin configuration -->
+      <id>perka-release</id>
+      <build>
+        <plugins>
+          <!-- Keep our licensing story straight -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>1.1</version>
+            <configuration>
+              <inceptionYear>2012</inceptionYear>
+              <licenseName>apache_v2</licenseName>
+              <organizationName>Perka Inc.</organizationName>
+              <roots>
+                <root>src/main</root>
+                <root>src/test</root>
+              </roots>
+            </configuration>
+            <executions>
+              <execution>
+                <id>first</id>
+                <goals>
+                  <goal>update-project-license</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>second</id>
+                <goals>
+                  <goal>update-file-header</goal>
+                </goals>
+                <phase>process-sources</phase>
+                <configuration>
+                  <extraExtensions>
+                    <stg>java</stg>
+                  </extraExtensions>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
