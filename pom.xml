@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.getperka.flatpack</groupId>
   <artifactId>flatpack-parent</artifactId>
-  <version>2.5-SNAPSHOT</version>
+  <version>2.5</version>
   <packaging>pom</packaging>
   <name>Flatpack</name>
   <description>An entity serialization framework</description>
@@ -20,6 +19,7 @@
     <url>https://github.com/perka/flatpack</url>
     <connection>scm:git:git@github.com:perka/flatpack.git</connection>
     <developerConnection>scm:git:git@github.com:perka/flatpack.git</developerConnection>
+    <tag>flatpack-2.5</tag>
   </scm>
   <developers>
     <developer>
@@ -55,7 +55,7 @@
       <dependency>
         <groupId>com.getperka.cli</groupId>
         <artifactId>cli</artifactId>
-        <version>1.13-SNAPSHOT</version>
+        <version>1.13</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
