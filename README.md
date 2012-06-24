@@ -11,7 +11,6 @@ FlatPack is serialization framework used by Perka to make its JPA entities avail
 * Minimize developer friction
 
 ## Thirty-Second Tour
-
 * `flatpack-core` contains the serialization logic. The central types are `FlatPack`, `Packer`, and `Unpacker`.
 * `flatpack-jersey` wires FlatPack into Jersey's request dispatch logic. The `ApiDescriber` type will produce a FlatPack description of the API server's methods and entities.
 * `flatpack-fast` and `fast-plugin`, the FlatPack Automatic Source Tool, take an `ApiDescription` and generate client access libraries consisting of DTO objects and API request methods.
@@ -19,3 +18,4 @@ FlatPack is serialization framework used by Perka to make its JPA entities avail
 * `apidoc-plugin`, `dockets` are used during the maven build process to make JavaDoc strings available to `ApiDescriber`
 * `flatpack-search` is grungy utility code
 * `demo-client` and `demo-server` show a very simple JAX-RS server and how to use generated client code.
+* `eclipse-plugin` contains an m2eclipse connector for the FlatPack plugins.

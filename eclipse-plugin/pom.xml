@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- Maven artifactId and OSGI bundle name must align -->
+  <artifactId>com.getperka.eclipse.plugin</artifactId>
+  <!-- Must use OSGI-style version -->
+  <version>1.0.1-SNAPSHOT</version>
+  <name>Perka Eclipse Customizations</name>
+  <!-- Provided by tycho -->
+  <packaging>eclipse-plugin</packaging>
+
+  <parent>
+    <groupId>com.getperka.flatpack</groupId>
+    <artifactId>flatpack-parent</artifactId>
+    <version>2.6-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <tycho.version>0.15.0</tycho.version>
+  </properties>
+
+  <scm>
+    <connection>scm:git:git@git.getperka.com:eclipse-plugin.git</connection>
+    <url>scm:git:git@git.getperka.com:eclipse-plugin.git</url>
+    <developerConnection>scm:git:git@git.getperka.com:eclipse-plugin.git</developerConnection>
+  </scm>
+
+  <!-- Tell tycho where to find Eclipse / OSGI plugins -->
+  <repositories>
+    <repository>
+      <id>indigo</id>
+      <layout>p2</layout>
+      <url>http://download.eclipse.org/releases/indigo</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <!-- Do all of the packaging magic -->
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <environments>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
+            </environment>
+          </environments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>perka-release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <configuration>
+              <roots>
+                <root>src</root>
+              </roots>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

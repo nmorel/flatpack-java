@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="com.getperka.eclipse.plugin.FastConfigurator"
+            id="com.getperka.eclipse.plugin.FastConfigurator"
+            name="FlatPack FAST Configurator">
+      </configurator>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="com.getperka.eclipse.plugin.ApidocConfigurator"
+            id="com.getperka.eclipse.plugin.ApidocConfigurator"
+            name="FlatPack API Documentation Configurator">
+      </configurator>
+   </extension>
+   <extension
+         point="org.eclipse.m2e.core.projectConfigurators">
+      <configurator
+            class="com.getperka.eclipse.plugin.JsonDdlConfigurator"
+            id="com.getperka.eclipse.plugin.JsonDdlConfigurator"
+            name="JsonDdl Configurator">
+      </configurator>
+   </extension>
+   <extension point="org.eclipse.m2e.core.lifecycleMappingMetadataSource">
+   </extension>
+</plugin>

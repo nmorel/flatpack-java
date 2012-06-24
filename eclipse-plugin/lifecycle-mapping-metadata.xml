@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lifecycleMappingMetadata>
+  <pluginExecutions>
+    <!-- Old groupId -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>com.getperka</groupId>
+        <artifactId>flatpack-fast-maven-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>fast</goal>
+          <goal>fast-test</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>com.getperka.eclipse.plugin.FastConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <!-- New groupId -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>com.getperka.flatpack</groupId>
+        <artifactId>flatpack-fast-maven-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>fast</goal>
+          <goal>fast-test</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>com.getperka.eclipse.plugin.FastConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <!-- Old groupId -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>com.getperka</groupId>
+        <artifactId>flatpack-apidoc-maven-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>apidoc</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>com.getperka.eclipse.plugin.ApidocConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <!-- New groupId -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>com.getperka.flatpack</groupId>
+        <artifactId>flatpack-apidoc-maven-plugin</artifactId>
+        <versionRange>[2.0,)</versionRange>
+        <goals>
+          <goal>apidoc</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>com.getperka.eclipse.plugin.ApidocConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+    <!-- New groupId -->
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.jsonddl</groupId>
+        <artifactId>jsonddl-maven-plugin</artifactId>
+        <versionRange>[0.1.5-SNAPSHOT,)</versionRange>
+        <goals>
+          <goal>generate-sources</goal>
+          <goal>generate-test-sources</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <configurator>
+          <id>com.getperka.eclipse.plugin.JsonDdlConfigurator</id>
+        </configurator>
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
+</lifecycleMappingMetadata>
