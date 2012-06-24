@@ -105,7 +105,12 @@ public class Unpacker {
           String simpleName = reader.nextName();
           Class<? extends HasUuid> clazz = typeContext.getClass(simpleName);
           if (clazz == null) {
-            throw new UnsupportedOperationException("Cannot resolve type " + simpleName);
+            if (configuration.isIgnoreUnresolvableTypes()) {
+              reader.skipValue();
+              continue;
+            } else {
+              throw new UnsupportedOperationException("Cannot resolve type " + simpleName);
+            }
           } else if (Modifier.isAbstract(clazz.getModifiers())) {
             throw new UnsupportedOperationException("A subclass of " + simpleName
               + " must be used instead");

@@ -34,6 +34,7 @@ import com.getperka.flatpack.util.FlatPackCollections;
 public class Configuration {
   private final Set<Class<?>> allTypes = FlatPackCollections.setForIteration();
   private List<CodexMapper> extraMappers = FlatPackCollections.listForAny();
+  private boolean ignoreUnresolvableTypes = false;
   private boolean prettyPrint;
   private PrincipalMapper principalMapper;
   private List<EntityResolver> resolvers = FlatPackCollections.listForAny();
@@ -97,6 +98,16 @@ public class Configuration {
   }
 
   /**
+   * By default, Unpacker will refuse to process payloads that contain unresolvable types. This
+   * behavior is typically desired for server operation, where an unresolvable type would typically
+   * indicate a misbehaving client. However, this behavior is not appropriate for clients, because
+   * it would force all clients to upgrade their object schema in lock-step with the server.
+   */
+  public boolean isIgnoreUnresolvableTypes() {
+    return ignoreUnresolvableTypes;
+  }
+
+  /**
    * If {@code true}, payloads will be formatted to be human-readable.
    */
   public boolean isPrettyPrint() {
@@ -116,6 +127,11 @@ public class Configuration {
 
   public void setVerbose(boolean verbose) {
     this.verbose = verbose;
+  }
+
+  public Configuration withIgnoreUnresolvableTypes(boolean ignore) {
+    this.ignoreUnresolvableTypes = ignore;
+    return this;
   }
 
   public Configuration withPrettyPrint(boolean prettyPrint) {
