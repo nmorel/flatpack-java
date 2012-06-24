@@ -40,6 +40,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
@@ -77,9 +78,12 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
    */
   @Override
   public ContainerRequest filter(ContainerRequest request) {
-    SecurityContext security = providers.getContextResolver(SecurityContext.class,
-        MediaType.WILDCARD_TYPE).getContext(SecurityContext.class);
-    requestPrincipal.set(security.getUserPrincipal());
+    ContextResolver<SecurityContext> contextResolver =
+        providers.getContextResolver(SecurityContext.class, MediaType.WILDCARD_TYPE);
+    if (contextResolver != null) {
+      SecurityContext security = contextResolver.getContext(SecurityContext.class);
+      requestPrincipal.set(security.getUserPrincipal());
+    }
     return request;
   }
 

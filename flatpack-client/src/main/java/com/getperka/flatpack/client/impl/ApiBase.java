@@ -30,9 +30,8 @@ import com.getperka.flatpack.client.Api;
  */
 public abstract class ApiBase implements Api {
   private String accessToken;
-  private URI serverBase;
   private final FlatPack flatpack;
-
+  private URI serverBase;
   private boolean verbose;
 
   protected ApiBase(FlatPack flatpack) {

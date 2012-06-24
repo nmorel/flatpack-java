@@ -65,7 +65,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
   protected FlatPackEntity<X> execute(HttpURLConnection conn) throws IOException {
     Reader reader;
     int status = conn.getResponseCode();
-    if (status != 200) {
+    if (!isOk(status)) {
       InputStream errorStream = conn.getErrorStream();
       reader = errorStream == null ? null : new InputStreamReader(errorStream, FlatPackTypes.UTF8);
     } else {
@@ -84,7 +84,8 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
       }
     }
 
-    if (status != 200) {
+    // Treat any non-2XX response as an error
+    if (!isOk(status)) {
       StatusCodeException sce = new StatusCodeException(status, cause);
       sce.setEntity(entity);
       throw sce;
@@ -107,5 +108,12 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     Writer out = new OutputStreamWriter(connection.getOutputStream(), FlatPackTypes.UTF8);
     getApi().getFlatPack().getPacker().pack(toSend, out);
     out.close();
+  }
+
+  /**
+   * Returns {@code true} for a 2XX series response code.
+   */
+  private boolean isOk(int statusCode) {
+    return statusCode >= 200 && statusCode < 300;
   }
 }

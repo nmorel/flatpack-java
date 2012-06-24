@@ -79,9 +79,16 @@ public class FastMojo extends AbstractMojo {
   protected String packageName;
 
   /**
+   * The number of path segments to remove from the generated URLs when creating method names.
+   * 
+   * @parameter default-value="0"
+   */
+  protected int stripPathSegments;
+
+  /**
    * An optional prefix to apply to all generated type names.
    * 
-   * @parameter
+   * @parameter default-value=""
    */
   protected String typePrefix;
 
@@ -93,6 +100,7 @@ public class FastMojo extends AbstractMojo {
 
     try {
       JavaDialect.packageName = packageName;
+      JavaDialect.stripPathSegments = stripPathSegments;
       JavaDialect.typePrefix = typePrefix == null ? "" : typePrefix;
       if (!new FastTool().generate(source.toURI(), dialect, outputDirectory)) {
         throw new MojoFailureException("Could not generate sources");

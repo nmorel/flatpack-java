@@ -64,6 +64,9 @@ public class Unpacker {
    */
   public <T> FlatPackEntity<T> unpack(Type returnType, Reader in, Principal principal)
       throws IOException {
+    if (configuration.isVerbose()) {
+      in = new VerboseReader(in);
+    }
     // Hold temporary state for deserialization
     DeserializationContext context = new DeserializationContext(configuration, typeContext,
         principal);

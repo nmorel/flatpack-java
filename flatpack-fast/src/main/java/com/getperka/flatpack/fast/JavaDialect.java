@@ -89,9 +89,13 @@ public class JavaDialect implements Dialect {
       defaultValue = "com.getperka.fast")
   static String packageName;
 
+  @Flag(tag = "stripPathSegments",
+      help = "The number of path segments to strip when creating method names", defaultValue = "0")
+  static Integer stripPathSegments;
+
   @Flag(tag = "typePrefix", help = "A prefix to apply to all generated type names",
       defaultValue = "")
-  static String typePrefix;
+  static String typePrefix = "";
 
   private static final Charset UTF8 = Charset.forName("UTF8");
   private static final List<Class<?>> WELL_KNOWN_TYPES = Arrays.<Class<?>> asList(
@@ -265,7 +269,7 @@ public class JavaDialect implements Dialect {
           String path = end.getPath();
           String[] parts = path.split(Pattern.quote("/"));
           StringBuilder sb = new StringBuilder();
-          for (int i = 3, j = parts.length; i < j; i++) {
+          for (int i = stripPathSegments, j = parts.length; i < j; i++) {
             try {
               String part = parts[i];
               if (part.length() == 0) {

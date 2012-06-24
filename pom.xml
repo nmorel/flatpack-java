@@ -40,8 +40,10 @@
 
   <modules>
     <module>apidoc-plugin</module>
-    <module>fast-plugin</module>
+    <module>demo-client</module>
+    <module>demo-server</module>
     <module>doclets</module>
+    <module>fast-plugin</module>
     <module>flatpack-client</module>
     <module>flatpack-core</module>
     <module>flatpack-fast</module>

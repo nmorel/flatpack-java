@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.Embedded;
@@ -250,6 +251,7 @@ public class Property extends BaseHasUuid {
 
   private Property() {}
 
+  @DenyAll
   public Codex<?> getCodex() {
     return codex;
   }
@@ -271,6 +273,7 @@ public class Property extends BaseHasUuid {
    * Returns the getter method for this Property. The returned method will have a non-{@code void}
    * return type and no parameters.
    */
+  @DenyAll
   public Method getGetter() {
     return getter;
   }
@@ -306,6 +309,7 @@ public class Property extends BaseHasUuid {
    * Returns the optional setter for the property. The returned method will have a single parameter
    * and a {@code void} return type.
    */
+  @DenyAll
   public Method getSetter() {
     return setter;
   }

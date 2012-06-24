@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.persistence.OneToMany;
@@ -114,6 +115,9 @@ public class TypeContext {
     if (name.startsWith("get") && name.length() > 3 ||
       name.startsWith("is") && name.length() > 2 && isBoolean(m.getReturnType())) {
 
+      if (m.isAnnotationPresent(DenyAll.class)) {
+        return false;
+      }
       if (m.isAnnotationPresent(PermitAll.class)) {
         return true;
       }
@@ -134,6 +138,9 @@ public class TypeContext {
    * Analogous to {@link #isGetter(Method)}.
    */
   private static boolean isSetter(Method m) {
+    if (m.isAnnotationPresent(DenyAll.class)) {
+      return false;
+    }
     if (m.getParameterTypes().length != 1) {
       return false;
     }
