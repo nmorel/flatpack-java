@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.getperka.flatpack</groupId>
     <artifactId>flatpack-parent</artifactId>
-    <version>2.6</version>
+    <version>2.7-SNAPSHOT</version>
   </parent>
   <properties>
     <com.getperka.packed-build-presets.mainClassName>
@@ -18,7 +18,7 @@
     <connection>scm:git:git@git.getperka.com:flatpack.git</connection>
     <url>scm:git:git@git.getperka.com:flatpack.git</url>
     <developerConnection>scm:git:git@git.getperka.com:flatpack.git</developerConnection>
-    <tag>flatpack-2.6</tag>
+    <tag>HEAD</tag>
   </scm>
   <dependencies>
     <dependency>
