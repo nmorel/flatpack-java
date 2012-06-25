@@ -19,6 +19,8 @@
  */
 package com.getperka.flatpack.demo.server;
 
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -51,6 +53,17 @@ public class DemoServer {
     // Attach the servlet to the Jetty server
     ServletContextHandler context = new ServletContextHandler(null, "/");
     context.addServlet(holder, "/");
+
+    /*
+     * Set up security handling. This will vary from container to container, however the important
+     * this is that something, somewhere maps each HTTP request to a java.security.Principal. In
+     * this app, the DummyAuthenticator is specific to Jetty and just looks for the presence of an
+     * isAdmin query parameter.
+     */
+    ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
+    sh.setAuthenticator(new DummyAuthenticator());
+    sh.setIdentityService(new DefaultIdentityService());
+    context.setSecurityHandler(sh);
 
     Server server = new Server(port);
     server.setHandler(context);

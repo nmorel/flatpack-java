@@ -57,18 +57,33 @@ public class DemoApplication extends Application {
     // Create the FlatPack configuration. This object adapts FlatPack behaviors to the local system.
     Configuration configuration = new Configuration()
         /*
-         * The EntityResolver is used when FlatPack deserializes a payload to retrieve a persistent
-         * entity to which properties in the incoming payload will be applied. Implementors that do
-         * not that need to manually merge incoming DTOs with persistent state may omit this
-         * configuration.
+         * The EntityResolver is optional and is used when FlatPack deserializes a payload to
+         * retrieve a persistent entity to which properties in the incoming payload will be applied.
+         * Implementors that do not that need to manually merge incoming DTOs with persistent state
+         * may omit this configuration.
          */
         .addEntityResolver(new FakeDatabaseResolver())
         /*
-         * The SearchTypeSource scans the classpath for HasUuid subtypes and determines the complete
-         * set of entity types that the FlatPack stack will operate on.
+         * At least one TypeSource is required. The TypeSources associated with a FlatPack stack
+         * determine the complete set of entity types that can be processed. This SearchTypeSource
+         * scans the classpath for HasUuid subtypes.
          */
         .addTypeSource(new SearchTypeSource("com.getperka.flatpack.demo.server"))
-        .withPrettyPrint(true);
+        .withPrettyPrint(true)
+        /*
+         * A PrincipalMapper is optional and, if present, enables the use principal-based property
+         * access restrictions whereby certain Principals are allowed to mutate only specific
+         * entities. This can be used, for example, to ensure that a Customer can only mutate
+         * properties that have an @InheritPrincipal chain back to the Customer.
+         */
+        .withPrincipalMapper(new DemoPrincipalMapper())
+        /*
+         * A RoleMapper enables role-based property access, which restricts property getters and
+         * setters based on @PermitAll / @DenyAll / @RolesAllowed annotations. Beyond just simple
+         * security measures, roles can be used to create sets of properties to reduce payload sizes
+         * (e.g. "CustomerSummary" vs. "CustomerDetail").
+         */
+        .withRoleMapper(new DemoRoleMapper());
     // The FlatPackResolver makes a FlatPack instance available through the Resources interface
     toReturn.add(new FlatPackResolver(configuration));
     // The FlatPackProvider installs MessageBodyReader/Writer behavior

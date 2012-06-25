@@ -21,6 +21,7 @@ package com.getperka.flatpack.demo.client;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -93,7 +95,9 @@ public class ClientSmokeTest {
 
     FlatPackEntity<?> entity = null;
     try {
-      api.productsPut(Collections.singletonList(p)).execute();
+      api.productsPut(Collections.singletonList(p))
+          .queryParameter("isAdmin", "true")
+          .execute();
       fail("Should have seen StatusCodeException");
     } catch (StatusCodeException e) {
       // The 400 status code is returned by the service method.
@@ -129,6 +133,57 @@ public class ClientSmokeTest {
   }
 
   /**
+   * Demonstrates the use of roles to restrict property setters.
+   */
+  @Test
+  public void testRolePropertyAccess() throws IOException {
+    // Create a Product
+    Product p = new Product();
+    UUID uuid = p.getUuid();
+    p.setName("Product");
+    p.setNotes("Some notes");
+    p.setPrice(BigDecimal.valueOf(42));
+    api.productsPut(Collections.singletonList(p))
+        .queryParameter("isAdmin", "true")
+        .execute();
+
+    // Try to update it with a non-admin request
+    p = new Product();
+    p.setUuid(uuid);
+    p.setPrice(BigDecimal.valueOf(1));
+    api.productsPut(Collections.singletonList(p))
+        .execute();
+
+    // Verify that nothing changed, as nobody
+    List<Product> products = api.productsGet().execute().getValue();
+    assertEquals(1, products.size());
+    p = products.get(0);
+    // Same UUID
+    assertEquals(uuid, p.getUuid());
+    // Unchanged price
+    assertEquals(BigDecimal.valueOf(42), p.getPrice());
+    // Can't see the notes
+    assertNull(p.getNotes());
+
+    // Now try the update again, as an admin
+    p = new Product();
+    p.setUuid(uuid);
+    p.setPrice(BigDecimal.valueOf(99));
+    api.productsPut(Collections.singletonList(p))
+        .queryParameter("isAdmin", "true")
+        .execute();
+
+    // Verify the changes, as nobody
+    products = api.productsGet().execute().getValue();
+    assertEquals(1, products.size());
+    p = products.get(0);
+    // Same UUID
+    assertEquals(uuid, p.getUuid());
+    // Unchanged price
+    assertEquals(BigDecimal.valueOf(99), p.getPrice());
+  }
+
+  /**
    * Demonstrates a couple of round-trips to the server.
    */
   @Test
@@ -137,15 +192,19 @@ public class ClientSmokeTest {
     assertEquals(0, product.size());
 
     // A server error would be reported as a StatusCodeException, a subclass of IOException
-    api.productsPut(Arrays.asList(makeProduct(), makeProduct())).execute();
+    api.productsPut(Arrays.asList(makeProduct(), makeProduct()))
+        .queryParameter("isAdmin", "true")
+        .execute();
 
     /*
      * The object returned from productsGet() is an endpoint-specific interface that may contain
-     * additional fluid setters for query parameters. It also provides access to some request
-     * internals, including the FlatPackEntity that will be sent as part of the request. This allows
-     * callers to further customize outgoing requests. The call to execute() triggers payload
-     * serialization and execution of the HTTP request. This returns a FlatPackEntity describing the
-     * response, and getValue() returns the primary value object contained in the payload.
+     * additional fluid setters for declared query parameters. It also provides access to some
+     * request internals, including the FlatPackEntity that will be sent as part of the request.
+     * This allows callers to further customize outgoing requests, in the above case to add the
+     * isAdmin query parameter that interacts with the DummyAuthenticator. The call to execute()
+     * triggers payload serialization and execution of the HTTP request. This returns a
+     * FlatPackEntity describing the response, and getValue() returns the primary value object
+     * contained in the payload.
      */
     product = api.productsGet().execute().getValue();
     assertEquals(2, product.size());
