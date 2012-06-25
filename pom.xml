@@ -8,7 +8,7 @@
   <packaging>pom</packaging>
   <name>Flatpack</name>
   <description>An entity serialization framework</description>
-  <url>https://github.com/perka/flatpack</url>
+  <url>https://github.com/perka/flatpack-java</url>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -17,9 +17,9 @@
     </license>
   </licenses>
   <scm>
-    <url>https://github.com/perka/flatpack</url>
-    <connection>scm:git:git@github.com:perka/flatpack.git</connection>
-    <developerConnection>scm:git:git@github.com:perka/flatpack.git</developerConnection>
+    <url>https://github.com/perka/flatpack-java</url>
+    <connection>scm:git:git@github.com:perka/flatpack-java.git</connection>
+    <developerConnection>scm:git:git@github.com:perka/flatpack-java.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
   <developers>
@@ -42,16 +42,16 @@
   <!-- The eclipse-plugin project isn't listed here because it only changes 
     when new maven plugins are added. -->
   <modules>
+    <module>apidoc</module>
     <module>apidoc-plugin</module>
+    <module>client</module>
+    <module>core</module>
     <module>demo-client</module>
     <module>demo-server</module>
-    <module>doclets</module>
+    <module>fast</module>
     <module>fast-plugin</module>
-    <module>flatpack-client</module>
-    <module>flatpack-core</module>
-    <module>flatpack-fast</module>
-    <module>flatpack-jersey</module>
-    <module>flatpack-search</module>
+    <module>jersey</module>
+    <module>search</module>
   </modules>
 
 
