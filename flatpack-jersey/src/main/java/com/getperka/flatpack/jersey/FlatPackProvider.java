@@ -39,7 +39,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
@@ -69,8 +68,6 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
 
   @Context
   Providers providers;
-  @Context
-  SecurityContext securityContext;
   private FlatPack flatpack;
 
   /**
@@ -79,9 +76,7 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
    */
   @Override
   public ContainerRequest filter(ContainerRequest request) {
-    if (securityContext != null) {
-      requestPrincipal.set(securityContext.getUserPrincipal());
-    }
+    requestPrincipal.set(request.getUserPrincipal());
     return request;
   }
 
@@ -112,7 +107,7 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
           type = t.getClass();
         }
         if (getFlatPack().isRootType(type)) {
-          Principal principal = requestPrincipal.get();
+          Principal principal = request.getUserPrincipal();
           toSend = FlatPackEntity.create(type, t, principal);
         } else {
           toSend = null;

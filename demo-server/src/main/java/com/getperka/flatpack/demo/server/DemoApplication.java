@@ -19,7 +19,7 @@
  */
 package com.getperka.flatpack.demo.server;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class DemoApplication extends Application {
 
   @Override
   public Set<Object> getSingletons() {
-    Set<Object> toReturn = new HashSet<Object>();
+    Set<Object> toReturn = new LinkedHashSet<Object>();
     // Create the FlatPack configuration. This object adapts FlatPack behaviors to the local system.
     Configuration configuration = new Configuration()
         /*
