@@ -18,4 +18,4 @@ FlatPack is serialization framework used by Perka to make its JPA entities avail
 * `apidoc-plugin`, `dockets` are used during the maven build process to make JavaDoc strings available to `ApiDescriber`
 * `flatpack-search` is grungy utility code
 * `demo-client` and `demo-server` show a very simple JAX-RS server and how to use generated client code. The `demo-client` module also contains smoke-tests.
-* `eclipse-plugin` contains an m2eclipse connector for the FlatPack plugins.
+* `eclipse-plugin` contains an m2eclipse connector for the FlatPack plugins. A pre-built drop-in is available at from [the project downloads](https://github.com/perka/flatpack/downloads).
