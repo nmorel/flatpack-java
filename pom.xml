@@ -34,9 +34,9 @@
   </developers>
 
   <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <groupId>com.getperka</groupId>
+    <artifactId>perka-oss-parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
 
   <!-- The eclipse-plugin project isn't listed here because it only changes 
@@ -73,95 +73,13 @@
 
   <build>
     <plugins>
-      <!-- compiler plugin -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
-        <configuration>
-          <compilerArgument>-proc:none</compilerArgument>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-
-      <!-- release plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.3.2</version><!--$NO-MVN-MAN-VER$ -->
         <configuration>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
           <tagNameFormat>flatpack-@{project.version}</tagNameFormat>
-          <arguments>-Psonatype-oss-release -Pperka-release</arguments>
         </configuration>
-      </plugin>
-
-      <!-- Disallow use of transitive dependencies without declaring them. -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <ignoreNonCompile>true</ignoreNonCompile>
-          <failOnWarning>true</failOnWarning>
-          <outputXML>true</outputXML>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>analyze-only</goal>
-            </goals>
-            <phase>test</phase>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <!-- Activated by the release-plugin configuration -->
-      <id>perka-release</id>
-      <build>
-        <plugins>
-          <!-- Keep our licensing story straight -->
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>license-maven-plugin</artifactId>
-            <version>1.1</version>
-            <configuration>
-              <inceptionYear>2012</inceptionYear>
-              <licenseName>apache_v2</licenseName>
-              <organizationName>Perka Inc.</organizationName>
-              <roots>
-                <root>src/main</root>
-                <root>src/test</root>
-              </roots>
-            </configuration>
-            <executions>
-              <execution>
-                <id>first</id>
-                <goals>
-                  <goal>update-project-license</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>second</id>
-                <goals>
-                  <goal>update-file-header</goal>
-                </goals>
-                <phase>process-sources</phase>
-                <configuration>
-                  <extraExtensions>
-                    <stg>java</stg>
-                  </extraExtensions>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
