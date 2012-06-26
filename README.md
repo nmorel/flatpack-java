@@ -15,7 +15,7 @@ FlatPack is serialization framework used by Perka to make its JPA entities avail
 * `client` provides support code for generated client libraries.
 * `core` contains the serialization logic. The central types are `FlatPack`, `Packer`, and `Unpacker`.
 * `demo-client` and `demo-server` show a very simple JAX-RS server and how to use generated client code. The `demo-client` module also contains smoke-tests.
-* `eclipse-plugin` contains an m2eclipse connector for the FlatPack plugins. A pre-built drop-in is available at from [the project downloads](https://github.com/perka/flatpack/downloads).
+* `eclipse-plugin` contains an m2eclipse connector for the FlatPack plugins. A pre-built drop-in is available at from [the project downloads](https://github.com/perka/flatpack-java/downloads).
 * `fast` and `fast-plugin`, the FlatPack Automatic Source Tool, take an `ApiDescription` and generate client access libraries consisting of DTO objects and API request methods.
 * `jersey` wires FlatPack into Jersey's request dispatch logic. The `ApiDescriber` type will produce a FlatPack description of the API server's methods and entities.
 * `search` is utility code.
