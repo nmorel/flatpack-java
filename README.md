@@ -19,3 +19,7 @@ FlatPack is serialization framework used by Perka to make its JPA entities avail
 * `fast` and `fast-plugin`, the FlatPack Automatic Source Tool, take an `ApiDescription` and generate client access libraries consisting of DTO objects and API request methods.
 * `jersey` wires FlatPack into Jersey's request dispatch logic. The `ApiDescriber` type will produce a FlatPack description of the API server's methods and entities.
 * `search` is utility code.
+
+## More Information
+
+Additional documentation is available in the [FlatPack wiki](https://github.com/perka/flatpack-java/wiki).
