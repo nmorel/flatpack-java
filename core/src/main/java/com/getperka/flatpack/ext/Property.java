@@ -21,6 +21,7 @@ package com.getperka.flatpack.ext;
 
 import static com.getperka.flatpack.util.FlatPackTypes.UTF8;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,14 +61,13 @@ public class Property extends BaseHasUuid {
       if (allowAll) {
         toReturn.getterRoles = toReturn.setterRoles = allRoles;
       } else {
-        toReturn.getterRoles = extractRoles(toReturn.roleMapper, toReturn.getter);
-        toReturn.setterRoles = extractRoles(toReturn.roleMapper, toReturn.setter);
         toReturn.getterRoleNames = extractRoleNames(toReturn.getter);
         toReturn.setterRoleNames = extractRoleNames(toReturn.setter);
-        if (toReturn.setterRoles.isEmpty()) {
-          toReturn.setterRoles = toReturn.getterRoles;
+        if (toReturn.setterRoleNames == noRoleNames) {
           toReturn.setterRoleNames = toReturn.getterRoleNames;
         }
+        toReturn.getterRoles = extractRoles(toReturn.roleMapper, toReturn.getterRoleNames);
+        toReturn.setterRoles = extractRoles(toReturn.roleMapper, toReturn.setterRoleNames);
       }
 
       // Compute a stable UUID for referring to the property
@@ -152,6 +152,8 @@ public class Property extends BaseHasUuid {
    */
   private interface AllRolesView {}
 
+  private interface NoRolesView {}
+
   /**
    * Sorts Property objects by {@link #getName()}.
    */
@@ -162,15 +164,21 @@ public class Property extends BaseHasUuid {
     }
   };
 
-  private static final Set<Class<?>> allRoles =
+  static final Set<Class<?>> allRoles =
       Collections.<Class<?>> singleton(AllRolesView.class);
-  private static final Set<String> allRoleNames = Collections.singleton("*");
+  static final Set<Class<?>> noRoles =
+      Collections.<Class<?>> singleton(NoRolesView.class);
+  static final Set<String> allRoleNames = Collections.singleton("*");
+  static final Set<String> noRoleNames = Collections.singleton("");
 
-  private static boolean checkRoles(RoleMapper roleMapper, Collection<Class<?>> required,
+  static boolean checkRoles(RoleMapper roleMapper, Collection<Class<?>> required,
       Collection<String> credentials) {
     // Object comparison intentional
     if (roleMapper == null || required == allRoles) {
       return true;
+    }
+    if (required == null || required.isEmpty()) {
+      return false;
     }
     for (String cred : credentials) {
       Class<?> credView = roleMapper.mapRole(cred);
@@ -187,41 +195,61 @@ public class Property extends BaseHasUuid {
   }
 
   /**
-   * Returns the role names associated with the method. A {@code null} return value indicates that
-   * all roles are permitted, while an empty return value means that no roles are permitted.
+   * Returns the role names associated with a method or class. This method never returns
+   * {@code null}, however there are several special return values:
+   * <ul>
+   * <li>{@link #noRoleNames} indicates that no access information was set
+   * <li>{@link #allRoleNames} indicates that access should be allowed for all roles
+   * <li>An empty set indicates access should be denied for all roles
+   * </ul>
    */
-  private static Set<String> extractRoleNames(Method method) {
+  static Set<String> extractRoleNames(AnnotatedElement obj) {
     // Map no method to none-allowed
-    if (method == null) {
+    if (obj == null) {
+      return noRoleNames;
+    }
+    if (obj.isAnnotationPresent(DenyAll.class)) {
       return Collections.emptySet();
     }
-    if (method.isAnnotationPresent(PermitAll.class)) {
+    if (obj.isAnnotationPresent(PermitAll.class)) {
       return allRoleNames;
     }
-    RolesAllowed view = method.getAnnotation(RolesAllowed.class);
+    RolesAllowed view = obj.getAnnotation(RolesAllowed.class);
     if (view == null) {
-      return Collections.emptySet();
+      return noRoleNames;
     }
     Set<String> toReturn = FlatPackCollections.setForIteration();
     toReturn.addAll(Arrays.asList(view.value()));
+    if (toReturn.isEmpty()) {
+      return Collections.emptySet();
+    }
     return Collections.unmodifiableSet(toReturn);
   }
 
-  private static Set<Class<?>> extractRoles(RoleMapper mapper, Method method) {
-    if (mapper == null || method == null) {
-      return Collections.emptySet();
+  /**
+   * Extract role information from a method or its declaring class.
+   */
+  static Set<String> extractRoleNames(Method method) {
+    if (method == null) {
+      return noRoleNames;
     }
+    Set<String> toReturn = extractRoleNames((AnnotatedElement) method);
+    if (noRoleNames == toReturn) {
+      toReturn = extractRoleNames(method.getDeclaringClass());
+    }
+    return toReturn;
+  }
 
-    if (method.isAnnotationPresent(PermitAll.class)) {
+  static Set<Class<?>> extractRoles(RoleMapper mapper, Set<String> roleNames) {
+    // Object comparison intentional
+    if (mapper == null || roleNames == null || noRoleNames == roleNames) {
+      return noRoles;
+    }
+    if (allRoleNames == roleNames) {
       return allRoles;
     }
-
-    RolesAllowed view = method.getAnnotation(RolesAllowed.class);
-    if (view == null) {
-      return Collections.emptySet();
-    }
     Set<Class<?>> toReturn = FlatPackCollections.setForIteration();
-    for (String name : view.value()) {
+    for (String name : roleNames) {
       toReturn.add(mapper.mapRole(name));
     }
     return Collections.unmodifiableSet(toReturn);
