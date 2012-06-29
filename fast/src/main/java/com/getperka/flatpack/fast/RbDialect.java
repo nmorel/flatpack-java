@@ -274,6 +274,9 @@ public class RbDialect implements Dialect {
                 return supertype;
               }
             } else if ("simpleName".equals(propertyName)) {
+              if (entity.getTypeName().equals("baseHasUuid")) {
+                return "Flatpack::Core::" + BaseHasUuid.class.getSimpleName();
+              }
               return upcase(entity.getTypeName());
             }
             return super.getProperty(interp, self, o, property, propertyName);

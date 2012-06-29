@@ -15,11 +15,13 @@ end
 entity(entity) ::= <<
 # Generated File - DO NOT EDIT
 
+require 'flatpack_core'
+
 module <names.moduleName>
   module <names.modelModuleName> 
 
     <docString(entity.docString)>
-    def <entity.simpleName> <if(entity.supertype.simpleName)>\< <entity.supertype.simpleName><endif>
+    class <entity.simpleName> <if(entity.supertype.simpleName)>\< <entity.supertype.simpleName><endif>
   
       <entity.properties:field(); separator="\n">
     
