@@ -49,7 +49,7 @@ attr_accessor :<property.attrName>
 %>
 
 /**
- * Emit a JavaDoc string, reflowed to fit the current context.
+ * Emit a doc string, reflowed to fit the current context.
  */
 docString(docString) ::= <<
 <if(docString)>
@@ -73,17 +73,21 @@ propertyRoles(kind) ::= <%
 /**
  * Generate an API accessor stub.
  */
-api(api, packageName, namePrefix) ::= <<
-// Generated File - DO NOT EDIT
-package <packageName>;
+api(api) ::= <<
+# Generated File - DO NOT EDIT
+require 'flatpack_core'
 
-public class <namePrefix>Api extends <names.ApiBase> {
-  public <namePrefix>Api(<names.FlatPack> flatpack) {
-    super(flatpack);
-  }
-
-  <api.endpoints:endpoint(); separator="\n">
-}
+module <names.moduleName>
+  class Api \< Flatpack::Client::BaseApi
+  
+    def initialize(flatpack)
+      @flatpack = flatpack
+    end
+      
+    <api.endpoints:endpoint(); separator="\n">
+      
+  end
+end
 >>
 
 /**

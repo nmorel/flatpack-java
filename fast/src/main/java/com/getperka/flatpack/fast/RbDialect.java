@@ -68,15 +68,6 @@ public class RbDialect implements Dialect {
         .toLowerCase();
   }
 
-  static String underscoreToCamelCase(String s) {
-    String[] parts = s.split("_|-");
-    String camelCaseString = "";
-    for (String part : parts) {
-      camelCaseString = camelCaseString + upcase(part);
-    }
-    return camelCaseString;
-  }
-
   private static String upcase(String s) {
     return Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
@@ -148,10 +139,8 @@ public class RbDialect implements Dialect {
      */
 
     // Render the Api convenience class
-    // ST apiST = group.getInstanceOf("api")
-    // .add("api", api);
-
-    // render(apiST, packageDir, namePrefix + "Api");
+    ST apiST = group.getInstanceOf("api").add("api", api);
+    render(apiST, moduleOutput, "api");
 
     // Emit a manifest of all generated types ST typeSourceST =
     /*
