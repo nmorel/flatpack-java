@@ -263,21 +263,34 @@ public class RbDialect implements Dialect {
           public Object getProperty(Interpreter interp, ST self, Object o,
               Object property, String propertyName)
               throws STNoSuchPropertyException {
+
             EntityDescription entity = (EntityDescription) o;
             if ("payloadName".equals(propertyName)) {
               return entity.getTypeName();
-            } else if ("supertype".equals(propertyName)) {
+            }
+
+            else if ("supertype".equals(propertyName)) {
               EntityDescription supertype = entity.getSupertype();
               if (supertype == null) {
                 return BaseHasUuid.class.getCanonicalName();
               } else {
                 return supertype;
               }
-            } else if ("simpleName".equals(propertyName)) {
+            }
+
+            else if ("simpleName".equals(propertyName)) {
               if (entity.getTypeName().equals("baseHasUuid")) {
                 return "Flatpack::Core::" + BaseHasUuid.class.getSimpleName();
               }
               return upcase(entity.getTypeName());
+            }
+
+            else if ("requireName".equals(propertyName)) {
+              if (entity.getTypeName().equals("baseHasUuid")) {
+                return "flatpack_core";
+              }
+              return gemName + "/" + camelCaseToUnderscore(modelModuleName) + "/"
+                + camelCaseToUnderscore(entity.getTypeName());
             }
             return super.getProperty(interp, self, o, property, propertyName);
           }
@@ -303,12 +316,8 @@ public class RbDialect implements Dialect {
           Object property, String propertyName)
           throws STNoSuchPropertyException {
         Property p = (Property) o;
-        if ("getterName".equals(propertyName)) {
-          return upcase(p.getName());
-        } else if ("getterPermitAll".equals(propertyName)) {
-          return Collections.singleton("*").equals(p.getGetterRoleNames());
-        } else if ("setterPermitAll".equals(propertyName)) {
-          return Collections.singleton("*").equals(p.getSetterRoleNames());
+        if ("attrName".equals(propertyName)) {
+          return camelCaseToUnderscore(p.getName());
         }
         return super.getProperty(interp, self, o, property, propertyName);
       }

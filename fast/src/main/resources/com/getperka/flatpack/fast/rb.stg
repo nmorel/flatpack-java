@@ -15,7 +15,9 @@ end
 entity(entity) ::= <<
 # Generated File - DO NOT EDIT
 
-require 'flatpack_core'
+<if(entity.supertype.requireName)>
+require '<entity.supertype.requireName>'
+<endif>
 
 module <names.moduleName>
   module <names.modelModuleName> 
@@ -43,7 +45,7 @@ public enum <enum> {
 field(property) ::= <%
 <docString(property.docString)>
 
-attr_accessor :<property.name>
+attr_accessor :<property.attrName>
 %>
 
 /**
