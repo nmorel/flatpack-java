@@ -75,7 +75,7 @@ propertyRoles(kind) ::= <%
  */
 api(api) ::= <<
 # Generated File - DO NOT EDIT
-require 'flatpack_core'
+require 'flatpack_client'
 
 module <names.moduleName>
   class Api \< Flatpack::Client::BaseApi
@@ -85,82 +85,80 @@ module <names.moduleName>
     end
       
     <api.endpoints:endpoint(); separator="\n">
-      
+    
+    private
+    
+    <api.endpoints:endpointPrivate()>
+    
   end
 end
 >>
+
+endpointPrivate(end) ::= <%
+
+<if(end.returnType)>
+  <endpointPrivateFlatPack(end)>
+<else>
+  <endpointPrivateConnectionResponse(end)>
+<endif> 
+
+%>
+
+endpointPrivateFlatPack(end) ::= <%
+
+<if(end.queryParameters)>
+<\n>
+<\n>
+class <end.className> \< Flatpack::Client::FlatpackRequest
+  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
+<\n>
+end
+<endif>
+
+%>
+
+endpointPrivateConnectionResponse(end) ::= <%
+<if(end.queryParameters)>
+<\n>
+<\n>
+class <end.className> \< Flatpack::Client::ConnectionRequest
+  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
+<\n>
+end
+<endif>
+
+%>
 
 /**
  * Select the kind of endpoint, either one that's documented to return a FlatPackEntity
  * or just return a HttpURLConnection for anything else.
  */
 endpoint(end) ::= <%
-<if(end.returnType)>
-  <endpointFlatPack(end)>
-<else>
-  <endpointConnectionResponse(end)>
-<endif> 
+  <\n>
+  <docString(end.docString)>
+  def <end.methodName><endpointArgList()><\n>
+    <if(end.queryParameters)>
+      to_return = <end.className>.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
+    <else>
+      <if(end.returnType)>
+      to_return = Flatpack::Client::FlatpackRequest.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
+      <else>
+      to_return = Flatpack::Client::ConnectionRequest.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
+      <endif>
+    <endif>
+    <\n>
+    <if(end.entity)>to_return.entity = entity<\n><endif>
+    to_return<\n>
+  end
 %>
-
-/**
- * Generates interfaces and methods for API methods that don't use flatpack.
- */
-endpointConnectionResponse(end) ::= <<
-public interface <end.javaNameUpcase> extends <names.Request>\<<end.javaNameUpcase>, <names.HttpURLConnection>\> {
-  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
-}
-
-private class <end.javaNameUpcase>Impl
-    extends <names.ConnectionRequestBase>\<<end.javaNameUpcase>\>
-    implements <end.javaNameUpcase> {
-  public <end.javaNameUpcase>Impl(Object... args) {
-    super(<namePrefix>Api.this, "<end.method>", "<end.pathDecoded>", args);
-  }
-  <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
-}
-
-<docString(end.docString)>
-public <end.javaNameUpcase> <end.javaName>(<endpointArgList()>) {
-  <end.javaNameUpcase>Impl toReturn =
-      new <end.javaNameUpcase>Impl(<end.pathParameters:{x|<x.name>}; separator=", ">);
-  <if(end.entity)>toReturn.setEntity(entity);<endif>
-  return toReturn;
-}
->>
-
-/**
- * Generates interfaces and methods for API methods that are fully-flatpacked.
- */
-endpointFlatPack(end) ::= <<
-public interface <end.javaNameUpcase> extends <names.FlatPackRequest>\<<end.javaNameUpcase>, <end.returnType>\> {
-  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
-}
-
-private class <end.javaNameUpcase>Impl
-    extends <names.FlatPackRequestBase>\<<end.javaNameUpcase>, <end.returnType>\>
-    implements <end.javaNameUpcase> {
-  public <end.javaNameUpcase>Impl(Object... args) {
-    super(<namePrefix>Api.this, <endpointCreateType(end.returnType)>, "<end.method>", "<end.pathDecoded>", args);
-  }
-  <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
-}
-
-<docString(end.docString)>
-public <end.javaNameUpcase> <end.javaName>(<endpointArgList()>) {
-  <end.javaNameUpcase>Impl toReturn =
-      new <end.javaNameUpcase>Impl(<end.pathParameters:{x|<x.name>}; separator=", ">);
-  <if(end.entity)>toReturn.setEntity(entity);<endif>
-  return toReturn;
-}
->>
 
 endpointArgList() ::= <%
 <if(end.entity && end.pathParameters)>
-  <end.entity> entity, <end.pathParameters:{x |<x.type> <x.name>}; separator=", ">
+  (entity, <end.pathParameters:{x |<x.name>}; separator=", ">)
 <elseif(end.entity)>
-  <end.entity> entity
-<else>
-  <end.pathParameters:{x |<x.type> <x.name>}; separator=", ">
+  (entity)
+<elseif(end.pathParameters)>
+  (<end.pathParameters:{x |<x.name>}; separator=", ">)
 <endif>
 %>
 
@@ -178,18 +176,11 @@ endpointPathParameters() ::= <%
 <end.pathParameters:{x |<x.name>}; separator=", ">
 %>
 
-/**
- * Create a stub method declaration for a request interface.
- */
 endpointQueryParameterStub(param) ::= <<
-<docString(param.docString)>
-<end.javaNameUpcase> with<param.javaNameUpcase>(<param.type> <param.name>);
->>
-
-endpointQueryParameterImpl(param) ::= <<
-public <end.javaNameUpcase> with<param.javaNameUpcase>(<param.type> <param.name>) {
-  return queryParameter("<param.name>", <param.name>);
-}
+  <docString(param.docString)>
+  def with_<param.underscoreName>(<param.underscoreName>)
+    query_parameter('<param.name>', <param.underscoreName>);
+  end
 >>
 
 typeSource(allEntities, packageName, namePrefix) ::= <<

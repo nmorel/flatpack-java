@@ -114,6 +114,7 @@ public class RbDialect implements Dialect {
 
     // rendr the list of require statements
     List<String> requires = new ArrayList<String>();
+    requires.add(gemName + "/api");
     for (EntityDescription desc : allEntities.values()) {
       requires.add(gemName + "/model/"
         + camelCaseToUnderscore(desc.getTypeName()));
@@ -197,9 +198,8 @@ public class RbDialect implements Dialect {
               Object property, String propertyName)
               throws STNoSuchPropertyException {
             EndpointDescription end = (EndpointDescription) o;
-            if ("javaName".equals(propertyName)
-              || "javaNameUpcase".equals(propertyName)) {
-              // Convert a path like /api/2/foo/bar/{}/baz to fooBarBazMethod
+            if ("className".equals(propertyName) || "methodName".equals(propertyName)) {
+              // Convert a path like /api/2/foo/bar/{}/baz to FooBarBazMethod
               String path = end.getPath();
               String[] parts = path.split(Pattern.quote("/"));
               StringBuilder sb = new StringBuilder();
@@ -228,11 +228,9 @@ public class RbDialect implements Dialect {
                 }
               }
               sb.append(upcase(end.getMethod().toLowerCase()));
-              String javaName = sb.toString();
-              if ("javaNameUpcase".equals(propertyName)) {
-                javaName = upcase(javaName);
-              }
-              return javaName;
+              String name = sb.toString();
+
+              return "className".equals(propertyName) ? upcase(name) : camelCaseToUnderscore(name);
             } else if ("pathDecoded".equals(propertyName)) {
               // URL-decode the path in the endpoint description
               try {
@@ -292,8 +290,8 @@ public class RbDialect implements Dialect {
               Object property, String propertyName)
               throws STNoSuchPropertyException {
             ParameterDescription param = (ParameterDescription) o;
-            if ("javaNameUpcase".equals(propertyName)) {
-              return upcase(param.getName());
+            if ("underscoreName".equals(propertyName)) {
+              return camelCaseToUnderscore(param.getName());
             }
             return super.getProperty(interp, self, o, property, propertyName);
           }
