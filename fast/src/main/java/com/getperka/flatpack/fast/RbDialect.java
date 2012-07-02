@@ -258,11 +258,7 @@ public class RbDialect implements Dialect {
 
             else if ("supertype".equals(propertyName)) {
               EntityDescription supertype = entity.getSupertype();
-              if (supertype == null) {
-                return BaseHasUuid.class.getCanonicalName();
-              } else {
-                return supertype;
-              }
+              return supertype == null ? new EntityDescription("baseHasUuid", null) : supertype;
             }
 
             else if ("simpleName".equals(propertyName)) {

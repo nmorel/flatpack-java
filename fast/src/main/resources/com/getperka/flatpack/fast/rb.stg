@@ -23,8 +23,8 @@ module <names.moduleName>
   module <names.modelModuleName> 
 
     <docString(entity.docString)>
-    class <entity.simpleName> <if(entity.supertype.simpleName)>\< <entity.supertype.simpleName><endif>
-  
+    class <entity.simpleName> \< <entity.supertype.simpleName>
+    
       <entity.properties:field(); separator="\n">
     
     end
@@ -91,20 +91,6 @@ module <names.moduleName>
 end
 >>
 
-endpointPrivate(end) ::= <<
-<if(end.queryParameters)>
-class <end.className> \< Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>
-    
-  def initialize(*args)
-    super("<end.method>", "<end.pathDecoded>", *args)
-  end
-      
-  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
-end
-    
-<endif>
->>
-
 /**
  * Select the kind of endpoint, either one that's documented to return a FlatPackEntity
  * or just return a HttpURLConnection for anything else.
@@ -113,14 +99,28 @@ endpoint(end) ::= <<
 <docString(end.docString)>
 def <end.methodName><endpointArgList()>
   <if(end.queryParameters)>
-  to_return = <end.className>.new<if(end.pathParameters)>(<end.pathParameters:{x|<x.name>}; separator=", ">)<endif>
+  to_return = <end.className>.new(self<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
   <else>
-  to_return = Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>.new("<end.method>", "<end.pathDecoded>"<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
+  to_return = Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>.new(self, "<end.method>", "<end.pathDecoded>"<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
   <endif>
   <if(end.entity)>to_return.entity = entity<endif>
   to_return
 end
 
+>>
+
+endpointPrivate(end) ::= <<
+<if(end.queryParameters)>
+class <end.className> \< Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>
+    
+  def initialize(api, *args)
+    super(api, "<end.method>", "<end.pathDecoded>", *args)
+  end
+      
+  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
+end
+    
+<endif>
 >>
 
 endpointArgList() ::= <%
