@@ -43,18 +43,17 @@ public enum <enum> {
 >>
 
 field(property) ::= <%
-<docString(property.docString)>
 
+<docString(property.docString)>
 attr_accessor :<property.attrName>
+
 %>
 
 /**
  * Emit a doc string, reflowed to fit the current context.
  */
 docString(docString) ::= <<
-<if(docString)>
-# <docString.chunks; wrap="\n# ", separator=" ">
-<endif>
+<if(docString)># <docString.chunks; wrap="\n# ", separator=" "><endif>
 >>
 
 /**
@@ -85,72 +84,44 @@ module <names.moduleName>
     end
       
     <api.endpoints:endpoint(); separator="\n">
-    
     private
     
     <api.endpoints:endpointPrivate()>
-    
   end
 end
 >>
 
-endpointPrivate(end) ::= <%
-
-<if(end.returnType)>
-  <endpointPrivateFlatPack(end)>
-<else>
-  <endpointPrivateConnectionResponse(end)>
-<endif> 
-
-%>
-
-endpointPrivateFlatPack(end) ::= <%
-
+endpointPrivate(end) ::= <<
 <if(end.queryParameters)>
-<\n>
-<\n>
-class <end.className> \< Flatpack::Client::FlatpackRequest
+class <end.className> \< Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>
+    
+  def initialize(*args)
+    super("<end.method>", "<end.pathDecoded>", *args)
+  end
+      
   <end.queryParameters:endpointQueryParameterStub(); separator="\n">
-<\n>
 end
+    
 <endif>
-
-%>
-
-endpointPrivateConnectionResponse(end) ::= <%
-<if(end.queryParameters)>
-<\n>
-<\n>
-class <end.className> \< Flatpack::Client::ConnectionRequest
-  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
-<\n>
-end
-<endif>
-
-%>
+>>
 
 /**
  * Select the kind of endpoint, either one that's documented to return a FlatPackEntity
  * or just return a HttpURLConnection for anything else.
  */
-endpoint(end) ::= <%
-  <\n>
-  <docString(end.docString)>
-  def <end.methodName><endpointArgList()><\n>
-    <if(end.queryParameters)>
-      to_return = <end.className>.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
-    <else>
-      <if(end.returnType)>
-      to_return = Flatpack::Client::FlatpackRequest.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
-      <else>
-      to_return = Flatpack::Client::ConnectionRequest.new(<end.pathParameters:{x|<x.name>}; separator=", ">)
-      <endif>
-    <endif>
-    <\n>
-    <if(end.entity)>to_return.entity = entity<\n><endif>
-    to_return<\n>
-  end
-%>
+endpoint(end) ::= <<
+<docString(end.docString)>
+def <end.methodName><endpointArgList()>
+  <if(end.queryParameters)>
+  to_return = <end.className>.new<if(end.pathParameters)>(<end.pathParameters:{x|<x.name>}; separator=", ">)<endif>
+  <else>
+  to_return = Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>.new("<end.method>", "<end.pathDecoded>"<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
+  <endif>
+  <if(end.entity)>to_return.entity = entity<endif>
+  to_return
+end
+
+>>
 
 endpointArgList() ::= <%
 <if(end.entity && end.pathParameters)>
@@ -177,10 +148,11 @@ endpointPathParameters() ::= <%
 %>
 
 endpointQueryParameterStub(param) ::= <<
-  <docString(param.docString)>
-  def with_<param.underscoreName>(<param.underscoreName>)
-    query_parameter('<param.name>', <param.underscoreName>);
-  end
+<docString(param.docString)>
+def with_<param.underscoreName>(<param.underscoreName>)
+  query_parameter('<param.name>', <param.underscoreName>);
+end
+
 >>
 
 typeSource(allEntities, packageName, namePrefix) ::= <<
