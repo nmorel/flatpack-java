@@ -19,8 +19,10 @@
  */
 package com.getperka.flatpack.doclets;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.stream.JsonWriter;
+import com.sun.javadoc.AnnotationDesc;
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.Doc;
 import com.sun.javadoc.FieldDoc;
@@ -40,12 +43,17 @@ import com.sun.javadoc.MethodDoc;
 import com.sun.javadoc.PackageDoc;
 import com.sun.javadoc.ParamTag;
 import com.sun.javadoc.Parameter;
+import com.sun.javadoc.ProgramElementDoc;
 import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.SeeTag;
+import com.sun.javadoc.SourcePosition;
 import com.sun.javadoc.Tag;
 
 @SuppressWarnings("restriction")
 public class DocStringsDoclet {
+  private static final String EXAMPLE_TYPE_NAME = "com.getperka.flatpack.Example";
+  private static final Charset UTF8 = Charset.forName("UTF8");
+
   public static LanguageVersion languageVersion() {
     return LanguageVersion.JAVA_1_5;
   }
@@ -78,7 +86,33 @@ public class DocStringsDoclet {
   private File outputDir;
   private Map<PackageDoc, JsonWriter> writersByPackage = new HashMap<PackageDoc, JsonWriter>();
 
-  private static final Charset UTF8 = Charset.forName("UTF8");
+  private int braceCount(CharSequence chars, int count) {
+    for (int i = 0, j = chars.length(); i < j; i++) {
+      switch (chars.charAt(i)) {
+        case '{':
+          count++;
+          break;
+        case '}':
+          count--;
+          break;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Counts the number of leading whitespace characters to compute the amount of padding to apply to
+   * extracted method contents. Returns {@link Integer#MAX_VALUE} if the string is empty or contains
+   * only whitespace.
+   */
+  private int countInitialWhitespace(CharSequence chars) {
+    for (int i = 0, j = chars.length(); i < j; i++) {
+      if (!Character.isWhitespace(chars.charAt(i))) {
+        return i;
+      }
+    }
+    return Integer.MAX_VALUE;
+  }
 
   private String docString(Doc doc) {
     return docString(doc.inlineTags());
@@ -120,9 +154,16 @@ public class DocStringsDoclet {
   private void examineClass(ClassDoc clazz) throws IOException {
     JsonWriter writer = getJsonWriter(clazz);
 
+    String classKey = key(clazz);
+    // Possibly extract the class's contents
+    if (hasAnnotation(clazz, EXAMPLE_TYPE_NAME)) {
+      String contents = extractContents(clazz);
+      writer.name(classKey + ":contents");
+      writer.value(contents);
+    }
     String doc = docString(clazz);
     if (!doc.isEmpty()) {
-      writer.name(key(clazz));
+      writer.name(classKey);
       writer.value(doc);
     }
 
@@ -136,11 +177,20 @@ public class DocStringsDoclet {
     }
 
     for (MethodDoc m : clazz.methods(true)) {
+      String methodKey = key(m);
+
+      // Possibly extract the method's contents
+      if (hasAnnotation(m, EXAMPLE_TYPE_NAME)) {
+        String contents = extractContents(m);
+        writer.name(methodKey + ":contents");
+        writer.value(contents);
+      }
+
       doc = docString(m);
       if (doc.isEmpty()) {
         continue;
       }
-      writer.name(key(m));
+      writer.name(methodKey);
       writer.value(doc);
 
       Map<String, Integer> namesToPositions = new HashMap<String, Integer>();
@@ -153,7 +203,7 @@ public class DocStringsDoclet {
         if (position == null) {
           continue;
         }
-        writer.name(key(m) + "[" + position + "]");
+        writer.name(methodKey + "[" + position + "]");
         writer.value(docString(tag));
       }
     }
@@ -168,6 +218,49 @@ public class DocStringsDoclet {
       writer.endObject();
       writer.close();
     }
+  }
+
+  private String extractContents(Doc doc) throws IOException {
+    SourcePosition position = doc.position();
+    File f = position.file();
+    if (f == null) {
+      return null;
+    }
+
+    BufferedReader r = new BufferedReader(new FileReader(f));
+    for (int i = 0, j = position.line() - 1; i < j; i++) {
+      r.readLine();
+    }
+
+    List<String> strings = new ArrayList<String>();
+    int padCount = Integer.MAX_VALUE;
+    int braceCount = 0;
+    do {
+      String line = r.readLine();
+      braceCount = braceCount(line, braceCount);
+      if (braceCount >= 0) {
+        strings.add(line);
+        padCount = Math.min(padCount, countInitialWhitespace(line));
+      }
+    } while (braceCount > 0);
+
+    StringBuilder sb = new StringBuilder();
+    boolean needsNewline = false;
+    for (String s : strings) {
+      if (needsNewline) {
+        sb.append("\n");
+      } else {
+        needsNewline = true;
+      }
+      String toAppend;
+      if (s.length() > padCount) {
+        toAppend = s.substring(padCount);
+      } else {
+        toAppend = "";
+      }
+      sb.append(toAppend);
+    }
+    return sb.toString();
   }
 
   private void extractOptions(RootDoc doc) {
@@ -191,6 +284,15 @@ public class DocStringsDoclet {
       toReturn.beginObject();
     }
     return toReturn;
+  }
+
+  private boolean hasAnnotation(ProgramElementDoc doc, String typeName) {
+    for (AnnotationDesc annotation : doc.annotations()) {
+      if (typeName.equals(annotation.annotationType().qualifiedTypeName())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private String key(ClassDoc clazz) {

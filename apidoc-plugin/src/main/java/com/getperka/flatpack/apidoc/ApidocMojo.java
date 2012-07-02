@@ -21,6 +21,7 @@ package com.getperka.flatpack.apidoc;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -52,12 +53,20 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Scanner;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.tautua.markdownpapers.HtmlEmitter;
+import org.tautua.markdownpapers.ast.Code;
+import org.tautua.markdownpapers.ast.CodeText;
 import org.tautua.markdownpapers.ast.Document;
 import org.tautua.markdownpapers.ast.Header;
+import org.tautua.markdownpapers.ast.ParserTreeConstants;
+import org.tautua.markdownpapers.ast.Tag;
+import org.tautua.markdownpapers.ast.TagAttribute;
 import org.tautua.markdownpapers.ast.Text;
 import org.tautua.markdownpapers.parser.ParseException;
 import org.tautua.markdownpapers.parser.Parser;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -72,7 +81,7 @@ public class ApidocMojo extends AbstractMojo {
    * A subclass of HtmlEmitter that spies on the document to retrieve the first header to use as a
    * title string.
    */
-  private static class TitleSpyHtmlEmitter extends HtmlEmitter {
+  private class TitleSpyHtmlEmitter extends HtmlEmitter {
     private boolean seenHeader;
     private boolean spyOnText;
     private final StringBuilder text = new StringBuilder();
@@ -99,12 +108,60 @@ public class ApidocMojo extends AbstractMojo {
     }
 
     @Override
+    public void visit(Tag node) {
+      getLog().info(node.getName());
+      // System.err.println(node.getName());
+      if (!"example".equals(node.getName())) {
+        super.visit(node);
+        return;
+      }
+      String className = null;
+      String methodDesc = null;
+      for (TagAttribute attr : node.getAttributes()) {
+        if ("class".equals(attr.getName())) {
+          className = attr.getValue();
+        } else if ("method".equals(attr.getName())) {
+          methodDesc = attr.getValue();
+        }
+      }
+      String contents;
+
+      String key = className + ":" + methodDesc + ":contents";
+      String packageName = className.substring(0, className.lastIndexOf('.'));
+      File f = new File(outputDirectory, packageName.replace('.', '/') + "/package.json");
+      if (f.canRead()) {
+        InputStreamReader reader;
+        try {
+          reader = new InputStreamReader(new FileInputStream(f), UTF8);
+        } catch (FileNotFoundException e) {
+          // The canRead() above should prevent this
+          throw new RuntimeException(e);
+        }
+        JsonObject obj = new Gson().fromJson(reader, JsonElement.class).getAsJsonObject();
+        if (obj.has(key)) {
+          contents = obj.get(key).getAsString();
+        } else {
+          contents = "No @Example annotation? " + key;
+        }
+      } else {
+        contents = "Cannot read " + f.getPath();
+      }
+
+      CodeText codeText = new CodeText(ParserTreeConstants.JJTCODETEXT);
+      codeText.append(contents);
+      Code code = new Code(ParserTreeConstants.JJTCODE);
+      code.jjtAddChild(codeText, 0);
+      visit(code);
+    }
+
+    @Override
     public void visit(Text node) {
       if (spyOnText) {
         if (node.getValue() != null) {
           text.append(node.getValue());
         }
       }
+      getLog().error(node.getValue());
       super.visit(node);
     }
   }
@@ -112,7 +169,7 @@ public class ApidocMojo extends AbstractMojo {
   /**
    * Used to look up Artifacts in the remote repository.
    * 
-   * @parameter expression= "${component.org.apache.maven.artifact.resolver.ArtifactResolver}"
+   * @component
    * @required
    * @readonly
    */
@@ -121,7 +178,7 @@ public class ApidocMojo extends AbstractMojo {
   /**
    * Used to look up Artifacts in the remote repository.
    * 
-   * @parameter expression= "${component.org.apache.maven.artifact.factory.ArtifactFactory}"
+   * @component
    * @required
    * @readonly
    */
@@ -149,7 +206,7 @@ public class ApidocMojo extends AbstractMojo {
   /**
    * Used to look up Artifacts in the remote repository.
    * 
-   * @parameter expression= "${component.org.apache.maven.artifact.metadata.ArtifactMetadataSource}"
+   * @component
    * @required
    * @readonly
    */
@@ -212,11 +269,11 @@ public class ApidocMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException, MojoFailureException {
-    convertMarkdown();
-
     if (!buildContext.isIncremental()) {
       extractDocStrings();
     }
+
+    convertMarkdown();
   }
 
   private void convertMarkdown() {
