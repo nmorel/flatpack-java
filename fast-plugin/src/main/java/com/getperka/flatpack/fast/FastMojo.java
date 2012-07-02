@@ -36,6 +36,13 @@ import org.sonatype.plexus.build.incremental.BuildContext;
  */
 public class FastMojo extends AbstractMojo {
   /**
+   * If {@code false}, the generated Api class will have package visibility.
+   * 
+   * @parameter default-value="true"
+   */
+  protected boolean apiIsPublic;
+
+  /**
    * @component
    * @required
    * @readonly
@@ -99,6 +106,7 @@ public class FastMojo extends AbstractMojo {
     }
 
     try {
+      JavaDialect.apiIsPublic = apiIsPublic;
       JavaDialect.packageName = packageName;
       JavaDialect.stripPathSegments = stripPathSegments;
       JavaDialect.typePrefix = typePrefix == null ? "" : typePrefix;

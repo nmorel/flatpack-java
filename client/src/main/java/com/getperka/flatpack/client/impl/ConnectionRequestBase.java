@@ -19,6 +19,7 @@
  */
 package com.getperka.flatpack.client.impl;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import com.getperka.flatpack.client.Request;
@@ -36,5 +37,5 @@ public class ConnectionRequestBase<R extends Request<R, HttpURLConnection>> exte
   }
 
   @Override
-  protected void writeEntity(HttpURLConnection connection) {}
+  protected void writeEntity(HttpURLConnection connection) throws IOException {}
 }

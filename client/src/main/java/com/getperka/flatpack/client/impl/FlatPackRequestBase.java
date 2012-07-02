@@ -109,11 +109,4 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     getApi().getFlatPack().getPacker().pack(toSend, out);
     out.close();
   }
-
-  /**
-   * Returns {@code true} for a 2XX series response code.
-   */
-  private boolean isOk(int statusCode) {
-    return statusCode >= 200 && statusCode < 300;
-  }
 }

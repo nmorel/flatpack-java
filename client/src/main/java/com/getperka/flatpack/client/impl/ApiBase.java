@@ -63,18 +63,18 @@ public abstract class ApiBase implements Api {
     this.verbose = verbose;
   }
 
-  HttpURLConnection filter(HttpURLConnection conn) {
+  protected HttpURLConnection filter(HttpURLConnection conn) {
     if (accessToken != null) {
       conn.setRequestProperty("Authorization", "Bearer: " + accessToken);
     }
     return conn;
   }
 
-  FlatPack getFlatPack() {
+  protected FlatPack getFlatPack() {
     return flatpack;
   }
 
-  boolean isVerbose() {
+  protected boolean isVerbose() {
     return verbose;
   }
 }

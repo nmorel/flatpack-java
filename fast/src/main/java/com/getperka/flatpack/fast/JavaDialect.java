@@ -84,6 +84,11 @@ import com.getperka.flatpack.util.FlatPackTypes;
  * Generates simple Java POJO representations of a FlatPack API.
  */
 public class JavaDialect implements Dialect {
+  @Flag(tag = "apiIsPublic",
+      help = "If false, the generated Api class will have package visibility",
+      defaultValue = "true")
+  static Boolean apiIsPublic;
+
   @Flag(tag = "packageName",
       help = "The name of the package that generated sources should belong to",
       defaultValue = "com.getperka.fast")
@@ -168,7 +173,8 @@ public class JavaDialect implements Dialect {
     ST apiST = group.getInstanceOf("api")
         .add("api", api)
         .add("packageName", packageName)
-        .add("namePrefix", namePrefix);
+        .add("namePrefix", namePrefix)
+        .add("apiIsPublic", apiIsPublic);
     render(apiST, packageDir, namePrefix + "Api");
 
     // Emit a manifest of all generated types

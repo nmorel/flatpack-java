@@ -95,11 +95,11 @@ propertyRoles(kind) ::= <%
 /**
  * Generate an API accessor stub.
  */
-api(api, packageName, namePrefix) ::= <<
+api(api, packageName, namePrefix, apiIsPublic) ::= <<
 // Generated File - DO NOT EDIT
 package <packageName>;
 
-public class <namePrefix>Api extends <names.ApiBase> {
+<if(apiIsPublic)>public<endif> class <namePrefix>Api extends <names.ApiBase> {
   public <namePrefix>Api(<names.FlatPack> flatpack) {
     super(flatpack);
   }

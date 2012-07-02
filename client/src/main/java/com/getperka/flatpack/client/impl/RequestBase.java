@@ -123,6 +123,13 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
     return api;
   }
 
+  /**
+   * Returns {@code true} for a 2XX series response code.
+   */
+  protected boolean isOk(int statusCode) {
+    return statusCode >= 200 && statusCode < 300;
+  }
+
   protected abstract void writeEntity(HttpURLConnection connection) throws IOException;
 
   @SuppressWarnings("unchecked")

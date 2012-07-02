@@ -22,6 +22,7 @@ package com.getperka.flatpack.client;
 import java.io.IOException;
 
 import com.getperka.flatpack.FlatPackEntity;
+import com.google.gson.JsonElement;
 
 /**
  * A subtype of IOException which conveys the status code for a failed request. If the return
@@ -31,6 +32,7 @@ public class StatusCodeException extends IOException {
   private static final long serialVersionUID = 2412978878192760667L;
 
   private FlatPackEntity<?> entity;
+  private JsonElement jsonElement;
   private final int statusCode;
 
   public StatusCodeException(int statusCode, Throwable cause) {
@@ -42,11 +44,19 @@ public class StatusCodeException extends IOException {
     return entity;
   }
 
+  public JsonElement getJsonElement() {
+    return jsonElement;
+  }
+
   public int getStatusCode() {
     return statusCode;
   }
 
   public void setEntity(FlatPackEntity<?> entity) {
     this.entity = entity;
+  }
+
+  public void setJsonElement(JsonElement element) {
+    this.jsonElement = element;
   }
 }
