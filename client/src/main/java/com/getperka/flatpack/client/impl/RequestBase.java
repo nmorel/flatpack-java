@@ -101,7 +101,7 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
       headers = FlatPackCollections.mapForIteration();
     }
     headers.put(name, value);
-    return null;
+    return as();
   }
 
   @Override
@@ -115,6 +115,11 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
 
   public void setEntity(Object entity) {
     this.entity = entity;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected R as() {
+    return (R) this;
   }
 
   protected abstract X execute(HttpURLConnection response) throws IOException;
@@ -131,9 +136,4 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
   }
 
   protected abstract void writeEntity(HttpURLConnection connection) throws IOException;
-
-  @SuppressWarnings("unchecked")
-  private R as() {
-    return (R) this;
-  }
 }

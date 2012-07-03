@@ -24,6 +24,12 @@ package <packageName>;
 <docString(entity.docString)>
 @<names.JsonTypeName>("<entity.payloadName>")
 public class <entity.simpleName> extends <entity.supertype> {
+  /**
+   * Returns the type name used to identify instances of <entity.simpleName> in a payload.
+   */
+  public static String typeName() {
+    return "<entity.payloadName>";
+  }
   <entity.properties:field(); separator="\n">
   <entity.properties:getter(); separator="\n">
   <entity.properties:setter(); separator="\n">

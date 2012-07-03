@@ -218,9 +218,9 @@ public class ApidocMojo extends AbstractMojo {
   private File apidocDirectory;
 
   /**
-   * The name of the Doclet to execute
+   * The name of the Doclet to execute.
    * 
-   * @parameter
+   * @parameter default-value="com.getperka.flatpack.doclets.DocStringsDoclet"
    * @required
    */
   private String docletClass;
