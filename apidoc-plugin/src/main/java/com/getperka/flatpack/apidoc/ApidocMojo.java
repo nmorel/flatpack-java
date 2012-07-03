@@ -109,8 +109,6 @@ public class ApidocMojo extends AbstractMojo {
 
     @Override
     public void visit(Tag node) {
-      getLog().info(node.getName());
-      // System.err.println(node.getName());
       if (!"example".equals(node.getName())) {
         super.visit(node);
         return;
@@ -161,7 +159,6 @@ public class ApidocMojo extends AbstractMojo {
           text.append(node.getValue());
         }
       }
-      getLog().error(node.getValue());
       super.visit(node);
     }
   }
