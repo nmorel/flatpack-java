@@ -122,27 +122,31 @@ public class ApidocMojo extends AbstractMojo {
           methodDesc = attr.getValue();
         }
       }
+
       String contents;
 
-      String key = className + ":" + methodDesc + ":contents";
-      String packageName = className.substring(0, className.lastIndexOf('.'));
-      File f = new File(outputDirectory, packageName.replace('.', '/') + "/package.json");
-      if (f.canRead()) {
-        InputStreamReader reader;
-        try {
-          reader = new InputStreamReader(new FileInputStream(f), UTF8);
-        } catch (FileNotFoundException e) {
-          // The canRead() above should prevent this
-          throw new RuntimeException(e);
-        }
-        JsonObject obj = new Gson().fromJson(reader, JsonElement.class).getAsJsonObject();
-        if (obj.has(key)) {
-          contents = obj.get(key).getAsString();
-        } else {
-          contents = "No @Example annotation? " + key;
-        }
+      if (className == null || methodDesc == null) {
+        contents = "example tag must specify class and method attributes";
       } else {
-        contents = "Cannot read " + f.getPath();
+        String key = className + ":" + methodDesc + ":contents";
+        File f = findPackageJson(className);
+        if (f == null) {
+          contents = "Cannot find package.json for " + className;
+        } else {
+          InputStreamReader reader;
+          try {
+            reader = new InputStreamReader(new FileInputStream(f), UTF8);
+          } catch (FileNotFoundException e) {
+            // The canRead() above should prevent this
+            throw new RuntimeException(e);
+          }
+          JsonObject obj = new Gson().fromJson(reader, JsonElement.class).getAsJsonObject();
+          if (obj.has(key)) {
+            contents = obj.get(key).getAsString();
+          } else {
+            contents = "No @Example annotation? " + key;
+          }
+        }
       }
 
       CodeText codeText = new CodeText(ParserTreeConstants.JJTCODETEXT);
@@ -350,7 +354,7 @@ public class ApidocMojo extends AbstractMojo {
         buildContext.addMessage(mdFile, 0, 0, "Could not parse markdown",
             BuildContext.SEVERITY_ERROR, e);
       } catch (Exception e) {
-        buildContext.addMessage(mdFile, 0, 0, "Error processing file", BuildContext.SEVERITY_ERROR,
+        buildContext.addMessage(mdFile, 1, 0, "Error processing file", BuildContext.SEVERITY_ERROR,
             e);
       }
     }
@@ -418,5 +422,22 @@ public class ApidocMojo extends AbstractMojo {
     project.addResource(resource);
 
     buildContext.refresh(outputDirectory);
+  }
+
+  private File findPackageJson(String className) {
+    String packageName = className.substring(0, className.lastIndexOf('.'));
+
+    while (!packageName.isEmpty()) {
+      File f = new File(outputDirectory, packageName.replace('.', '/') + "/package.json");
+      if (f.canRead()) {
+        return f;
+      }
+      int idx = packageName.lastIndexOf('.');
+      if (idx == -1) {
+        break;
+      }
+      packageName = packageName.substring(0, idx);
+    }
+    return null;
   }
 }
