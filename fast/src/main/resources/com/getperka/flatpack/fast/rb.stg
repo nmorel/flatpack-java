@@ -44,8 +44,14 @@ module <names.moduleName>
     <docString(entity.docString)>
     class <entity.simpleName> \< <entity.supertype.simpleName>
     
-      <entity.properties:field(); separator="\n">
-    
+      <if(entity.properties)>
+      PROPERTY_NAMES = [
+        <entity.properties:field(); separator=",\n">
+      ]
+      
+      attr_accessor *PROPERTY_NAMES
+      <endif>
+      
     end
   end
 end
@@ -62,10 +68,8 @@ public enum <enum> {
 >>
 
 field(property) ::= <%
-
-<docString(property.docString)>
-attr_accessor :<property.attrName>
-
+<if(property.docString)><\n><docString(property.docString)><\n><endif>
+:<property.attrName>
 %>
 
 /**
