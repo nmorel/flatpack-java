@@ -133,7 +133,7 @@ public class RbDialect implements Dialect {
 
     // rendr the list of require statements
     List<String> requires = new ArrayList<String>();
-    requires.add(gemName + "/api");
+    requires.add(gemName + "/client_api");
     for (EntityDescription desc : allEntities.values()) {
       requires.add(gemName + "/model/"
         + camelCaseToUnderscore(desc.getTypeName()));
@@ -160,7 +160,7 @@ public class RbDialect implements Dialect {
 
     // Render the Api convenience class
     ST apiST = group.getInstanceOf("api").add("api", api);
-    render(apiST, moduleOutput, "api");
+    render(apiST, moduleOutput, "clientApi");
 
     // Emit a manifest of all generated types ST typeSourceST =
     /*

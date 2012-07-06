@@ -100,7 +100,7 @@ api(api) ::= <<
 require 'flatpack_client'
 
 module <names.moduleName>
-  class Api \< Flatpack::Client::BaseApi
+  class ClientApi \< Flatpack::Client::BaseApi
   
     def initialize(flatpack)
       @flatpack = flatpack
