@@ -37,11 +37,11 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
@@ -53,8 +53,12 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
+import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.codexes.DefaultCodexMapper;
 import com.getperka.flatpack.codexes.DynamicCodex;
+import com.getperka.flatpack.inject.FlatPackModule.AllTypes;
+import com.getperka.flatpack.inject.FlatPackModule.ExtraMappers;
+import com.getperka.flatpack.inject.FlatPackModule.Nullable;
 import com.getperka.flatpack.util.FlatPackTypes;
 
 /**
@@ -159,19 +163,24 @@ public class TypeContext {
   private final boolean allowAllRoles;
   private final Map<String, Class<? extends HasUuid>> classes = sortedMapForIteration();
   private final List<CodexMapper> codexMappers = listForAny();
-  private final Configuration configuration;
   private final Map<Type, Codex<?>> codexes = mapForLookup();
   private static final Logger logger = LoggerFactory.getLogger(TypeContext.class);
   private final Map<Class<?>, List<Property>> properties = mapForLookup();
   private final Map<Class<?>, List<PropertyPath>> principalPaths = mapForLookup();
+  @Inject
+  @Nullable
+  private PrincipalMapper principalMapper;
+  private final RoleMapper roleMapper;
 
-  public TypeContext(Configuration configuration) {
-    this.allowAllRoles = configuration.getRoleMapper() == null;
-    this.configuration = configuration;
-    codexMappers.addAll(configuration.getExtraMappers());
-    codexMappers.add(new DefaultCodexMapper());
+  @Inject
+  TypeContext(@Nullable RoleMapper roleMapper, @ExtraMappers Collection<CodexMapper> extraMappers,
+      @AllTypes Collection<Class<?>> allTypes, DefaultCodexMapper defaultMapper) {
+    this.allowAllRoles = roleMapper == null;
+    this.roleMapper = roleMapper;
+    codexMappers.addAll(extraMappers);
+    codexMappers.add(defaultMapper);
 
-    Set<Class<?>> found = configuration.getAllTypes();
+    Collection<Class<?>> found = allTypes;
     if (found.isEmpty()) {
       logger.warn("No unpackable classes. Will not be able to deserialize entity payloads");
       return;
@@ -228,7 +237,7 @@ public class TypeContext {
         Property.Builder builder = getBuilderForProperty(builders, beanPropertyName);
         toReturn.add(builder.peek());
 
-        builder.withRoleMapper(configuration.getRoleMapper());
+        builder.withRoleMapper(roleMapper);
 
         // Only use the getter to determine the actual json property name
         JsonProperty override = m.getAnnotation(JsonProperty.class);
@@ -380,7 +389,7 @@ public class TypeContext {
     }
 
     // Add the current path if it provides useful information
-    if (configuration.getPrincipalMapper().isMapped(Collections.unmodifiableList(seen), lookingAt)) {
+    if (principalMapper.isMapped(Collections.unmodifiableList(seen), lookingAt)) {
       accumulator.add(new PropertyPath(pathSoFar));
     }
 

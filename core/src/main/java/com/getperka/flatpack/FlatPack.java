@@ -21,9 +21,13 @@ package com.getperka.flatpack;
 
 import java.lang.reflect.Type;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.codexes.ValueCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackModule;
+import com.google.inject.Guice;
 
 /**
  * The main entry-point to the FlatPack API. This type exists to provide a central point for
@@ -34,18 +38,19 @@ public class FlatPack {
    * Create a new instance of FlatPack.
    */
   public static synchronized FlatPack create(Configuration configuration) {
-    return new FlatPack(configuration);
+    return Guice.createInjector(new FlatPackModule(configuration)).getInstance(FlatPack.class);
   }
 
-  private final Packer packer;
-  private final TypeContext types;
-  private final Unpacker unpacker;
+  @Inject
+  private Packer packer;
 
-  private FlatPack(Configuration configuration) {
-    types = new TypeContext(configuration);
-    packer = new Packer(configuration, types);
-    unpacker = new Unpacker(configuration, types);
-  }
+  @Inject
+  private TypeContext types;
+
+  @Inject
+  private Unpacker unpacker;
+
+  FlatPack() {}
 
   /**
    * Returns a configured instance of {@link Packer}.

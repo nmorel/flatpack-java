@@ -57,16 +57,16 @@ public class FlatPackTypes {
    * Construct as possible parameterized type from a flattened representation of a generic
    * parameterization.
    */
-  public static Type createType(Class<?>... flatParameterization) {
-    return createType(Arrays.<Type> asList(flatParameterization));
+  public static Type createType(List<Type> flatParameterization) {
+    return createType(flatParameterization.iterator());
   }
 
   /**
    * Construct as possible parameterized type from a flattened representation of a generic
    * parameterization.
    */
-  public static Type createType(List<Type> flatParameterization) {
-    return createType(flatParameterization.iterator());
+  public static Type createType(Type... flatParameterization) {
+    return createType(Arrays.<Type> asList(flatParameterization));
   }
 
   /**

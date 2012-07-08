@@ -20,14 +20,13 @@
 package com.getperka.flatpack.ext;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.joda.time.DateTime;
 
-import com.getperka.flatpack.Configuration;
-import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.HasTimestamps;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.TraversalMode;
@@ -40,21 +39,15 @@ import com.google.gson.stream.JsonWriter;
 public class SerializationContext extends BaseContext {
 
   private final Map<HasUuid, Void> entities = FlatPackCollections.mapForIteration();
-  private final DateTime lastModifiedTime;
-  private final TraversalMode traversalMode;
-  private final JsonWriter writer;
 
-  public SerializationContext(FlatPackEntity<?> entity, Configuration configuration,
-      TypeContext typeContext, Writer out) {
-    super(configuration, typeContext, entity.getPrincipal());
-    this.lastModifiedTime = entity.getLastModifiedTime();
-    this.traversalMode = entity.getTraversalMode();
-    this.writer = new JsonWriter(out);
-    writer.setSerializeNulls(false);
-    if (configuration.isPrettyPrint()) {
-      writer.setIndent("  ");
-    }
-  }
+  @Inject
+  private DateTime lastModifiedTime;
+  @Inject
+  private TraversalMode traversalMode;
+  @Inject
+  private JsonWriter writer;
+
+  SerializationContext() {}
 
   /**
    * Returns {@code true} if {@code entity} needs to be processed.

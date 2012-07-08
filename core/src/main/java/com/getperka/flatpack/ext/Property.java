@@ -33,6 +33,7 @@ import java.util.UUID;
 import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.persistence.Embedded;
 
 import com.getperka.flatpack.BaseHasUuid;
@@ -277,6 +278,7 @@ public class Property extends BaseHasUuid {
   private boolean suppressDefaultValue;
   private Type type;
 
+  @Inject
   private Property() {}
 
   @DenyAll

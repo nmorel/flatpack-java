@@ -26,9 +26,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.getperka.flatpack.Configuration;
+import javax.inject.Inject;
+
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.codexes.EntityCodex.MyReceiver;
+import com.getperka.flatpack.inject.FlatPackModule.Nullable;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
@@ -38,11 +40,11 @@ public class DeserializationContext extends BaseContext {
   private final Map<UUID, HasUuid> entities = FlatPackCollections.mapForLookup();
   private final Map<HasUuid, Set<Property>> modified = FlatPackCollections.mapForLookup();
   private final Set<UUID> resolved = FlatPackCollections.setForLookup();
+  @Inject
+  @Nullable
+  private PrincipalMapper principalMapper;
 
-  public DeserializationContext(Configuration configuration, TypeContext typeContext,
-      Principal principal) {
-    super(configuration, typeContext, principal);
-  }
+  DeserializationContext() {}
 
   /**
    * Record the modification of an entity's property.
@@ -73,7 +75,6 @@ public class DeserializationContext extends BaseContext {
     if (getRoles().isEmpty()) {
       return true;
     }
-    PrincipalMapper principalMapper = getConfiguration().getPrincipalMapper();
     Principal principal = getPrincipal();
     // Check for superusers
     if (!principalMapper.isAccessEnforced(principal, object)) {

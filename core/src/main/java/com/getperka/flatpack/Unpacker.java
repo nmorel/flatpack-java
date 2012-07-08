@@ -27,16 +27,22 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackModule.IgnoreUnresolvableTypes;
+import com.getperka.flatpack.inject.FlatPackModule.Verbose;
+import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
+import com.google.inject.Injector;
 
 /**
  * Allows {@link FlatPackEntity} instances to be restored from their serialized representations.
@@ -45,13 +51,23 @@ import com.google.gson.stream.JsonToken;
  */
 public class Unpacker {
 
-  private final Configuration configuration;
-  private final TypeContext typeContext;
+  @Inject
+  private Injector injector;
 
-  Unpacker(Configuration configuration, TypeContext typeContext) {
-    this.configuration = configuration;
-    this.typeContext = typeContext;
-  }
+  @IgnoreUnresolvableTypes
+  @Inject
+  private boolean ignoreUnresolvableTypes;
+  @Inject
+  private PackScope packScope;
+
+  @Inject
+  private TypeContext typeContext;
+
+  @Inject
+  @Verbose
+  private boolean verbose;
+
+  Unpacker() {}
 
   /**
    * Reify a {@link FlatPackEntity} from its serialized form.
@@ -64,12 +80,41 @@ public class Unpacker {
    */
   public <T> FlatPackEntity<T> unpack(Type returnType, Reader in, Principal principal)
       throws IOException {
-    if (configuration.isVerbose()) {
+    if (verbose) {
       in = new VerboseReader(in);
     }
+
+    packScope.enter().withPrincipal(principal);
+    try {
+      return unpack(returnType, new JsonReader(in), principal);
+    } finally {
+      packScope.exit();
+    }
+  }
+
+  /**
+   * This method can be used with an anonymous subclass of {@link TypeReference} or with an empty
+   * entity returned by a {@link FlatPackEntity} factory method.
+   * 
+   * @param <T> the type of data to return
+   * @param returnType a reference to {@code T}
+   * @param in the source of the serialized data
+   * @param principal the identity for which the unpacking is occurring
+   * @return the reified {@link FlatPackEntity}.
+   * @see FlatPackEntity#collectionOf(Class)
+   * @see FlatPackEntity#mapOf(Class, Class)
+   * @see FlatPackEntity#stringMapOf(Class)
+   */
+  public <T> FlatPackEntity<T> unpack(TypeReference<T> returnType, Reader in,
+      Principal principal) throws IOException {
+    return unpack(returnType.getType(), in, principal);
+  }
+
+  private <T> FlatPackEntity<T> unpack(Type returnType, JsonReader reader, Principal principal)
+      throws IOException {
     // Hold temporary state for deserialization
-    DeserializationContext context = new DeserializationContext(configuration, typeContext,
-        principal);
+    DeserializationContext context = injector.getInstance(DeserializationContext.class);
+
     /*
      * Decoding is done as a two-pass operation since the runtime type of an allocated object cannot
      * be swizzled. The per-entity data is held as a semi-reified JsonObject to be passed off to a
@@ -82,7 +127,6 @@ public class Unpacker {
      * The reader is placed in lenient mode as an aid to developers, however all output will be
      * strictly formatted.
      */
-    JsonReader reader = new JsonReader(in);
     reader.setLenient(true);
 
     // The return value
@@ -108,7 +152,7 @@ public class Unpacker {
           String simpleName = reader.nextName();
           Class<? extends HasUuid> clazz = typeContext.getClass(simpleName);
           if (clazz == null) {
-            if (configuration.isIgnoreUnresolvableTypes()) {
+            if (ignoreUnresolvableTypes) {
               reader.skipValue();
               continue;
             } else {
@@ -183,23 +227,5 @@ public class Unpacker {
     context.close();
 
     return toReturn;
-  }
-
-  /**
-   * This method can be used with an anonymous subclass of {@link TypeReference} or with an empty
-   * entity returned by a {@link FlatPackEntity} factory method.
-   * 
-   * @param <T> the type of data to return
-   * @param returnType a reference to {@code T}
-   * @param in the source of the serialized data
-   * @param principal the identity for which the unpacking is occurring
-   * @return the reified {@link FlatPackEntity}.
-   * @see FlatPackEntity#collectionOf(Class)
-   * @see FlatPackEntity#mapOf(Class, Class)
-   * @see FlatPackEntity#stringMapOf(Class)
-   */
-  public <T> FlatPackEntity<T> unpack(TypeReference<T> returnType, Reader in,
-      Principal principal) throws IOException {
-    return unpack(returnType.getType(), in, principal);
   }
 }

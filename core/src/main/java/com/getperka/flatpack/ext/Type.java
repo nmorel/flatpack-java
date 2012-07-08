@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.security.PermitAll;
+import javax.inject.Inject;
 
 import com.getperka.flatpack.BaseHasUuid;
 
@@ -90,6 +91,7 @@ public class Type extends BaseHasUuid {
 
   private TypeHint hint;
 
+  @Inject
   private Type() {}
 
   @PermitAll

@@ -19,15 +19,19 @@
  */
 package com.getperka.flatpack.codexes;
 
+import static com.getperka.flatpack.util.FlatPackTypes.erase;
+
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import javax.inject.Inject;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PostUnpack;
@@ -42,9 +46,12 @@ import com.getperka.flatpack.ext.PropertyPath;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackModule.Resolvers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
 
 public class EntityCodex<T extends HasUuid> extends Codex<T> {
   public static class MyReceiver implements PropertyPath.Receiver {
@@ -75,16 +82,23 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
   }
 
   private final Class<T> clazz;
+  @Inject
+  private Injector injector;
   private final List<Method> preUnpackMethods;
   private final List<Method> postUnpackMethods;
 
-  public EntityCodex(Class<T> clazz) {
-    this.clazz = clazz;
+  @Inject
+  @Resolvers
+  private Collection<EntityResolver> entityResolvers;
+
+  @Inject
+  EntityCodex(TypeLiteral<T> clazz) {
+    this.clazz = (Class<T>) erase(clazz.getType());
 
     List<Method> pre = new ArrayList<Method>();
     List<Method> post = new ArrayList<Method>();
     // Iterate over all methods in the type and then its supertypes
-    for (Class<?> lookAt = clazz; lookAt != null; lookAt = lookAt.getSuperclass()) {
+    for (Class<?> lookAt = this.clazz; lookAt != null; lookAt = lookAt.getSuperclass()) {
       for (Method m : lookAt.getDeclaredMethods()) {
         Class<?>[] params = m.getParameterTypes();
         switch (params.length) {
@@ -300,7 +314,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
       // Possibly delegate to injected resolvers
       if (useResolvers) {
-        for (EntityResolver resolver : context.getConfiguration().getEntityResolvers()) {
+        for (EntityResolver resolver : entityResolvers) {
           toReturn = resolver.resolve(clazz, uuid);
           if (toReturn != null) {
             resolved = true;
@@ -311,9 +325,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
       // Otherwise try to construct a new instance
       if (toReturn == null) {
-        Constructor<T> constructor = clazz.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        toReturn = constructor.newInstance();
+        toReturn = injector.getInstance(clazz);
       }
 
       toReturn.setUuid(uuid);

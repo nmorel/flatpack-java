@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import org.joda.time.DateTimeZone;
 
 import com.getperka.flatpack.HasUuid;
@@ -39,12 +41,20 @@ import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.ext.TypeHint;
+import com.getperka.flatpack.util.FlatPackTypes;
 import com.google.gson.JsonElement;
+import com.google.inject.Injector;
+import com.google.inject.Key;
 
 /**
  * Support for all built-in types.
  */
 public class DefaultCodexMapper implements CodexMapper {
+
+  @Inject
+  private Injector injector;
+
+  DefaultCodexMapper() {}
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -81,7 +91,8 @@ public class DefaultCodexMapper implements CodexMapper {
     } else if (Enum.class.isAssignableFrom(erased)) {
       toReturn = new EnumCodex(erased);
     } else if (HasUuid.class.isAssignableFrom(erased)) {
-      toReturn = new EntityCodex(erased);
+      Key<?> key = Key.get(FlatPackTypes.createType(EntityCodex.class, type));
+      toReturn = (Codex<?>) injector.getInstance(key);
     } else if (JsonElement.class.isAssignableFrom(erased)) {
       toReturn = new JsonElementCodex();
     } else if (TypeHint.class.isAssignableFrom(erased)) {

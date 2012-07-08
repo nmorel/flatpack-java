@@ -33,10 +33,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import com.getperka.flatpack.Configuration;
-import com.getperka.flatpack.FlatPack;
+import javax.inject.Inject;
+
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.inject.FlatPackModule.Nullable;
+import com.getperka.flatpack.inject.PackScope.PackPrincipal;
 
 /**
  * Contains common data that affects the serialization process.
@@ -60,18 +62,21 @@ import com.getperka.flatpack.HasUuid;
  */
 public class BaseContext implements Closeable {
 
-  private final Configuration configuration;
   private final Deque<String> path = new ArrayDeque<String>();
   private final List<Callable<?>> postWork = listForAny();
-  private final Principal principal;
-  private final TypeContext typeContext;
 
+  @Inject
+  @PackPrincipal
+  @Nullable
+  private Principal principal;
+  @Inject
+  @Nullable
+  private PrincipalMapper principalMapper;
+  @Inject
+  private TypeContext typeContext;
   private final Map<UUID, String> warnings = mapForIteration();
 
-  public BaseContext(Configuration configuration, TypeContext typeContext, Principal principal) {
-    this.configuration = configuration;
-    this.principal = principal;
-    this.typeContext = typeContext;
+  BaseContext() {
     path.addLast("<root>");
   }
 
@@ -108,19 +113,12 @@ public class BaseContext implements Closeable {
     this.<RuntimeException> sneakyThrow(e);
   }
 
-  /**
-   * Returns the {@link Configuration} in use by the {@link FlatPack} instance.
-   */
-  public Configuration getConfiguration() {
-    return configuration;
-  }
-
   public Principal getPrincipal() {
     return principal;
   }
 
   public List<String> getRoles() {
-    PrincipalMapper mapper = configuration.getPrincipalMapper();
+    PrincipalMapper mapper = principalMapper;
     List<String> toReturn = null;
     if (principal != null && mapper != null) {
       toReturn = mapper.getRoles(principal);

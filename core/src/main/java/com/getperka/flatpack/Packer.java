@@ -28,27 +28,39 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackModule.PrettyPrint;
+import com.getperka.flatpack.inject.FlatPackModule.Verbose;
+import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.Injector;
 
 /**
  * Writes {@link FlatPackEntity} objects into a {@link Writer}.
  */
 public class Packer {
 
-  private final Configuration configuration;
-  private final TypeContext typeContext;
+  @Inject
+  private Injector injector;
+  @Inject
+  private PackScope packScope;
+  @Inject
+  private TypeContext typeContext;
+  @Inject
+  @Verbose
+  private boolean verbose;
+  @Inject
+  @PrettyPrint
+  private boolean prettyPrint;
 
-  Packer(Configuration configuration, TypeContext typeContext) {
-    this.configuration = configuration;
-    this.typeContext = typeContext;
-  }
+  Packer() {}
 
   /**
    * Write the given entity into a {@link Writer}.
@@ -57,18 +69,55 @@ public class Packer {
    * @param out the destination output which will be closed by this method
    */
   public void pack(FlatPackEntity<?> entity, Writer out) throws IOException {
-    SerializationContext context;
     StringWriter verboseWriter = null;
-    {
-      Writer target;
-      if (configuration.isVerbose()) {
-        verboseWriter = new StringWriter();
-        target = verboseWriter;
-      } else {
-        target = out;
-      }
-      context = new SerializationContext(entity, configuration, typeContext, target);
+    Writer target;
+    if (verbose) {
+      verboseWriter = new StringWriter();
+      target = verboseWriter;
+    } else {
+      target = out;
     }
+    JsonWriter json = new JsonWriter(target);
+    json.setSerializeNulls(false);
+    if (prettyPrint) {
+      json.setIndent("  ");
+    }
+
+    packScope.enter().withEntity(entity).withJsonWriter(json);
+    try {
+      pack(entity);
+    } finally {
+      packScope.exit();
+    }
+    if (verbose) {
+      String payload = verboseWriter.toString();
+      System.out.println(payload);
+      out.write(payload);
+      out.close();
+    }
+  }
+
+  private Map<Class<? extends HasUuid>, List<HasUuid>> collate(
+      Set<HasUuid> entities) {
+    Map<Class<? extends HasUuid>, List<HasUuid>> toReturn = FlatPackCollections
+        .mapForIteration();
+
+    for (HasUuid entity : entities) {
+      Class<? extends HasUuid> key = entity.getClass();
+
+      List<HasUuid> list = toReturn.get(key);
+      if (list == null) {
+        list = FlatPackCollections.listForAny();
+        toReturn.put(key, list);
+      }
+      list.add(entity);
+    }
+
+    return toReturn;
+  }
+
+  private void pack(FlatPackEntity<?> entity) throws IOException {
+    SerializationContext context = injector.getInstance(SerializationContext.class);
 
     @SuppressWarnings("unchecked")
     Codex<Object> codex = (Codex<Object>) typeContext.getCodex(entity.getType());
@@ -148,32 +197,6 @@ public class Packer {
 
     context.runPostWork();
     context.close();
-
-    if (configuration.isVerbose()) {
-      String payload = verboseWriter.toString();
-      System.out.println(payload);
-      out.write(payload);
-      out.close();
-    }
-  }
-
-  private Map<Class<? extends HasUuid>, List<HasUuid>> collate(
-      Set<HasUuid> entities) {
-    Map<Class<? extends HasUuid>, List<HasUuid>> toReturn = FlatPackCollections
-        .mapForIteration();
-
-    for (HasUuid entity : entities) {
-      Class<? extends HasUuid> key = entity.getClass();
-
-      List<HasUuid> list = toReturn.get(key);
-      if (list == null) {
-        list = FlatPackCollections.listForAny();
-        toReturn.put(key, list);
-      }
-      list.add(entity);
-    }
-
-    return toReturn;
   }
 
 }
