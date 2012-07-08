@@ -158,10 +158,11 @@ public class TypeContext {
   @Inject
   private PrincipalMapper principalMapper;
   /**
-   * Vends instances of DynamicCodex to act as placeholders.
+   * A DynamicCodex acts as a placeholder when type information can't be determined (which should be
+   * rare).
    */
   @Inject
-  private Provider<DynamicCodex> dynamicCodexProvider;
+  private DynamicCodex dynamicCodex;
 
   @Inject
   TypeContext(CodexMapper codexMapper, @AllTypes Collection<Class<?>> allTypes) {
@@ -299,7 +300,7 @@ public class TypeContext {
     toReturn = codexMapper.getCodex(this, type);
 
     if (toReturn == null) {
-      toReturn = dynamicCodexProvider.get();
+      toReturn = dynamicCodex;
     }
 
     codexes.put(type, toReturn);
