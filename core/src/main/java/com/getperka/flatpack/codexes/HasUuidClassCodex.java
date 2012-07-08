@@ -19,6 +19,8 @@
  */
 package com.getperka.flatpack.codexes;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
@@ -28,8 +30,13 @@ import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
 
 public class HasUuidClassCodex extends ValueCodex<Class<? extends HasUuid>> {
+  @Inject
+  private TypeContext typeContext;
+
+  HasUuidClassCodex() {}
+
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.STRING).build();
   }
 
@@ -37,12 +44,12 @@ public class HasUuidClassCodex extends ValueCodex<Class<? extends HasUuid>> {
   public Class<? extends HasUuid> readNotNull(JsonElement element, DeserializationContext context)
       throws Exception {
     String name = element.getAsString();
-    return context.getTypeContext().getClass(name);
+    return typeContext.getClass(name);
   }
 
   @Override
   public void writeNotNull(Class<? extends HasUuid> object, SerializationContext context)
       throws Exception {
-    context.getWriter().value(context.getTypeContext().getPayloadName(object));
+    context.getWriter().value(typeContext.getPayloadName(object));
   }
 }

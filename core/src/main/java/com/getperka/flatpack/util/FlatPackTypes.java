@@ -85,13 +85,14 @@ public class FlatPackTypes {
   /**
    * Determine the erasure of a given type.
    */
-  public static Class<?> erase(Type type) {
+  @SuppressWarnings("unchecked")
+  public static <T> Class<T> erase(Type type) {
     if (type instanceof Class) {
-      return (Class<?>) type;
+      return (Class<T>) type;
     }
     if (type instanceof GenericArrayType) {
       Class<?> component = erase(((GenericArrayType) type).getGenericComponentType());
-      return Array.newInstance(component, 0).getClass();
+      return (Class<T>) Array.newInstance(component, 0).getClass();
     }
     if (type instanceof ParameterizedType) {
       return erase(((ParameterizedType) type).getRawType());

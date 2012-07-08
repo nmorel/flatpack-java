@@ -28,7 +28,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -47,11 +46,11 @@ public class EntityMapCodex<K extends HasUuid, V> extends Codex<Map<K, V>> {
   }
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder()
         .withJsonKind(JsonKind.MAP)
-        .withMapKey(keyCodex.describe(context))
-        .withMapValue(valueCodex.describe(context))
+        .withMapKey(keyCodex.describe())
+        .withMapValue(valueCodex.describe())
         .build();
   }
 

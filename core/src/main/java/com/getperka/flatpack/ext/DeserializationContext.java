@@ -30,19 +30,21 @@ import javax.inject.Inject;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.codexes.EntityCodex.MyReceiver;
-import com.getperka.flatpack.inject.FlatPackModule.Nullable;
+import com.getperka.flatpack.inject.PackScoped;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Contains state relating to in-process deserialization.
  */
+@PackScoped
 public class DeserializationContext extends BaseContext {
   private final Map<UUID, HasUuid> entities = FlatPackCollections.mapForLookup();
   private final Map<HasUuid, Set<Property>> modified = FlatPackCollections.mapForLookup();
+  @Inject
+  private PrincipalMapper principalMapper;
   private final Set<UUID> resolved = FlatPackCollections.setForLookup();
   @Inject
-  @Nullable
-  private PrincipalMapper principalMapper;
+  private TypeContext typeContext;
 
   DeserializationContext() {}
 
@@ -81,8 +83,7 @@ public class DeserializationContext extends BaseContext {
       return true;
     }
 
-    TypeContext typeCtx = getTypeContext();
-    List<PropertyPath> paths = typeCtx.getPrincipalPaths(object.getClass());
+    List<PropertyPath> paths = typeContext.getPrincipalPaths(object.getClass());
     MyReceiver receiver = new MyReceiver(principalMapper, principal);
     for (PropertyPath path : paths) {
       path.evaluate(object, receiver);
@@ -91,7 +92,7 @@ public class DeserializationContext extends BaseContext {
       }
     }
     addWarning(object, "User %s does not have permission to edit this %s", principal,
-        typeCtx.getPayloadName(object.getClass()));
+        typeContext.getPayloadName(object.getClass()));
     return false;
   }
 

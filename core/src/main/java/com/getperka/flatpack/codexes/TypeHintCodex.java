@@ -23,7 +23,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 
@@ -34,7 +33,7 @@ public class TypeHintCodex extends ValueCodex<TypeHint> {
   public static TypeHint HINT = TypeHint.create(TypeHint.class);
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder()
         .withJsonKind(JsonKind.STRING)
         .withTypeHint(HINT)

@@ -28,21 +28,21 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.TypeContext;
-import com.getperka.flatpack.inject.FlatPackModule.IgnoreUnresolvableTypes;
-import com.getperka.flatpack.inject.FlatPackModule.Verbose;
+import com.getperka.flatpack.inject.IgnoreUnresolvableTypes;
 import com.getperka.flatpack.inject.PackScope;
+import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import com.google.inject.Injector;
 
 /**
  * Allows {@link FlatPackEntity} instances to be restored from their serialized representations.
@@ -52,8 +52,7 @@ import com.google.inject.Injector;
 public class Unpacker {
 
   @Inject
-  private Injector injector;
-
+  private Provider<DeserializationContext> contexts;
   @IgnoreUnresolvableTypes
   @Inject
   private boolean ignoreUnresolvableTypes;
@@ -113,7 +112,7 @@ public class Unpacker {
   private <T> FlatPackEntity<T> unpack(Type returnType, JsonReader reader, Principal principal)
       throws IOException {
     // Hold temporary state for deserialization
-    DeserializationContext context = injector.getInstance(DeserializationContext.class);
+    DeserializationContext context = contexts.get();
 
     /*
      * Decoding is done as a two-pass operation since the runtime type of an allocated object cannot

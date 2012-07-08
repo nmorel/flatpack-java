@@ -26,7 +26,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 
@@ -42,7 +41,7 @@ public class ToStringCodex<T> extends ValueCodex<T> {
   }
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder()
         .withJsonKind(JsonKind.STRING)
         .withTypeHint(TypeHint.create(constructor.getDeclaringClass()))

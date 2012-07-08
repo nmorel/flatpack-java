@@ -37,8 +37,6 @@ import javax.inject.Inject;
 
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.HasUuid;
-import com.getperka.flatpack.inject.FlatPackModule.Nullable;
-import com.getperka.flatpack.inject.PackScope.PackPrincipal;
 
 /**
  * Contains common data that affects the serialization process.
@@ -60,20 +58,15 @@ import com.getperka.flatpack.inject.PackScope.PackPrincipal;
  * }
  * </pre>
  */
-public class BaseContext implements Closeable {
+public abstract class BaseContext implements Closeable {
 
   private final Deque<String> path = new ArrayDeque<String>();
   private final List<Callable<?>> postWork = listForAny();
 
   @Inject
-  @PackPrincipal
-  @Nullable
   private Principal principal;
   @Inject
-  @Nullable
   private PrincipalMapper principalMapper;
-  @Inject
-  private TypeContext typeContext;
   private final Map<UUID, String> warnings = mapForIteration();
 
   BaseContext() {
@@ -125,13 +118,6 @@ public class BaseContext implements Closeable {
     }
     return toReturn == null ? Collections.<String> emptyList() :
         Collections.unmodifiableList(toReturn);
-  }
-
-  /**
-   * Returns the {@link TypeContext} in use.
-   */
-  public TypeContext getTypeContext() {
-    return typeContext;
   }
 
   public Map<UUID, String> getWarnings() {

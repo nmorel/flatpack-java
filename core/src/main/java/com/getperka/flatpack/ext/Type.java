@@ -34,7 +34,7 @@ import com.getperka.flatpack.BaseHasUuid;
 /**
  * A simple JSON type description.
  * 
- * @see Codex#describe(TypeContext)
+ * @see Codex#describe()
  */
 public class Type extends BaseHasUuid {
   public static class Builder {

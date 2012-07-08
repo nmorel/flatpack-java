@@ -23,7 +23,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
 
 /**
@@ -31,7 +30,7 @@ import com.google.gson.JsonElement;
  */
 public class VoidCodex extends ValueCodex<Void> {
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.NULL).build();
   }
 

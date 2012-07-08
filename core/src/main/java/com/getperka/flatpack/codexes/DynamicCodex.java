@@ -21,6 +21,8 @@ package com.getperka.flatpack.codexes;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
@@ -33,8 +35,14 @@ import com.google.gson.JsonElement;
  * Allows arbitrary objects to be written, but not read, by examining their type.
  */
 public class DynamicCodex extends Codex<Object> {
+
+  @Inject
+  private TypeContext typeContext;
+
+  DynamicCodex() {}
+
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.ANY).build();
   }
 
@@ -47,7 +55,7 @@ public class DynamicCodex extends Codex<Object> {
 
   @Override
   public void scanNotNull(Object object, SerializationContext context) {
-    Codex<Object> actual = context.getTypeContext().getCodex(object.getClass());
+    Codex<Object> actual = typeContext.getCodex(object.getClass());
     if (actual == this) {
       context.fail(new UnsupportedOperationException(object.getClass().getName()));
     }
@@ -56,7 +64,7 @@ public class DynamicCodex extends Codex<Object> {
 
   @Override
   public void writeNotNull(Object object, SerializationContext context) throws IOException {
-    Codex<Object> actual = context.getTypeContext().getCodex(object.getClass());
+    Codex<Object> actual = typeContext.getCodex(object.getClass());
     actual.write(object, context);
   }
 }

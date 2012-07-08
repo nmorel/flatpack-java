@@ -27,7 +27,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
@@ -40,13 +39,13 @@ public class StringMapCodex<V> extends Codex<Map<Object, V>> {
   }
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder()
         .withJsonKind(JsonKind.MAP)
         .withMapKey(new Type.Builder()
             .withJsonKind(JsonKind.STRING)
             .build())
-        .withMapValue(valueCodex.describe(context))
+        .withMapValue(valueCodex.describe())
         .build();
   }
 

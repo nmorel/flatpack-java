@@ -29,7 +29,6 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
 
 public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
@@ -40,7 +39,7 @@ public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
   }
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     List<String> values = new ArrayList<String>();
     for (Enum<?> value : clazz.getEnumConstants()) {
       values.add(value.name());

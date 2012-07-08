@@ -42,6 +42,7 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
@@ -53,12 +54,8 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
-import com.getperka.flatpack.RoleMapper;
-import com.getperka.flatpack.codexes.DefaultCodexMapper;
 import com.getperka.flatpack.codexes.DynamicCodex;
-import com.getperka.flatpack.inject.FlatPackModule.AllTypes;
-import com.getperka.flatpack.inject.FlatPackModule.ExtraMappers;
-import com.getperka.flatpack.inject.FlatPackModule.Nullable;
+import com.getperka.flatpack.inject.AllTypes;
 import com.getperka.flatpack.util.FlatPackTypes;
 
 /**
@@ -81,19 +78,6 @@ public class TypeContext {
       name = name.substring(3);
     }
     return decapitalize(name);
-  }
-
-  /**
-   * Implements a get-or-create pattern.
-   */
-  private static Property.Builder getBuilderForProperty(Map<String, Property.Builder> builders,
-      String beanPropertyName) {
-    Property.Builder builder = builders.get(beanPropertyName);
-    if (builder == null) {
-      builder = new Property.Builder();
-      builders.put(beanPropertyName, builder);
-    }
-    return builder;
   }
 
   private static boolean isBoolean(Class<?> clazz) {
@@ -160,33 +144,35 @@ public class TypeContext {
     return !Modifier.isPrivate(m.getModifiers());
   }
 
-  private final boolean allowAllRoles;
+  /**
+   * Used to instantiate instances of
+   */
+  @Inject
+  private Provider<Property.Builder> builderProvider;
   private final Map<String, Class<? extends HasUuid>> classes = sortedMapForIteration();
-  private final List<CodexMapper> codexMappers = listForAny();
+  private final CodexMapper codexMapper;
   private final Map<Type, Codex<?>> codexes = mapForLookup();
   private static final Logger logger = LoggerFactory.getLogger(TypeContext.class);
   private final Map<Class<?>, List<Property>> properties = mapForLookup();
   private final Map<Class<?>, List<PropertyPath>> principalPaths = mapForLookup();
   @Inject
-  @Nullable
   private PrincipalMapper principalMapper;
-  private final RoleMapper roleMapper;
+  /**
+   * Vends instances of DynamicCodex to act as placeholders.
+   */
+  @Inject
+  private Provider<DynamicCodex> dynamicCodexProvider;
 
   @Inject
-  TypeContext(@Nullable RoleMapper roleMapper, @ExtraMappers Collection<CodexMapper> extraMappers,
-      @AllTypes Collection<Class<?>> allTypes, DefaultCodexMapper defaultMapper) {
-    this.allowAllRoles = roleMapper == null;
-    this.roleMapper = roleMapper;
-    codexMappers.addAll(extraMappers);
-    codexMappers.add(defaultMapper);
+  TypeContext(CodexMapper codexMapper, @AllTypes Collection<Class<?>> allTypes) {
+    this.codexMapper = codexMapper;
 
-    Collection<Class<?>> found = allTypes;
-    if (found.isEmpty()) {
+    if (allTypes.isEmpty()) {
       logger.warn("No unpackable classes. Will not be able to deserialize entity payloads");
       return;
     }
 
-    for (Class<?> clazz : found) {
+    for (Class<?> clazz : allTypes) {
       if (!HasUuid.class.isAssignableFrom(clazz)) {
         logger.warn("Ignoring type {} because it is not assignable to {}", clazz.getName(),
             HasUuid.class.getSimpleName());
@@ -237,8 +223,6 @@ public class TypeContext {
         Property.Builder builder = getBuilderForProperty(builders, beanPropertyName);
         toReturn.add(builder.peek());
 
-        builder.withRoleMapper(roleMapper);
-
         // Only use the getter to determine the actual json property name
         JsonProperty override = m.getAnnotation(JsonProperty.class);
         if (override != null) {
@@ -280,7 +264,7 @@ public class TypeContext {
 
     // Finish construction
     for (Property.Builder builder : builders.values()) {
-      builder.withAllowAllRoles(allowAllRoles).build(this);
+      builder.build();
     }
 
     return unmodifiable;
@@ -312,15 +296,10 @@ public class TypeContext {
       return toReturn;
     }
 
-    for (CodexMapper mapper : codexMappers) {
-      toReturn = mapper.getCodex(this, type);
-      if (toReturn != null) {
-        break;
-      }
-    }
+    toReturn = codexMapper.getCodex(this, type);
 
     if (toReturn == null) {
-      toReturn = new DynamicCodex();
+      toReturn = dynamicCodexProvider.get();
     }
 
     codexes.put(type, toReturn);
@@ -421,5 +400,18 @@ public class TypeContext {
       pathSoFar.removeLast();
     }
     seen.pop();
+  }
+
+  /**
+   * Implements a get-or-create pattern.
+   */
+  private Property.Builder getBuilderForProperty(Map<String, Property.Builder> builders,
+      String beanPropertyName) {
+    Property.Builder builder = builders.get(beanPropertyName);
+    if (builder == null) {
+      builder = builderProvider.get();
+      builders.put(beanPropertyName, builder);
+    }
+    return builder;
   }
 }

@@ -25,13 +25,12 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
 
 public class BooleanCodex extends ValueCodex<Boolean> {
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.BOOLEAN).build();
   }
 

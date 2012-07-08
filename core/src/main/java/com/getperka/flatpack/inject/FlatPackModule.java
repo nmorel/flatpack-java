@@ -1,73 +1,25 @@
 package com.getperka.flatpack.inject;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.security.Principal;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
 
 import com.getperka.flatpack.Configuration;
-import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.TraversalMode;
+import com.getperka.flatpack.codexes.DefaultCodexMapper;
 import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.ext.PrincipalMapper;
 import com.getperka.flatpack.ext.TypeContext;
-import com.getperka.flatpack.inject.PackScope.LastModifiedTime;
-import com.getperka.flatpack.inject.PackScope.PackPrincipal;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.AbstractModule;
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Providers;
 
 public class FlatPackModule extends AbstractModule {
-
-  /**
-   * A binding annotation for a {@code Collection<Class<?>>} with all {@link HasUuid} types that
-   * should be supported.
-   */
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface AllTypes {}
-
-  /**
-   * A binding annotation for a {@code Collection<CodexMapper>}.
-   */
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface ExtraMappers {}
-
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface IgnoreUnresolvableTypes {}
-
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Nullable {};
-
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface PrettyPrint {}
-
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Resolvers {}
-
-  @BindingAnnotation
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Verbose {}
-
   private final Configuration configuration;
 
   public FlatPackModule(Configuration configuration) {
@@ -76,47 +28,100 @@ public class FlatPackModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(RoleMapper.class).toProvider(Providers.of(configuration.getRoleMapper()));
-    bind(PrincipalMapper.class).toProvider(Providers.of(configuration.getPrincipalMapper()));
-
+    // Bind TypeContext in singleton, because we want referential integrity
     bind(TypeContext.class).in(Scopes.SINGLETON);
 
+    // Bind simple constants
+    bindConstant()
+        .annotatedWith(IgnoreUnresolvableTypes.class)
+        .to(configuration.isIgnoreUnresolvableTypes());
+    bindConstant()
+        .annotatedWith(PrettyPrint.class)
+        .to(configuration.isPrettyPrint());
+    bindConstant()
+        .annotatedWith(Verbose.class)
+        .to(configuration.isVerbose());
+
+    // Provide all class types
     bind(new TypeLiteral<Collection<Class<?>>>() {})
         .annotatedWith(AllTypes.class)
         .toInstance(configuration.getAllTypes());
 
-    bind(new TypeLiteral<Collection<CodexMapper>>() {})
-        .annotatedWith(ExtraMappers.class)
-        .toInstance(configuration.getExtraMappers());
+    bindPackScope();
+    bindUserTypes();
+  }
 
-    bind(new TypeLiteral<Collection<EntityResolver>>() {})
-        .annotatedWith(Resolvers.class)
-        .toInstance(configuration.getEntityResolvers());
-
+  /**
+   * Set up bindings for {@link PackScoped} types (e.g. SerializationContext).
+   */
+  private void bindPackScope() {
     PackScope packScope = new PackScope();
-    bindScope(PackScoped.class, packScope);
+    // Make the instance of the PackScope available
     bind(PackScope.class).toInstance(packScope);
-    bind(DateTime.class)
-        .annotatedWith(LastModifiedTime.class)
-        .toProvider(packScope.<DateTime> provider())
+
+    // All @PackScoped object should be constructed through the scope
+    bindScope(PackScoped.class, packScope);
+
+    // Always provide a binding for Principal
+    bind(Principal.class)
+        .to(NullPrincipal.class)
         .in(packScope);
 
-    bind(Principal.class)
-        .annotatedWith(PackPrincipal.class)
-        .toProvider(packScope.<Principal> provider())
+    // Additional, scope-specific bindings
+    bind(DateTime.class)
+        .annotatedWith(LastModifiedTime.class)
+        .toProvider(Providers.of(new DateTime(0)))
         .in(packScope);
 
     bind(TraversalMode.class)
-        .toProvider(packScope.<TraversalMode> provider())
+        .toProvider(PackScope.<TraversalMode> provider())
         .in(packScope);
 
     bind(JsonWriter.class)
-        .toProvider(packScope.<JsonWriter> provider())
+        .toProvider(PackScope.<JsonWriter> provider())
         .in(packScope);
+  }
 
-    bindConstant().annotatedWith(IgnoreUnresolvableTypes.class)
-        .to(configuration.isIgnoreUnresolvableTypes());
-    bindConstant().annotatedWith(PrettyPrint.class).to(configuration.isPrettyPrint());
-    bindConstant().annotatedWith(Verbose.class).to(configuration.isVerbose());
+  /**
+   * Attach bindings for user-injectable behaviors or default instances.
+   */
+  private void bindUserTypes() {
+    // CodexMapper
+    if (configuration.getExtraMappers().isEmpty()) {
+      bind(CodexMapper.class)
+          .to(DefaultCodexMapper.class);
+    } else {
+      bind(CodexMapper.class)
+          .toInstance(new CompositeCodexMapper(configuration.getExtraMappers()));
+    }
+
+    // EntityResolver
+    if (configuration.getEntityResolvers().size() == 1) {
+      bind(EntityResolver.class)
+          .toInstance(configuration.getEntityResolvers().get(0));
+    } else {
+      bind(EntityResolver.class)
+          .toInstance(new CompositeEntityResolver(configuration.getEntityResolvers()));
+    }
+
+    // PrincipalMapper
+    if (configuration.getPrincipalMapper() == null) {
+      bind(PrincipalMapper.class).to(PermissivePrincipalMapper.class);
+    } else {
+      bind(PrincipalMapper.class).toInstance(configuration.getPrincipalMapper());
+    }
+
+    // RoleMapper
+    if (configuration.getRoleMapper() == null) {
+      bind(RoleMapper.class).to(NullRoleMapper.class);
+      bindConstant()
+          .annotatedWith(DisableRoleChecks.class)
+          .to(true);
+    } else {
+      bind(RoleMapper.class).toInstance(configuration.getRoleMapper());
+      bindConstant()
+          .annotatedWith(DisableRoleChecks.class)
+          .to(false);
+    }
   }
 }

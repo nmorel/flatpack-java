@@ -32,7 +32,7 @@ public abstract class Codex<T> {
   /**
    * Returns a type descriptor for the JSON structure created by the Codex implementation.
    */
-  public abstract Type describe(TypeContext context);
+  public abstract Type describe();
 
   /**
    * Returns a suffix to append to properties of the Codex's type.

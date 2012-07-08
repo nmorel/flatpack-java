@@ -26,5 +26,8 @@ import javax.annotation.security.RolesAllowed;
  * assignability is used to determine role inheritance.
  */
 public interface RoleMapper {
+  /**
+   * Returns a class peer for a role name or {@code null} if the role name is not supported.
+   */
   Class<?> mapRole(String roleName);
 }

@@ -29,18 +29,18 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.validation.ConstraintViolation;
 
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.TypeContext;
-import com.getperka.flatpack.inject.FlatPackModule.PrettyPrint;
-import com.getperka.flatpack.inject.FlatPackModule.Verbose;
 import com.getperka.flatpack.inject.PackScope;
+import com.getperka.flatpack.inject.PrettyPrint;
+import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.stream.JsonWriter;
-import com.google.inject.Injector;
 
 /**
  * Writes {@link FlatPackEntity} objects into a {@link Writer}.
@@ -48,7 +48,7 @@ import com.google.inject.Injector;
 public class Packer {
 
   @Inject
-  private Injector injector;
+  private Provider<SerializationContext> contexts;
   @Inject
   private PackScope packScope;
   @Inject
@@ -117,7 +117,7 @@ public class Packer {
   }
 
   private void pack(FlatPackEntity<?> entity) throws IOException {
-    SerializationContext context = injector.getInstance(SerializationContext.class);
+    SerializationContext context = contexts.get(); // injector.getInstance(SerializationContext.class);
 
     @SuppressWarnings("unchecked")
     Codex<Object> codex = (Codex<Object>) typeContext.getCodex(entity.getType());

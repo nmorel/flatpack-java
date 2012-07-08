@@ -26,12 +26,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PostUnpack;
@@ -46,11 +46,9 @@ import com.getperka.flatpack.ext.PropertyPath;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
-import com.getperka.flatpack.inject.FlatPackModule.Resolvers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
-import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
 
 public class EntityCodex<T extends HasUuid> extends Codex<T> {
@@ -83,17 +81,17 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
   private final Class<T> clazz;
   @Inject
-  private Injector injector;
+  private EntityResolver entityResolver;
+  @com.google.inject.Inject(optional = true)
+  private Provider<T> provider;
   private final List<Method> preUnpackMethods;
   private final List<Method> postUnpackMethods;
-
   @Inject
-  @Resolvers
-  private Collection<EntityResolver> entityResolvers;
+  private TypeContext typeContext;
 
   @Inject
   EntityCodex(TypeLiteral<T> clazz) {
-    this.clazz = (Class<T>) erase(clazz.getType());
+    this.clazz = erase(clazz.getType());
 
     List<Method> pre = new ArrayList<Method>();
     List<Method> post = new ArrayList<Method>();
@@ -155,10 +153,10 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
   }
 
   @Override
-  public Type describe(TypeContext context) {
+  public Type describe() {
     return new Type.Builder()
         .withJsonKind(JsonKind.STRING)
-        .withName(context.getPayloadName(clazz))
+        .withName(typeContext.getPayloadName(clazz))
         .build();
   }
 
@@ -205,7 +203,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
       }
 
       List<String> roles = context.getRoles();
-      for (Property prop : context.getTypeContext().extractProperties(clazz)) {
+      for (Property prop : typeContext.extractProperties(clazz)) {
         if (!prop.maySet(roles)) {
           continue;
         }
@@ -269,7 +267,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
   @Override
   public void scanNotNull(T object, SerializationContext context) throws Exception {
     // Handle subtypes of the expected type by delegating to a more specific implementation
-    Codex<HasUuid> maybeSubtype = context.getTypeContext().getCodex(object.getClass());
+    Codex<HasUuid> maybeSubtype = typeContext.getCodex(object.getClass());
     if (this == maybeSubtype) {
       if (context.add(object)) {
         traverse(object, false, context, null);
@@ -314,18 +312,15 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
       // Possibly delegate to injected resolvers
       if (useResolvers) {
-        for (EntityResolver resolver : entityResolvers) {
-          toReturn = resolver.resolve(clazz, uuid);
-          if (toReturn != null) {
-            resolved = true;
-            break;
-          }
+        toReturn = entityResolver.resolve(clazz, uuid);
+        if (toReturn != null) {
+          resolved = true;
         }
       }
 
       // Otherwise try to construct a new instance
-      if (toReturn == null) {
-        toReturn = injector.getInstance(clazz);
+      if (toReturn == null && provider != null) {
+        toReturn = provider.get();
       }
 
       toReturn.setUuid(uuid);
@@ -354,7 +349,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
     if (object == null) return;
 
     // Write all properties
-    for (Property prop : context.getTypeContext().extractProperties(clazz)) {
+    for (Property prop : typeContext.extractProperties(clazz)) {
       // Check access
       if (!prop.mayGet(context.getRoles())) {
         continue;

@@ -32,13 +32,14 @@ import com.getperka.flatpack.util.FlatPackCollections;
  * Provides configuration options when creating {@link FlatPack} instances.
  */
 public class Configuration {
+
   private final Set<Class<?>> allTypes = FlatPackCollections.setForIteration();
   private List<CodexMapper> extraMappers = FlatPackCollections.listForAny();
   private boolean ignoreUnresolvableTypes = false;
   private boolean prettyPrint;
-  private PrincipalMapper principalMapper;
+  private PrincipalMapper principalMapper = null;
   private List<EntityResolver> resolvers = FlatPackCollections.listForAny();
-  private RoleMapper roleMapper;
+  private RoleMapper roleMapper = null;
   private boolean verbose;
 
   /**

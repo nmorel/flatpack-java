@@ -1,8 +1,5 @@
 package com.getperka.flatpack.inject;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.security.Principal;
 import java.util.Map;
 
@@ -12,24 +9,43 @@ import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.TraversalMode;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.stream.JsonWriter;
-import com.google.inject.BindingAnnotation;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
-import com.google.inject.util.Providers;
 
+/**
+ * Provides injection for objects whose lifespans are bounded by a pack or unpack operation.
+ */
 public class PackScope implements Scope {
 
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  @BindingAnnotation
-  public @interface LastModifiedTime {}
+  private static class DummyProvider implements Provider<Object> {
+    private static final DummyProvider INSTANCE = new DummyProvider();
 
-  @Documented
-  @Retention(RetentionPolicy.RUNTIME)
-  @BindingAnnotation
-  public @interface PackPrincipal {}
+    @Override
+    public Object get() {
+      throw new IllegalStateException("Not in a PackScope");
+    }
+  }
 
+  /**
+   * Returns a dummy provider that always throws an exception. This provider is injected as the
+   * default provider for bindings that can only be satisfied inside of the pack scope.
+   */
+  public static <T> Provider<T> provider() {
+    return cast(DummyProvider.INSTANCE);
+  }
+
+  /**
+   * Utility method for an unchecked cast.
+   */
+  @SuppressWarnings("unchecked")
+  private static <T> Provider<T> cast(Provider<?> provider) {
+    return (Provider<T>) provider;
+  }
+
+  /**
+   * Retains the thread-local data.
+   */
   private final ThreadLocal<Map<Key<?>, Object>> allData = new ThreadLocal<Map<Key<?>, Object>>();
 
   PackScope() {}
@@ -41,15 +57,6 @@ public class PackScope implements Scope {
 
   public void exit() {
     allData.remove();
-  }
-
-  public <T> Provider<T> provider() {
-    return cast(new Provider<Object>() {
-      @Override
-      public Object get() {
-        throw new IllegalStateException("Not in a PackScope");
-      }
-    });
   }
 
   @Override
@@ -77,33 +84,41 @@ public class PackScope implements Scope {
   }
 
   public PackScope withJsonWriter(JsonWriter writer) {
-    allData.get().put(Key.get(JsonWriter.class), writer);
+    Key<JsonWriter> key = Key.get(JsonWriter.class);
+    if (writer == null) {
+      allData.get().remove(key);
+    } else {
+      allData.get().put(key, writer);
+    }
     return this;
   }
 
   public PackScope withLastModifiedTime(DateTime lastModified) {
-    allData.get().put(Key.get(DateTime.class, LastModifiedTime.class), lastModified);
+    Key<DateTime> key = Key.get(DateTime.class, LastModifiedTime.class);
+    if (lastModified == null) {
+      lastModified = new DateTime(0);
+    }
+    allData.get().put(key, lastModified);
     return this;
   }
 
   public PackScope withPrincipal(Principal principal) {
-    allData.get().put(Key.get(Principal.class, PackPrincipal.class), principal);
+    Key<Principal> key = Key.get(Principal.class);
+    if (principal == null) {
+      allData.get().remove(key);
+    } else {
+      allData.get().put(key, principal);
+    }
     return this;
   }
 
   public PackScope withTraversalMode(TraversalMode mode) {
-    allData.get().put(Key.get(TraversalMode.class), mode);
+    Key<TraversalMode> key = Key.get(TraversalMode.class);
+    if (mode == null) {
+      allData.get().remove(key);
+    } else {
+      allData.get().put(key, mode);
+    }
     return this;
   }
-
-  @SuppressWarnings("unchecked")
-  private <T> Provider<T> cast(Provider<?> provider) {
-    return (Provider<T>) provider;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> Provider<T> provide(Object value) {
-    return (Provider<T>) Providers.of(value);
-  }
-
 }

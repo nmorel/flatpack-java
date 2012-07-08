@@ -30,18 +30,23 @@ import org.joda.time.DateTime;
 import com.getperka.flatpack.HasTimestamps;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.TraversalMode;
+import com.getperka.flatpack.inject.LastModifiedTime;
+import com.getperka.flatpack.inject.PackScoped;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.stream.JsonWriter;
 
 /**
  * Holds all of the state necessary to perform a serialization.
  */
+@PackScoped
 public class SerializationContext extends BaseContext {
 
   private final Map<HasUuid, Void> entities = FlatPackCollections.mapForIteration();
 
   @Inject
+  @LastModifiedTime
   private DateTime lastModifiedTime;
+
   @Inject
   private TraversalMode traversalMode;
   @Inject
@@ -70,7 +75,7 @@ public class SerializationContext extends BaseContext {
    * cutoff time.
    */
   public Set<HasUuid> getEntities() {
-    if (lastModifiedTime == null) {
+    if (lastModifiedTime.getMillis() == 0) {
       return entities.keySet();
     }
     Set<HasUuid> toReturn = FlatPackCollections.setForIteration();

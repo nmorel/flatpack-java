@@ -189,20 +189,20 @@ public class ApiDescriber {
         Type parameterType = parameters[i];
         if (annotations[i].length == 0) {
           // Assume that an un-annotated parameter is the main entity type
-          desc.setEntity(ctx.getCodex(parameterType).describe(ctx));
+          desc.setEntity(ctx.getCodex(parameterType).describe());
         } else {
           for (Annotation annotation : annotations[i]) {
             if (PathParam.class.equals(annotation.annotationType())) {
               PathParam pathParam = (PathParam) annotation;
               ParameterDescription param = new ParameterDescription(desc, pathParam.value(),
-                  ctx.getCodex(parameterType).describe(ctx));
+                  ctx.getCodex(parameterType).describe());
               String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
               param.setDocString(replaceLinks(docString, classesToPayloadNames));
               pathParams.add(param);
             } else if (QueryParam.class.equals(annotation.annotationType())) {
               QueryParam queryParam = (QueryParam) annotation;
               ParameterDescription param = new ParameterDescription(desc, queryParam.value(),
-                  ctx.getCodex(parameterType).describe(ctx));
+                  ctx.getCodex(parameterType).describe());
               String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
               param.setDocString(replaceLinks(docString, classesToPayloadNames));
               queryParams.add(param);
@@ -215,7 +215,7 @@ public class ApiDescriber {
       FlatPackResponse responseAnnotation = method.getAnnotation(FlatPackResponse.class);
       if (responseAnnotation != null) {
         Type returnType = FlatPackTypes.createType(responseAnnotation.value());
-        desc.setReturnType(ctx.getCodex(returnType).describe(ctx));
+        desc.setReturnType(ctx.getCodex(returnType).describe());
       }
 
       String docString = getDocStrings(declaringClass).get(methodKey);

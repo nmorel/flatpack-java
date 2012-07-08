@@ -41,6 +41,7 @@ import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.SuppressDefaultValue;
+import com.getperka.flatpack.inject.DisableRoleChecks;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
@@ -51,11 +52,21 @@ public class Property extends BaseHasUuid {
   /**
    * Constructs {@link Property} instances.
    */
-  public static class Builder {
-    private boolean allowAll;
-    private Property prop = new Property();
+  static class Builder {
 
-    public Property build(TypeContext context) {
+    @Inject
+    @DisableRoleChecks
+    private boolean allowAll;
+
+    @Inject
+    private Property prop;
+
+    @Inject
+    private TypeContext typeContext;
+
+    Builder() {}
+
+    public Property build() {
       Property toReturn = prop;
       prop = null;
 
@@ -75,14 +86,14 @@ public class Property extends BaseHasUuid {
       Method getter = toReturn.getGetter();
       if (getter != null) {
         Class<?> enclosingType = getter.getDeclaringClass();
-        toReturn.enclosingTypeName = context.getPayloadName(enclosingType);
+        toReturn.enclosingTypeName = typeContext.getPayloadName(enclosingType);
 
         java.lang.reflect.Type returnType = getter.getGenericReturnType();
-        toReturn.codex = context.getCodex(returnType);
+        toReturn.codex = typeContext.getCodex(returnType);
         toReturn.embedded = getter.isAnnotationPresent(Embedded.class);
         toReturn.inheritPrincipal = getter.isAnnotationPresent(InheritPrincipal.class);
         toReturn.suppressDefaultValue = getter.isAnnotationPresent(SuppressDefaultValue.class);
-        toReturn.type = toReturn.codex.describe(context);
+        toReturn.type = toReturn.codex.describe();
       }
 
       return toReturn;
@@ -110,11 +121,6 @@ public class Property extends BaseHasUuid {
       return prop;
     }
 
-    public Builder withAllowAllRoles(boolean allowAll) {
-      this.allowAll = allowAll;
-      return this;
-    }
-
     public Builder withDeepTraversalOnly(boolean only) {
       prop.deepTraversalOnly = only;
       return this;
@@ -133,11 +139,6 @@ public class Property extends BaseHasUuid {
 
     public Builder withName(String name) {
       prop.name = name;
-      return this;
-    }
-
-    public Builder withRoleMapper(RoleMapper roleMapper) {
-      prop.roleMapper = roleMapper;
       return this;
     }
 
@@ -183,6 +184,9 @@ public class Property extends BaseHasUuid {
     }
     for (String cred : credentials) {
       Class<?> credView = roleMapper.mapRole(cred);
+      if (credView == null) {
+        continue;
+      }
       if (required.contains(credView)) {
         return true;
       }
@@ -251,7 +255,10 @@ public class Property extends BaseHasUuid {
     }
     Set<Class<?>> toReturn = FlatPackCollections.setForIteration();
     for (String name : roleNames) {
-      toReturn.add(mapper.mapRole(name));
+      Class<?> roleClass = mapper.mapRole(name);
+      if (roleClass != null) {
+        toReturn.add(roleClass);
+      }
     }
     return Collections.unmodifiableSet(toReturn);
   }
@@ -271,6 +278,7 @@ public class Property extends BaseHasUuid {
   private Property implied;
   private boolean inheritPrincipal;
   private String name;
+  @Inject
   private RoleMapper roleMapper;
   private Method setter;
   private Set<Class<?>> setterRoles;
