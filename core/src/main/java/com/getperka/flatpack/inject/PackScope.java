@@ -51,6 +51,9 @@ public class PackScope implements Scope {
   PackScope() {}
 
   public PackScope enter() {
+    if (allData.get() != null) {
+      throw new IllegalStateException("Already in a PackScope");
+    }
     allData.set(FlatPackCollections.<Key<?>, Object> mapForLookup());
     return this;
   }

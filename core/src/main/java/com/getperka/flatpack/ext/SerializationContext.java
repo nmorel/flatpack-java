@@ -49,6 +49,7 @@ public class SerializationContext extends BaseContext {
 
   @Inject
   private TraversalMode traversalMode;
+
   @Inject
   private JsonWriter writer;
 

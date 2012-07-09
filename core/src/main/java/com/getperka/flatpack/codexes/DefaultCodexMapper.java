@@ -22,6 +22,7 @@ package com.getperka.flatpack.codexes;
 import static com.getperka.flatpack.util.FlatPackTypes.BOXED_TYPES;
 import static com.getperka.flatpack.util.FlatPackTypes.PRIMITIVE_TYPES;
 import static com.getperka.flatpack.util.FlatPackTypes.box;
+import static com.getperka.flatpack.util.FlatPackTypes.createType;
 import static com.getperka.flatpack.util.FlatPackTypes.erase;
 import static com.getperka.flatpack.util.FlatPackTypes.getParameterization;
 import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization;
@@ -41,7 +42,6 @@ import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.ext.TypeHint;
-import com.getperka.flatpack.util.FlatPackTypes;
 import com.google.gson.JsonElement;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -68,8 +68,7 @@ public class DefaultCodexMapper implements CodexMapper {
       toReturn = new CollectionCodex(erased, context.getCodex(valueType));
     } else if (erased.isArray()) {
       // Treat an array like a list
-      Class<?> valueType = erased.getComponentType();
-      toReturn = new ArrayCodex(valueType, context.getCodex(valueType));
+      toReturn = getInstance(ArrayCodex.class, erased.getComponentType());
     } else if (Map.class.isAssignableFrom(erased)) {
       // Maps can be <String, ?> or <HasUuid, ?>
       Type[] params = getParameterization(Map.class, type);
@@ -91,8 +90,7 @@ public class DefaultCodexMapper implements CodexMapper {
     } else if (Enum.class.isAssignableFrom(erased)) {
       toReturn = new EnumCodex(erased);
     } else if (HasUuid.class.isAssignableFrom(erased)) {
-      Key<?> key = Key.get(FlatPackTypes.createType(EntityCodex.class, type));
-      toReturn = (Codex<?>) injector.getInstance(key);
+      toReturn = getInstance(EntityCodex.class, type);
     } else if (JsonElement.class.isAssignableFrom(erased)) {
       toReturn = new JsonElementCodex();
     } else if (TypeHint.class.isAssignableFrom(erased)) {
@@ -120,6 +118,11 @@ public class DefaultCodexMapper implements CodexMapper {
       } catch (NoSuchMethodException expected) {}
     }
     return toReturn;
+  }
+
+  private Codex<?> getInstance(Class<?> codexType, Type type) {
+    Key<?> key = Key.get(createType(codexType, type));
+    return (Codex<?>) injector.getInstance(key);
   }
 
 }

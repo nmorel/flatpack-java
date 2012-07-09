@@ -28,6 +28,7 @@ import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.inject.FlatPackModule;
 import com.google.inject.Guice;
+import com.google.inject.Stage;
 
 /**
  * The main entry-point to the FlatPack API. This type exists to provide a central point for
@@ -38,7 +39,8 @@ public class FlatPack {
    * Create a new instance of FlatPack.
    */
   public static synchronized FlatPack create(Configuration configuration) {
-    return Guice.createInjector(new FlatPackModule(configuration)).getInstance(FlatPack.class);
+    return Guice.createInjector(Stage.PRODUCTION,
+        new FlatPackModule(configuration)).getInstance(FlatPack.class);
   }
 
   @Inject

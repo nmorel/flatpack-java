@@ -19,25 +19,33 @@
  */
 package com.getperka.flatpack.codexes;
 
+import static com.getperka.flatpack.util.FlatPackTypes.erase;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
+
+import javax.inject.Inject;
 
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.TypeLiteral;
 
 public class ArrayCodex<T> extends Codex<T[]> {
   private final Class<T> elementType;
   private final Codex<T> valueCodex;
 
-  public ArrayCodex(Class<T> elementType, Codex<T> valueCodex) {
-    this.elementType = elementType;
-    this.valueCodex = valueCodex;
+  @Inject
+  @SuppressWarnings("unchecked")
+  ArrayCodex(TypeLiteral<T> elementType, TypeContext context) {
+    this.elementType = erase(elementType.getType());
+    this.valueCodex = (Codex<T>) context.getCodex(elementType.getType());
   }
 
   @Override
