@@ -30,6 +30,9 @@ import java.util.UUID;
 
 import javax.validation.ConstraintViolation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.SerializationContext;
@@ -42,6 +45,7 @@ import com.google.gson.stream.JsonWriter;
  */
 public class Packer {
 
+  private static final Logger logger = LoggerFactory.getLogger(Packer.class);
   private final Configuration configuration;
   private final TypeContext typeContext;
 
@@ -151,7 +155,7 @@ public class Packer {
 
     if (configuration.isVerbose()) {
       String payload = verboseWriter.toString();
-      System.out.println(payload);
+      logger.debug("Outgoing flatpack payload:\n{}", payload);
       out.write(payload);
       out.close();
     }
