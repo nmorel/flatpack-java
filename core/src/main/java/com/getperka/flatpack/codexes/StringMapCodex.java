@@ -22,20 +22,26 @@ package com.getperka.flatpack.codexes;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.TypeLiteral;
 
-public class StringMapCodex<V> extends Codex<Map<Object, V>> {
+public class StringMapCodex<V> extends Codex<Map<String, V>> {
   private final Codex<V> valueCodex;
 
-  public StringMapCodex(Codex<V> valueCodex) {
-    this.valueCodex = valueCodex;
+  @Inject
+  @SuppressWarnings("unchecked")
+  StringMapCodex(TypeLiteral<V> valueType, TypeContext typeContext) {
+    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
   }
 
   @Override
@@ -55,9 +61,9 @@ public class StringMapCodex<V> extends Codex<Map<Object, V>> {
   }
 
   @Override
-  public Map<Object, V> readNotNull(JsonElement element, DeserializationContext context)
+  public Map<String, V> readNotNull(JsonElement element, DeserializationContext context)
       throws IOException {
-    Map<Object, V> toReturn = FlatPackCollections.mapForIteration();
+    Map<String, V> toReturn = FlatPackCollections.mapForIteration();
     for (Map.Entry<String, JsonElement> elt : element.getAsJsonObject().entrySet()) {
       context.pushPath("[" + elt.getKey() + "]");
       try {
@@ -71,8 +77,8 @@ public class StringMapCodex<V> extends Codex<Map<Object, V>> {
   }
 
   @Override
-  public void scanNotNull(Map<Object, V> object, SerializationContext context) {
-    for (Map.Entry<Object, V> entry : object.entrySet()) {
+  public void scanNotNull(Map<String, V> object, SerializationContext context) {
+    for (Map.Entry<String, V> entry : object.entrySet()) {
       context.pushPath("[" + entry.getKey() + "]");
       try {
         valueCodex.scan(entry.getValue(), context);
@@ -83,11 +89,11 @@ public class StringMapCodex<V> extends Codex<Map<Object, V>> {
   }
 
   @Override
-  public void writeNotNull(Map<Object, V> object, SerializationContext context)
+  public void writeNotNull(Map<String, V> object, SerializationContext context)
       throws IOException {
     JsonWriter writer = context.getWriter();
     writer.beginObject();
-    for (Map.Entry<Object, V> entry : object.entrySet()) {
+    for (Map.Entry<String, V> entry : object.entrySet()) {
       String key = entry.getKey().toString();
       context.pushPath("[" + key + "]");
       try {

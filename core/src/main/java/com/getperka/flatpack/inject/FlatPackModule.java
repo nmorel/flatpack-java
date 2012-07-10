@@ -33,7 +33,6 @@ public class FlatPackModule extends AbstractModule {
   protected void configure() {
     // Bind TypeContext in singleton, because we want referential integrity
     bind(TypeContext.class).in(Scopes.SINGLETON);
-
     bind(Logger.class).toInstance(LoggerFactory.getLogger(FlatPack.class));
 
     // Bind simple constants

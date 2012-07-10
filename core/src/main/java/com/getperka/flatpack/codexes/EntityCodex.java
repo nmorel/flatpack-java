@@ -24,7 +24,6 @@ import static com.getperka.flatpack.util.FlatPackTypes.erase;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,9 +39,7 @@ import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.ext.JsonKind;
-import com.getperka.flatpack.ext.PrincipalMapper;
 import com.getperka.flatpack.ext.Property;
-import com.getperka.flatpack.ext.PropertyPath;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
@@ -52,32 +49,6 @@ import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
 public class EntityCodex<T extends HasUuid> extends Codex<T> {
-  public static class MyReceiver implements PropertyPath.Receiver {
-    private final Principal lookFor;
-    private final PrincipalMapper mapper;
-    private boolean result;
-
-    public MyReceiver(PrincipalMapper mapper, Principal lookFor) {
-      this.lookFor = lookFor;
-      this.mapper = mapper;
-    }
-
-    public boolean getResult() {
-      return result;
-    }
-
-    @Override
-    public boolean receive(Object value) {
-      if (value instanceof HasUuid) {
-        List<Principal> principals = mapper.getPrincipals((HasUuid) value);
-        if (principals != null && principals.contains(lookFor)) {
-          result = true;
-          return false;
-        }
-      }
-      return true;
-    }
-  }
 
   private final Class<T> clazz;
   @Inject

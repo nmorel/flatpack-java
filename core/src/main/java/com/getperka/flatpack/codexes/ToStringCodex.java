@@ -36,7 +36,7 @@ import com.google.gson.JsonElement;
 public class ToStringCodex<T> extends ValueCodex<T> {
   private final Constructor<T> constructor;
 
-  public ToStringCodex(Constructor<T> constructor) {
+  ToStringCodex(Constructor<T> constructor) {
     this.constructor = constructor;
   }
 

@@ -29,15 +29,17 @@ import java.util.UUID;
 import javax.inject.Inject;
 
 import com.getperka.flatpack.HasUuid;
-import com.getperka.flatpack.codexes.EntityCodex.MyReceiver;
 import com.getperka.flatpack.inject.PackScoped;
 import com.getperka.flatpack.util.FlatPackCollections;
+import com.google.inject.Provider;
 
 /**
  * Contains state relating to in-process deserialization.
  */
 @PackScoped
 public class DeserializationContext extends BaseContext {
+  @Inject
+  private Provider<PropertyPathChecker> checkers;
   private final Map<UUID, HasUuid> entities = FlatPackCollections.mapForLookup();
   private final Map<HasUuid, Set<Property>> modified = FlatPackCollections.mapForLookup();
   @Inject
@@ -84,10 +86,10 @@ public class DeserializationContext extends BaseContext {
     }
 
     List<PropertyPath> paths = typeContext.getPrincipalPaths(object.getClass());
-    MyReceiver receiver = new MyReceiver(principalMapper, principal);
+    PropertyPathChecker checker = checkers.get();
     for (PropertyPath path : paths) {
-      path.evaluate(object, receiver);
-      if (receiver.getResult()) {
+      path.evaluate(object, checker);
+      if (checker.getResult()) {
         return true;
       }
     }

@@ -30,7 +30,9 @@ import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -42,7 +44,9 @@ import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.ext.TypeHint;
+import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
+import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
@@ -51,78 +55,118 @@ import com.google.inject.Key;
  */
 public class DefaultCodexMapper implements CodexMapper {
 
-  @Inject
-  private Injector injector;
+  private final Injector injector;
+  private final Map<Class<?>, ValueCodex<?>> simpleCodexes = FlatPackCollections.mapForLookup();
 
-  DefaultCodexMapper() {}
+  @Inject
+  DefaultCodexMapper(Injector injector) {
+    this.injector = injector;
+
+    simpleCodexes.put(boolean.class, injector.getInstance(BooleanCodex.class));
+    simpleCodexes.put(Boolean.class, injector.getInstance(BooleanCodex.class));
+    simpleCodexes.put(Class.class, injector.getInstance(HasUuidClassCodex.class));
+    simpleCodexes.put(DateTimeZone.class, injector.getInstance(DateTimeZoneCodex.class));
+    simpleCodexes.put(JsonElement.class, injector.getInstance(JsonElementCodex.class));
+    simpleCodexes.put(String.class, injector.getInstance(StringCodex.class));
+    simpleCodexes.put(TypeHint.class, injector.getInstance(TypeHintCodex.class));
+    simpleCodexes.put(UUID.class, injector.getInstance(UUIDCodex.class));
+    simpleCodexes.put(void.class, injector.getInstance(VoidCodex.class));
+    simpleCodexes.put(Void.class, injector.getInstance(VoidCodex.class));
+
+    for (Class<?> clazz : BOXED_TYPES) {
+      if (Number.class.isAssignableFrom(clazz)) {
+        @SuppressWarnings("unchecked")
+        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, clazz));
+        simpleCodexes.put(clazz, injector.getInstance(key));
+      }
+    }
+
+    for (Class<?> clazz : PRIMITIVE_TYPES) {
+      clazz = box(clazz);
+      if (Number.class.isAssignableFrom(clazz)) {
+        @SuppressWarnings("unchecked")
+        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, clazz));
+        simpleCodexes.put(clazz, injector.getInstance(key));
+      }
+    }
+  }
 
   @Override
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public Codex<?> getCodex(TypeContext context, Type type) {
-    Codex<?> toReturn = null;
+    // Simple types
+    if (simpleCodexes.containsKey(type)) {
+      return simpleCodexes.get(type);
+    }
+
     Class<?> erased = erase(type);
 
+    // Entities
+    if (HasUuid.class.isAssignableFrom(erased)) {
+      return getInstance(EntityCodex.class, type);
+    }
+
+    // Enums
+    if (Enum.class.isAssignableFrom(erased)) {
+      return getInstance(EnumCodex.class, erased);
+    }
+
     // Collections and collection-like objects
-    if (Collection.class.isAssignableFrom(erased)) {
-      Type valueType = getSingleParameterization(type, Collection.class);
-      toReturn = new CollectionCodex(erased, context.getCodex(valueType));
-    } else if (erased.isArray()) {
+    if (erased.isArray()) {
       // Treat an array like a list
-      toReturn = getInstance(ArrayCodex.class, erased.getComponentType());
-    } else if (Map.class.isAssignableFrom(erased)) {
-      // Maps can be <String, ?> or <HasUuid, ?>
+      return getInstance(ArrayCodex.class, erased.getComponentType());
+    }
+    if (Collection.class.equals(erased) || List.class.isAssignableFrom(erased)) {
+      Type valueType = getSingleParameterization(type, Collection.class);
+      return getInstance(ListCodex.class, valueType);
+    }
+    if (Set.class.isAssignableFrom(erased)) {
+      Type valueType = getSingleParameterization(type, Collection.class);
+      return getInstance(SetCodex.class, valueType);
+    }
+
+    // Maps, either <String, ?> or <HasUuid, ?>
+    if (Map.class.isAssignableFrom(erased)) {
       Type[] params = getParameterization(Map.class, type);
       if (HasUuid.class.isAssignableFrom(erase(params[0]))) {
-        toReturn = new EntityMapCodex((EntityCodex<?>) context.getCodex(params[0]),
-            context.getCodex(params[1]));
-      } else {
-        toReturn = new StringMapCodex(context.getCodex(params[1]));
+        return getInstance(EntityMapCodex.class, params[0], params[1]);
+      } else if (String.class.equals(params[0])) {
+        return getInstance(StringMapCodex.class, params[1]);
       }
-      // Scalar types below here
-    } else if (Boolean.class.equals(erased) || boolean.class.equals(erased)) {
-      toReturn = new BooleanCodex();
-    } else if (CharSequence.class.isAssignableFrom(erased)) {
-      toReturn = new StringCodex();
-    } else if (Class.class.equals(erased)) {
-      toReturn = new HasUuidClassCodex();
-    } else if (DateTimeZone.class.isAssignableFrom(erased)) {
-      toReturn = new DateTimeZoneCodex();
-    } else if (Enum.class.isAssignableFrom(erased)) {
-      toReturn = new EnumCodex(erased);
-    } else if (HasUuid.class.isAssignableFrom(erased)) {
-      toReturn = getInstance(EntityCodex.class, type);
-    } else if (JsonElement.class.isAssignableFrom(erased)) {
-      toReturn = new JsonElementCodex();
-    } else if (TypeHint.class.isAssignableFrom(erased)) {
-      toReturn = new TypeHintCodex();
-    } else if (UUID.class.equals(erased)) {
-      toReturn = new UUIDCodex();
-    } else if (Void.class.equals(erased) || void.class.equals(erased)) {
-      toReturn = new VoidCodex();
-    } else if (BOXED_TYPES.contains(erased)) {
-      toReturn = new NumberCodex(erased);
-    } else if (PRIMITIVE_TYPES.contains(erased)) {
-      toReturn = new NumberCodex(box(erased));
-    } else {
-      /*
-       * Try to find a one-arg String or Object constructor. This is kind of shady, but it works for
-       * a number of the auxiliary value types used in the model classes, mainly joda-time.
-       */
-      try {
-        Constructor<?> constructor = erased.getConstructor(String.class);
-        toReturn = new ToStringCodex(constructor);
-      } catch (NoSuchMethodException expected) {}
-      try {
-        Constructor<?> constructor = erased.getConstructor(Object.class);
-        toReturn = new ToStringCodex(constructor);
-      } catch (NoSuchMethodException expected) {}
     }
-    return toReturn;
+
+    /*
+     * Try to find a one-arg String or Object constructor. This is kind of shady, but it works for a
+     * number of the auxiliary value types used in the model classes, mainly joda-time.
+     */
+    try {
+      Constructor<?> constructor = erased.getConstructor(String.class);
+      return new ToStringCodex(constructor);
+    } catch (NoSuchMethodException expected) {}
+    try {
+      Constructor<?> constructor = erased.getConstructor(Object.class);
+      return new ToStringCodex(constructor);
+    } catch (NoSuchMethodException expected) {}
+    return null;
   }
 
   private Codex<?> getInstance(Class<?> codexType, Type type) {
-    Key<?> key = Key.get(createType(codexType, type));
+    Key<?> key;
+    try {
+      key = Key.get(createType(codexType, type));
+    } catch (ConfigurationException e) {
+      key = Key.get(createType(codexType, erase(type)));
+    }
     return (Codex<?>) injector.getInstance(key);
   }
 
+  private Codex<?> getInstance(Class<?> codexType, Type type, Type type2) {
+    Key<?> key;
+    try {
+      key = Key.get(createType(codexType, type, type2));
+    } catch (ConfigurationException e) {
+      key = Key.get(createType(codexType, erase(type)));
+    }
+    return (Codex<?>) injector.getInstance(key);
+  }
 }

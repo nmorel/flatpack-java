@@ -20,33 +20,25 @@
 package com.getperka.flatpack.codexes;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
+
+import javax.inject.Inject;
 
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.TypeLiteral;
 
-public class CollectionCodex<T> extends Codex<Collection<T>> {
-  private final Class<?> collectionType;
-  private final Codex<T> valueCodex;
+public abstract class CollectionCodex<T extends Collection<V>, V> extends Codex<T> {
+  private Codex<V> valueCodex;
 
-  public CollectionCodex(Class<? extends Collection<?>> collectionType,
-      Codex<T> valueCodex) {
-    if (Set.class.isAssignableFrom(collectionType)) {
-      this.collectionType = LinkedHashSet.class;
-    } else {
-      this.collectionType = ArrayList.class;
-    }
-    this.valueCodex = valueCodex;
-  }
+  CollectionCodex() {}
 
   @Override
   public Type describe() {
@@ -62,10 +54,9 @@ public class CollectionCodex<T> extends Codex<Collection<T>> {
   }
 
   @Override
-  public Collection<T> readNotNull(JsonElement element, DeserializationContext context)
+  public T readNotNull(JsonElement element, DeserializationContext context)
       throws Exception {
-    @SuppressWarnings("unchecked")
-    Collection<T> toReturn = (Collection<T>) collectionType.newInstance();
+    T toReturn = newCollection();
     JsonArray array = element.getAsJsonArray();
     int count = 0;
     for (JsonElement elt : array) {
@@ -77,26 +68,33 @@ public class CollectionCodex<T> extends Codex<Collection<T>> {
   }
 
   @Override
-  public void scanNotNull(Collection<T> object, SerializationContext context) throws Exception {
+  public void scanNotNull(T collection, SerializationContext context) throws Exception {
     int count = 0;
-    for (T t : object) {
+    for (V t : collection) {
       context.pushPath("[" + count++ + "]");
-      valueCodex.scanNotNull(t, context);
+      valueCodex.scan(t, context);
       context.popPath();
     }
   }
 
   @Override
-  public void writeNotNull(Collection<T> object, SerializationContext context)
-      throws IOException {
+  public void writeNotNull(T collection, SerializationContext context) throws IOException {
     JsonWriter writer = context.getWriter();
     writer.beginArray();
     int count = 0;
-    for (T t : object) {
+    for (V t : collection) {
       context.pushPath("[" + count++ + "]");
       valueCodex.write(t, context);
       context.popPath();
     }
     writer.endArray();
+  }
+
+  protected abstract T newCollection();
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void setType(TypeLiteral<V> valueType, TypeContext context) {
+    valueCodex = (Codex<V>) context.getCodex(valueType.getType());
   }
 }

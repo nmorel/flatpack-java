@@ -32,6 +32,8 @@ import com.google.gson.JsonElement;
 public class UUIDCodex extends ValueCodex<UUID> {
   public static final TypeHint HINT = TypeHint.create(UUID.class);
 
+  UUIDCodex() {}
+
   @Override
   public Type describe() {
     return new Type.Builder()

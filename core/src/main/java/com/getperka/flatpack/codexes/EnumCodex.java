@@ -25,17 +25,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
+import com.google.inject.TypeLiteral;
 
 public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
   private final Class<E> clazz;
 
-  public EnumCodex(Class<E> clazz) {
-    this.clazz = clazz;
+  @Inject
+  @SuppressWarnings("unchecked")
+  EnumCodex(TypeLiteral<E> type) {
+    clazz = (Class<E>) type.getRawType();
   }
 
   @Override

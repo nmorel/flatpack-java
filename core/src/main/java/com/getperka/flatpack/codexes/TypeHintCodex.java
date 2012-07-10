@@ -32,6 +32,8 @@ import com.google.gson.JsonElement;
 public class TypeHintCodex extends ValueCodex<TypeHint> {
   public static TypeHint HINT = TypeHint.create(TypeHint.class);
 
+  TypeHintCodex() {}
+
   @Override
   public Type describe() {
     return new Type.Builder()

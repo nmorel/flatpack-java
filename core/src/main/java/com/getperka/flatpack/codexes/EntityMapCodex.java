@@ -22,16 +22,20 @@ package com.getperka.flatpack.codexes;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.stream.JsonWriter;
+import com.google.inject.TypeLiteral;
 
 /**
  * Provides a mapping of entities to arbitrary values.
@@ -40,9 +44,11 @@ public class EntityMapCodex<K extends HasUuid, V> extends Codex<Map<K, V>> {
   private final EntityCodex<K> keyCodex;
   private final Codex<V> valueCodex;
 
-  public EntityMapCodex(EntityCodex<K> keyCodex, Codex<V> valueCodex) {
+  @Inject
+  @SuppressWarnings("unchecked")
+  EntityMapCodex(EntityCodex<K> keyCodex, TypeLiteral<V> valueType, TypeContext typeContext) {
     this.keyCodex = keyCodex;
-    this.valueCodex = valueCodex;
+    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
   }
 
   @Override

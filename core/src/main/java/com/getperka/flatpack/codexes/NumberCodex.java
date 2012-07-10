@@ -21,17 +21,22 @@ package com.getperka.flatpack.codexes;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
+import com.google.inject.TypeLiteral;
 
 public class NumberCodex<N extends Number> extends ValueCodex<N> {
   private final Class<N> clazz;
 
-  public NumberCodex(Class<N> clazz) {
-    this.clazz = clazz;
+  @Inject
+  @SuppressWarnings("unchecked")
+  NumberCodex(TypeLiteral<N> type) {
+    this.clazz = (Class<N>) type.getRawType();
   }
 
   @Override

@@ -29,6 +29,8 @@ import com.google.gson.JsonElement;
 
 public class BooleanCodex extends ValueCodex<Boolean> {
 
+  BooleanCodex() {}
+
   @Override
   public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.BOOLEAN).build();

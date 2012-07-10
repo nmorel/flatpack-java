@@ -32,6 +32,8 @@ import com.google.gson.JsonElement;
  * A pass-through codex to allow raw access to JSON payloads.
  */
 public class JsonElementCodex extends ValueCodex<JsonElement> {
+  JsonElementCodex() {}
+
   @Override
   public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.ANY).build();

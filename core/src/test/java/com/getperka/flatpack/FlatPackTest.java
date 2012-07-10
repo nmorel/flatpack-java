@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -86,6 +87,13 @@ public abstract class FlatPackTest {
    * Performs an encode/decode operation.
    */
   protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value) {
+    return testCodex(codexType, value, null);
+  }
+
+  /**
+   * Performs an encode/decode operation, accumulating any scanned entities.
+   */
+  protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value, Set<HasUuid> scanned) {
     Provider<? extends Codex<T>> codexes = injector.getProvider(Key.get(codexType));
 
     // Just smoke-test the description
@@ -94,7 +102,12 @@ public abstract class FlatPackTest {
     StringWriter out = new StringWriter();
     SerializationContext serialization = serializationContext(out);
     try {
+      Codex<T> codex = codexes.get();
+      codex.scan(value, serialization);
       codexes.get().write(value, serialization);
+      if (scanned != null) {
+        scanned.addAll(serialization.getEntities());
+      }
     } finally {
       closeContext();
     }

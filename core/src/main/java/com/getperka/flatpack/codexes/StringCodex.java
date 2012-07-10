@@ -28,6 +28,7 @@ import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
 
 public class StringCodex extends ValueCodex<String> {
+  StringCodex() {}
 
   @Override
   public Type describe() {

@@ -29,6 +29,8 @@ import com.google.gson.JsonElement;
  * Ignores all values.
  */
 public class VoidCodex extends ValueCodex<Void> {
+  VoidCodex() {}
+
   @Override
   public Type describe() {
     return new Type.Builder().withJsonKind(JsonKind.NULL).build();
