@@ -28,14 +28,11 @@ import java.io.Writer;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -92,11 +89,6 @@ public class RbDialect implements Dialect {
   }
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  /**
-   * Used at the end of the code-generation process to emit referenced enum values.
-   */
-  private final Set<Type> usedEnums = new LinkedHashSet<Type>();
 
   @Override
   public void generate(ApiDescription api, File outputDir) throws IOException {
@@ -200,6 +192,7 @@ public class RbDialect implements Dialect {
     STGroup group = new STGroupFile(getClass().getResource("rb.stg"), "UTF8", '<', '>');
     // EntityDescription are rendered as the FQN
     group.registerRenderer(EntityDescription.class, new AttributeRenderer() {
+
       @Override
       public String toString(Object o, String formatString, Locale locale) {
         EntityDescription entity = (EntityDescription) o;
@@ -288,12 +281,22 @@ public class RbDialect implements Dialect {
             }
 
             else if ("requireName".equals(propertyName)) {
-              if (entity.getTypeName().equals("baseHasUuid")) {
-                return "flatpack_core";
-              }
-              return gemName + "/" + camelCaseToUnderscore(modelModuleName) + "/"
-                + camelCaseToUnderscore(entity.getTypeName());
+              return requireNameForType(entity.getTypeName());
             }
+
+            else if ("entityProperties".equals(propertyName)) {
+
+              Map<String, Property> propertyMap = new HashMap<String, Property>();
+              for (Property p : entity.getProperties()) {
+                // TODO if we decide to encode enum types, we'll want to remove the second condition
+                if (p.getType().getName() != null && p.getType().getEnumValues() == null) {
+                  propertyMap.put(p.getName(), p);
+                }
+              }
+
+              return propertyMap.values();
+            }
+
             return super.getProperty(interp, self, o, property, propertyName);
           }
         });
@@ -321,6 +324,10 @@ public class RbDialect implements Dialect {
         if ("attrName".equals(propertyName)) {
           return camelCaseToUnderscore(p.getName());
         }
+
+        else if ("requireName".equals(propertyName)) {
+          return requireNameForType(p.getType().getName());
+        }
         return super.getProperty(interp, self, o, property, propertyName);
       }
     });
@@ -331,50 +338,11 @@ public class RbDialect implements Dialect {
       public Object getProperty(Interpreter interp, ST self, Object o,
           Object property, String propertyName)
           throws STNoSuchPropertyException {
-        Type type = (Type) o;
-        if ("flatTypes".equals(propertyName)) {
-          return flatten(type);
+
+        if (propertyName.equals("name")) {
+          return moduleName + "::" + modelModuleName + "::" + upcase(((Type) o).getName());
         }
         return super.getProperty(interp, self, o, property, propertyName);
-      }
-
-      private List<String> flatten(Type type) {
-        switch (type.getJsonKind()) {
-          case ANY:
-            return Collections.singletonList(Object.class.getCanonicalName());
-          case BOOLEAN:
-            return Collections.singletonList(Boolean.class.getCanonicalName());
-          case DOUBLE:
-            return Collections.singletonList(Double.class.getCanonicalName());
-          case INTEGER:
-            return Collections.singletonList(Integer.class.getCanonicalName());
-          case LIST: {
-            List<String> toReturn = new ArrayList<String>();
-            toReturn.add(List.class.getCanonicalName());
-            toReturn.addAll(flatten(type.getListElement()));
-            return toReturn;
-          }
-          case MAP: {
-            List<String> toReturn = new ArrayList<String>();
-            toReturn.add(Map.class.getCanonicalName());
-            toReturn.addAll(flatten(type.getMapKey()));
-            toReturn.addAll(flatten(type.getMapValue()));
-            return toReturn;
-          }
-          case NULL:
-            return Collections.singletonList(Void.class.getCanonicalName());
-          case STRING: {
-            if (type.getName() != null) {
-              return Collections.singletonList(upcase(type.getName()));
-            } else if (type.getTypeHint() != null) {
-              return Collections.singletonList(type.getTypeHint().getValue());
-            } else {
-              return Collections.singletonList(String.class.getCanonicalName());
-            }
-          }
-        }
-        throw new UnsupportedOperationException("Unknown JsonKind "
-          + type.getJsonKind());
       }
     });
 
@@ -466,5 +434,13 @@ public class RbDialect implements Dialect {
     writer.setLineWidth(80);
     enumST.write(writer);
     fileWriter.close();
+  }
+
+  private String requireNameForType(String type) {
+    if (type.equals("baseHasUuid")) {
+      return "flatpack_core";
+    }
+    return gemName + "/" + camelCaseToUnderscore(modelModuleName) + "/"
+      + camelCaseToUnderscore(type);
   }
 }

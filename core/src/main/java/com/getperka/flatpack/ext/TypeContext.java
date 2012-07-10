@@ -47,7 +47,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.HasUuid;
@@ -150,9 +149,10 @@ public class TypeContext {
   @Inject
   private Provider<Property.Builder> builderProvider;
   private final Map<String, Class<? extends HasUuid>> classes = sortedMapForIteration();
-  private final CodexMapper codexMapper;
+  @Inject
+  private CodexMapper codexMapper;
   private final Map<Type, Codex<?>> codexes = mapForLookup();
-  private static final Logger logger = LoggerFactory.getLogger(TypeContext.class);
+  private Logger logger;
   private final Map<Class<?>, List<Property>> properties = mapForLookup();
   private final Map<Class<?>, List<PropertyPath>> principalPaths = mapForLookup();
   @Inject
@@ -165,30 +165,7 @@ public class TypeContext {
   private DynamicCodex dynamicCodex;
 
   @Inject
-  TypeContext(CodexMapper codexMapper, @AllTypes Collection<Class<?>> allTypes) {
-    this.codexMapper = codexMapper;
-
-    if (allTypes.isEmpty()) {
-      logger.warn("No unpackable classes. Will not be able to deserialize entity payloads");
-      return;
-    }
-
-    for (Class<?> clazz : allTypes) {
-      if (!HasUuid.class.isAssignableFrom(clazz)) {
-        logger.warn("Ignoring type {} because it is not assignable to {}", clazz.getName(),
-            HasUuid.class.getSimpleName());
-        continue;
-      }
-      String payloadName = getPayloadName(clazz);
-      if (classes.containsKey(payloadName)) {
-        logger.error("Duplicate payload name {} in class {}",
-            payloadName, clazz.getCanonicalName());
-      } else {
-        classes.put(payloadName, clazz.asSubclass(HasUuid.class));
-        logger.debug("Flatpack map: {} -> {}", clazz.getCanonicalName(), payloadName);
-      }
-    }
-  }
+  TypeContext() {}
 
   /**
    * Examine a class and return {@link Property} helpers that describe all JSON properties that the
@@ -334,6 +311,32 @@ public class TypeContext {
     toReturn = Collections.unmodifiableList(computePrincipalPaths(clazz));
     principalPaths.put(clazz, toReturn);
     return toReturn;
+  }
+
+  @Inject
+  void setAllTypes(Logger logger, @AllTypes Collection<Class<?>> allTypes) {
+    this.logger = logger;
+
+    if (allTypes.isEmpty()) {
+      logger.warn("No unpackable classes. Will not be able to deserialize entity payloads");
+      return;
+    }
+
+    for (Class<?> clazz : allTypes) {
+      if (!HasUuid.class.isAssignableFrom(clazz)) {
+        logger.warn("Ignoring type {} because it is not assignable to {}", clazz.getName(),
+            HasUuid.class.getSimpleName());
+        continue;
+      }
+      String payloadName = getPayloadName(clazz);
+      if (classes.containsKey(payloadName)) {
+        logger.error("Duplicate payload name {} in class {}",
+            payloadName, clazz.getCanonicalName());
+      } else {
+        classes.put(payloadName, clazz.asSubclass(HasUuid.class));
+        logger.debug("Flatpack map: {} -> {}", clazz.getCanonicalName(), payloadName);
+      }
+    }
   }
 
   /**

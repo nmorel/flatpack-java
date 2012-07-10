@@ -30,6 +30,8 @@ import java.util.UUID;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.slf4j.Logger;
+
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
@@ -57,11 +59,11 @@ public class Unpacker {
   @Inject
   private boolean ignoreUnresolvableTypes;
   @Inject
+  private Logger logger;
+  @Inject
   private PackScope packScope;
-
   @Inject
   private TypeContext typeContext;
-
   @Inject
   @Verbose
   private boolean verbose;
@@ -80,7 +82,7 @@ public class Unpacker {
   public <T> FlatPackEntity<T> unpack(Type returnType, Reader in, Principal principal)
       throws IOException {
     if (verbose) {
-      in = new VerboseReader(in);
+      in = new VerboseReader(logger, in);
     }
 
     packScope.enter().withPrincipal(principal);

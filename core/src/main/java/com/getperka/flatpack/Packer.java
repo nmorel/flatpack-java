@@ -32,6 +32,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.validation.ConstraintViolation;
 
+import org.slf4j.Logger;
+
 import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.SerializationContext;
@@ -49,6 +51,8 @@ public class Packer {
 
   @Inject
   private Provider<SerializationContext> contexts;
+  @Inject
+  private Logger logger;
   @Inject
   private PackScope packScope;
   @Inject
@@ -91,7 +95,7 @@ public class Packer {
     }
     if (verbose) {
       String payload = verboseWriter.toString();
-      System.out.println(payload);
+      logger.debug("Outgoing flatpack payload:\n{}", payload);
       out.write(payload);
       out.close();
     }

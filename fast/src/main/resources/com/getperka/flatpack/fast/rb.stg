@@ -48,23 +48,19 @@ module <names.moduleName>
       PROPERTY_NAMES = [
         <entity.properties:field(); separator=",\n">
       ]
-      
       attr_accessor *PROPERTY_NAMES
+      <endif>
+      
+      <if(entity.entityProperties)>
+      <entity.entityProperties:{p | require '<p.requireName>'}; wrap, separator="\n">
+      TYPE_MAP = {
+        <entity.entityProperties:{p | :<p.attrName> => <p.type.name>}; wrap, separator=",\n">
+      }
       <endif>
       
     end
   end
 end
->>
-
-enum(enum, packageName) ::= <<
-// Generated File - DO NOT EDIT
-package <packageName>;
-
-<docString(enum.docString)>
-public enum <enum> {
-  <enum.enumValues:{x |<x>}; separator=",\n">;
-}
 >>
 
 field(property) ::= <%
@@ -80,19 +76,6 @@ docString(docString) ::= <<
 >>
 
 /**
- * Create property security annotation. The kind parameter should be a string
- * either "getter" or "setter".  The property.({template}) allows for dynamic lookup
- * based on the value of kind.
- */
-propertyRoles(kind) ::= <%
-<if(property.({<kind>PermitAll}))>
-  @<names.PermitAll>
-<elseif(property.({<kind>RoleNames}))>
-  @<names.RolesAllowed>({<property.({<kind>RoleNames}):{x|"<x>"}; separator=", ">})
-<endif>
-%>
-
-/**
  * Generate an API accessor stub.
  */
 api(api) ::= <<
@@ -101,11 +84,8 @@ require 'flatpack_client'
 
 module <names.moduleName>
   class ClientApi \< Flatpack::Client::BaseApi
+    include Flatpack::Core::MapInitialize
   
-    def initialize(flatpack)
-      @flatpack = flatpack
-    end
-      
     <api.endpoints:endpoint(); separator="\n">
     private
     
@@ -124,7 +104,7 @@ def <end.methodName><endpointArgList()>
   <if(end.queryParameters)>
   to_return = <end.className>.new(self<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
   <else>
-  to_return = Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>.new(self, "<end.method>", "<end.pathDecoded>"<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
+  to_return = Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>Request<endif>.new(self, "<end.method>", "<end.pathDecoded>"<if(end.pathParameters)>, <end.pathParameters:{x|<x.name>}; separator=", "><endif>)
   <endif>
   <if(end.entity)>to_return.entity = entity<endif>
   to_return
@@ -134,7 +114,7 @@ end
 
 endpointPrivate(end) ::= <<
 <if(end.queryParameters)>
-class <end.className> \< Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>ConnectionRequest<endif>
+class <end.className> \< Flatpack::Client::<if(end.returnType)>FlatpackRequest<else>Request<endif>
     
   def initialize(api, *args)
     super(api, "<end.method>", "<end.pathDecoded>", *args)
@@ -157,13 +137,6 @@ endpointArgList() ::= <%
 %>
 
 /**
- * Make a call to FlatPackTypes.createType() for a synthetic Type reference.
- */
-endpointCreateType(type) ::= <%
-<names.FlatPackTypes>.createType(<type.flatTypes:{x|<x>.class}; separator=", ">)
-%>
-
-/**
  * The names of the path parameter arguments.
  */
 endpointPathParameters() ::= <%
@@ -176,26 +149,4 @@ def with_<param.underscoreName>(<param.underscoreName>)
   query_parameter('<param.name>', <param.underscoreName>);
 end
 
->>
-
-typeSource(allEntities, packageName, namePrefix) ::= <<
-// Generated File - DO NOT EDIT
-package <packageName>;
-public class <namePrefix>TypeSource implements <names.TypeSource> {
-  private static final <names.Set>\<Class\<?\>\> classes = <names.Collections>.unmodifiableSet(
-    new <names.HashSet>\<Class\<?\>\>(<names.Arrays>.\<Class\<?\>\>asList(
-      <allEntities:{x |<x>.class}; wrap, separator=", ">
-    )));
-  private static final <names.TypeSource> instance = new <namePrefix>TypeSource();
-  
-  public static <names.TypeSource> get() {
-    return instance;
-  }
-
-  public <names.Set>\<Class\<?\>\> getTypes() {
-    return classes;
-  }
-  
-  private <namePrefix>TypeSource(){}
-}
 >>

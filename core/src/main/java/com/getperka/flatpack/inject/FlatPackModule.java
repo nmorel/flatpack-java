@@ -4,8 +4,11 @@ import java.security.Principal;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.getperka.flatpack.Configuration;
+import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.TraversalMode;
 import com.getperka.flatpack.codexes.DefaultCodexMapper;
@@ -30,6 +33,8 @@ public class FlatPackModule extends AbstractModule {
   protected void configure() {
     // Bind TypeContext in singleton, because we want referential integrity
     bind(TypeContext.class).in(Scopes.SINGLETON);
+
+    bind(Logger.class).toInstance(LoggerFactory.getLogger(FlatPack.class));
 
     // Bind simple constants
     bindConstant()
