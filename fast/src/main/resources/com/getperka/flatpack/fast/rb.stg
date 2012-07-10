@@ -48,8 +48,14 @@ module <names.moduleName>
       PROPERTY_NAMES = [
         <entity.properties:field(); separator=",\n">
       ]
-      
       attr_accessor *PROPERTY_NAMES
+      <endif>
+      
+      <if(entity.entityProperties)>
+      <entity.entityProperties:{p | require '<p.requireName>'}; wrap, separator="\n">
+      TYPE_MAP = {
+        <entity.entityProperties:{p | :<p.attrName> => <p.type.name>}; wrap, separator=",\n">
+      }
       <endif>
       
     end
