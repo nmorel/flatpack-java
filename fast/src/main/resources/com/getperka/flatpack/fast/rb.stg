@@ -78,11 +78,8 @@ require 'flatpack_client'
 
 module <names.moduleName>
   class ClientApi \< Flatpack::Client::BaseApi
+    include Flatpack::Core::MapInitialize
   
-    def initialize(flatpack)
-      @flatpack = flatpack
-    end
-      
     <api.endpoints:endpoint(); separator="\n">
     private
     
