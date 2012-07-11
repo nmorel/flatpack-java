@@ -19,20 +19,22 @@
  */
 package com.getperka.flatpack.jersey;
 
+import static com.getperka.flatpack.util.FlatPackCollections.mapForIteration;
+import static com.getperka.flatpack.util.FlatPackCollections.mapForLookup;
+import static com.getperka.flatpack.util.FlatPackCollections.setForIteration;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,6 +56,7 @@ import com.getperka.flatpack.client.dto.EndpointDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
 import com.getperka.flatpack.client.dto.ParameterDescription;
 import com.getperka.flatpack.ext.Property;
+import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.getperka.flatpack.util.FlatPackTypes;
@@ -65,16 +68,22 @@ import com.google.gson.Gson;
 public class ApiDescriber {
   private static final Pattern linkPattern =
       Pattern.compile("[{]@link[\\s]+([^\\s}]+)([^}]*)?[}]");
-  private final Map<Package, Map<String, String>> docStringsByPackage =
-      new HashMap<Package, Map<String, String>>();
 
   private final Set<String> allRoles = Collections.singleton("*");
   private final Collection<Method> apiMethods;
-  private final FlatPack flatpack;
+  private final Map<Package, Map<String, String>> docStringsByPackage = mapForLookup();
+  private final Map<String, String> classesToPayloadNames = mapForLookup();
+  private final TypeContext ctx;
+  private final Map<Class<? extends HasUuid>, EntityDescription> descriptions = mapForIteration();
+  private Set<Class<? extends HasUuid>> entitiesToExtract = setForIteration();
+  private Set<Class<? extends HasUuid>> ignoreSubtypesOf = Collections.emptySet();
+  private Set<String> limitRoles;
+  private final Map<String, Class<? extends HasUuid>> payloadNamesToClasses = mapForLookup();
+  private final Map<Class<? extends HasUuid>, Set<Class<? extends HasUuid>>> typeHierarchy = mapForLookup();
 
   public ApiDescriber(FlatPack flatpack, Collection<Method> apiMethods) {
     this.apiMethods = apiMethods;
-    this.flatpack = flatpack;
+    ctx = flatpack.getTypeContext();
   }
 
   /**
@@ -86,47 +95,22 @@ public class ApiDescriber {
     List<EntityDescription> entities = new ArrayList<EntityDescription>();
     description.setEntities(entities);
 
-    TypeContext ctx = flatpack.getTypeContext();
-
     // Create a map of simple class names to payload names for resolving @link tags
-    Map<String, String> classesToPayloadNames = FlatPackCollections.mapForLookup();
     for (Class<? extends HasUuid> clazz : ctx.getEntityTypes()) {
       classesToPayloadNames.put(clazz.getCanonicalName(), ctx.getPayloadName(clazz));
-    }
+      payloadNamesToClasses.put(ctx.getPayloadName(clazz), clazz);
 
-    // Extract all entities
-    Map<Class<? extends HasUuid>, EntityDescription> descriptions =
-        new LinkedHashMap<Class<? extends HasUuid>, EntityDescription>();
-    for (Class<? extends HasUuid> clazz : ctx.getEntityTypes()) {
-      EntityDescription entity = new EntityDescription(ctx.getPayloadName(clazz),
-          ctx.extractProperties(clazz));
-      descriptions.put(clazz, entity);
-
-      Map<String, String> strings = getDocStrings(clazz);
-      String docString = strings.get(clazz.getName());
-      if (docString != null) {
-        entity.setDocString(replaceLinks(docString, classesToPayloadNames));
-      }
-
-      for (Property prop : entity.getProperties()) {
-        Class<?> declaringClass = prop.getGetter().getDeclaringClass();
-        strings = getDocStrings(declaringClass);
-        if (strings != null) {
-          String memberName = declaringClass.getName() + ":" + prop.getGetter().getName() + "()";
-          prop.setDocString(replaceLinks(strings.get(memberName), classesToPayloadNames));
+      // Popuplate the typeHiererchy map
+      for (Class<?> superclass = clazz.getSuperclass(); superclass != null
+        && HasUuid.class.isAssignableFrom(superclass); superclass = superclass.getSuperclass()) {
+        Class<? extends HasUuid> superUuid = superclass.asSubclass(HasUuid.class);
+        Set<Class<? extends HasUuid>> set = typeHierarchy.get(superUuid);
+        if (set == null) {
+          set = setForIteration();
+          typeHierarchy.put(superUuid, set);
         }
+        set.add(clazz);
       }
-
-      entities.add(entity);
-    }
-
-    // Link up supertypes
-    for (Map.Entry<Class<? extends HasUuid>, EntityDescription> entry : descriptions.entrySet()) {
-      Class<?> supertype = entry.getKey().getSuperclass();
-      if (Object.class.equals(supertype)) {
-        continue;
-      }
-      entry.getValue().setSupertype(descriptions.get(supertype));
     }
 
     // Extract API endpoints
@@ -134,99 +118,177 @@ public class ApiDescriber {
     description.setEndpoints(endpoints);
 
     for (Method method : apiMethods) {
-      Class<?> declaringClass = method.getDeclaringClass();
-
-      // Determine the HTTP access method
-      String methodName = null;
-      for (Annotation annotation : method.getAnnotations()) {
-        // The HTTP method is declared as a meta-annotation on the @GET, @PUT, etc. annotation
-        HttpMethod methodAnnotation = annotation.annotationType().getAnnotation(HttpMethod.class);
-        if (methodAnnotation != null) {
-          methodName = methodAnnotation.value();
-        }
+      EndpointDescription desc = describeEndpoint(method);
+      if (desc != null) {
+        endpoints.add(desc);
       }
-      if (methodName == null) {
-        continue;
-      }
-
-      // Create a key for looking up the method's doc strings
-      String methodKey;
-      {
-        StringBuilder methodKeyBuilder = new StringBuilder(declaringClass.getName())
-            .append(":").append(method.getName()).append("(");
-        boolean needsComma = false;
-        for (Class<?> clazz : method.getParameterTypes()) {
-          if (needsComma) {
-            methodKeyBuilder.append(", ");
-          } else {
-            needsComma = true;
-          }
-          methodKeyBuilder.append(clazz.getName());
-        }
-        methodKeyBuilder.append(")");
-        methodKey = methodKeyBuilder.toString();
-      }
-
-      // Determine the endpoint path
-      UriBuilder builder = UriBuilder.fromPath("");
-      if (declaringClass.isAnnotationPresent(Path.class)) {
-        builder.path(declaringClass);
-      }
-      if (method.isAnnotationPresent(Path.class)) {
-        builder.path(method);
-      }
-      // This path has special character URL-escaped, so we'll undo the escaping
-      String path = builder.build().toString();
-      path = URLDecoder.decode(path, "UTF8");
-
-      // Build the EndpointDescription
-      EndpointDescription desc = new EndpointDescription(methodName, path);
-      List<ParameterDescription> pathParams = new ArrayList<ParameterDescription>();
-      List<ParameterDescription> queryParams = new ArrayList<ParameterDescription>();
-      Annotation[][] annotations = method.getParameterAnnotations();
-      Type[] parameters = method.getGenericParameterTypes();
-      for (int i = 0, j = parameters.length; i < j; i++) {
-        Type parameterType = parameters[i];
-        if (annotations[i].length == 0) {
-          // Assume that an un-annotated parameter is the main entity type
-          desc.setEntity(ctx.getCodex(parameterType).describe(ctx));
-        } else {
-          for (Annotation annotation : annotations[i]) {
-            if (PathParam.class.equals(annotation.annotationType())) {
-              PathParam pathParam = (PathParam) annotation;
-              ParameterDescription param = new ParameterDescription(desc, pathParam.value(),
-                  ctx.getCodex(parameterType).describe(ctx));
-              String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
-              param.setDocString(replaceLinks(docString, classesToPayloadNames));
-              pathParams.add(param);
-            } else if (QueryParam.class.equals(annotation.annotationType())) {
-              QueryParam queryParam = (QueryParam) annotation;
-              ParameterDescription param = new ParameterDescription(desc, queryParam.value(),
-                  ctx.getCodex(parameterType).describe(ctx));
-              String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
-              param.setDocString(replaceLinks(docString, classesToPayloadNames));
-              queryParams.add(param);
-            }
-          }
-        }
-      }
-
-      // If the returned entity type is described, extract the information
-      FlatPackResponse responseAnnotation = method.getAnnotation(FlatPackResponse.class);
-      if (responseAnnotation != null) {
-        Type returnType = FlatPackTypes.createType(responseAnnotation.value());
-        desc.setReturnType(ctx.getCodex(returnType).describe(ctx));
-      }
-
-      String docString = getDocStrings(declaringClass).get(methodKey);
-      desc.setDocString(replaceLinks(docString, classesToPayloadNames));
-      desc.setPathParameters(pathParams.isEmpty() ? null : pathParams);
-      desc.setRoleNames(extractRoles(method));
-      desc.setQueryParameters(queryParams.isEmpty() ? null : queryParams);
-      endpoints.add(desc);
     }
 
+    // Extract all entities
+    do {
+      Set<Class<? extends HasUuid>> toProcess = entitiesToExtract;
+      entitiesToExtract = setForIteration();
+      for (Class<? extends HasUuid> clazz : toProcess) {
+        entities.add(describeEntity(clazz));
+      }
+    } while (!entitiesToExtract.isEmpty());
+
     return description;
+  }
+
+  public ApiDescriber ignoreSubtypesOf(Collection<? extends Class<? extends HasUuid>> toIgnore) {
+    ignoreSubtypesOf = setForIteration();
+    ignoreSubtypesOf.addAll(toIgnore);
+    return this;
+  }
+
+  /**
+   * Only extract items that may be accessesd by the given roles.
+   */
+  public ApiDescriber limitRoles(Collection<String> limitRoles) {
+    this.limitRoles = setForIteration();
+    this.limitRoles.addAll(limitRoles);
+    return this;
+  }
+
+  private EndpointDescription describeEndpoint(Method method) throws IOException {
+    Class<?> declaringClass = method.getDeclaringClass();
+
+    // Determine the HTTP access method
+    String methodName = null;
+    for (Annotation annotation : method.getAnnotations()) {
+      // The HTTP method is declared as a meta-annotation on the @GET, @PUT, etc. annotation
+      HttpMethod methodAnnotation = annotation.annotationType().getAnnotation(HttpMethod.class);
+      if (methodAnnotation != null) {
+        methodName = methodAnnotation.value();
+      }
+    }
+    if (methodName == null) {
+      return null;
+    }
+
+    // Create a key for looking up the method's doc strings
+    String methodKey;
+    {
+      StringBuilder methodKeyBuilder = new StringBuilder(declaringClass.getName())
+          .append(":").append(method.getName()).append("(");
+      boolean needsComma = false;
+      for (Class<?> clazz : method.getParameterTypes()) {
+        if (needsComma) {
+          methodKeyBuilder.append(", ");
+        } else {
+          needsComma = true;
+        }
+        methodKeyBuilder.append(clazz.getName());
+      }
+      methodKeyBuilder.append(")");
+      methodKey = methodKeyBuilder.toString();
+    }
+
+    // Determine the endpoint path
+    UriBuilder builder = UriBuilder.fromPath("");
+    if (declaringClass.isAnnotationPresent(Path.class)) {
+      builder.path(declaringClass);
+    }
+    if (method.isAnnotationPresent(Path.class)) {
+      builder.path(method);
+    }
+    // This path has special characters URL-escaped, so we'll undo the escaping
+    String path = builder.build().toString();
+    path = URLDecoder.decode(path, "UTF8");
+
+    // Build the EndpointDescription
+    EndpointDescription desc = new EndpointDescription(methodName, path);
+    List<ParameterDescription> pathParams = new ArrayList<ParameterDescription>();
+    List<ParameterDescription> queryParams = new ArrayList<ParameterDescription>();
+    Annotation[][] annotations = method.getParameterAnnotations();
+    java.lang.reflect.Type[] parameters = method.getGenericParameterTypes();
+    for (int i = 0, j = parameters.length; i < j; i++) {
+      Type paramType = reference(parameters[i]);
+      if (annotations[i].length == 0) {
+        // Assume that an un-annotated parameter is the main entity type
+        desc.setEntity(paramType);
+      } else {
+        for (Annotation annotation : annotations[i]) {
+          if (PathParam.class.equals(annotation.annotationType())) {
+            PathParam pathParam = (PathParam) annotation;
+            ParameterDescription param = new ParameterDescription(desc, pathParam.value(),
+                paramType);
+            String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
+            param.setDocString(replaceLinks(docString));
+            pathParams.add(param);
+          } else if (QueryParam.class.equals(annotation.annotationType())) {
+            QueryParam queryParam = (QueryParam) annotation;
+            ParameterDescription param = new ParameterDescription(desc, queryParam.value(),
+                paramType);
+            String docString = getDocStrings(declaringClass).get(methodKey + "[" + i + "]");
+            param.setDocString(replaceLinks(docString));
+            queryParams.add(param);
+          }
+        }
+      }
+    }
+
+    // If the returned entity type is described, extract the information
+    FlatPackResponse responseAnnotation = method.getAnnotation(FlatPackResponse.class);
+    if (responseAnnotation != null) {
+      Type returnType = reference(FlatPackTypes.createType(responseAnnotation.value()));
+      desc.setReturnType(returnType);
+    }
+
+    String docString = getDocStrings(declaringClass).get(methodKey);
+    desc.setDocString(replaceLinks(docString));
+    desc.setPathParameters(pathParams.isEmpty() ? null : pathParams);
+    desc.setRoleNames(extractRoles(method));
+    desc.setQueryParameters(queryParams.isEmpty() ? null : queryParams);
+    return desc;
+  }
+
+  private EntityDescription describeEntity(Class<? extends HasUuid> clazz) throws IOException {
+    if (descriptions.containsKey(clazz)) {
+      return descriptions.get(clazz);
+    }
+    // Use a mutable property list to support filtering below
+    EntityDescription entity = new EntityDescription(ctx.getPayloadName(clazz),
+        new ArrayList<Property>(ctx.extractProperties(clazz)));
+    descriptions.put(clazz, entity);
+
+    // Link the supertype
+    if (HasUuid.class.isAssignableFrom(clazz.getSuperclass())) {
+      entity.setSupertype(describeEntity(clazz.getSuperclass().asSubclass(HasUuid.class)));
+    }
+
+    // Attach the docstring
+    Map<String, String> strings = getDocStrings(clazz);
+    String docString = strings.get(clazz.getName());
+    if (docString != null) {
+      entity.setDocString(replaceLinks(docString));
+    }
+
+    // Iterate over the properties
+    for (Iterator<Property> it = entity.getProperties().iterator(); it.hasNext();) {
+      Property prop = it.next();
+
+      // Filter by roles
+      if (limitRoles != null) {
+        if (!prop.mayGet(limitRoles) && !prop.maySet(limitRoles)) {
+          it.remove();
+          continue;
+        }
+      }
+
+      // Record a reference to (possibly) an entity type
+      reference(prop.getType());
+
+      // The property set include all properties defined in supertypes
+      Class<?> declaringClass = prop.getGetter().getDeclaringClass();
+      strings = getDocStrings(declaringClass);
+      if (strings != null) {
+        String memberName = declaringClass.getName() + ":" + prop.getGetter().getName() + "()";
+        prop.setDocString(replaceLinks(strings.get(memberName)));
+      }
+    }
+    return entity;
   }
 
   private Set<String> extractRoles(Method method) {
@@ -261,11 +323,57 @@ public class ApiDescriber {
     return toReturn;
   }
 
+  private void reference(Class<? extends HasUuid> clazz) {
+    if (clazz != null && !descriptions.containsKey(clazz)) {
+      entitiesToExtract.add(clazz);
+
+      if (ignoreSubtypesOf.contains(clazz)) {
+        return;
+      }
+
+      Set<Class<? extends HasUuid>> subtypes = typeHierarchy.get(clazz);
+      if (subtypes != null) {
+        for (Class<? extends HasUuid> subtype : subtypes) {
+          reference(subtype);
+        }
+      }
+    }
+  }
+
+  /**
+   * Convert a reflection Type into FlatPack's typesystem. This method will also record any
+   * referenced entities.
+   */
+  private Type reference(java.lang.reflect.Type t) {
+    Type type = ctx.getCodex(t).describe(ctx);
+    reference(type);
+    return type;
+  }
+
+  /**
+   * Traverse a type, looking for references to entities. This should be a visitor.
+   */
+  private void reference(Type type) {
+    if (type.getName() != null) {
+      Class<? extends HasUuid> clazz = payloadNamesToClasses.get(type.getName());
+      reference(clazz);
+    }
+    if (type.getListElement() != null) {
+      reference(type.getListElement());
+    }
+    if (type.getMapKey() != null) {
+      reference(type.getMapKey());
+    }
+    if (type.getMapValue() != null) {
+      reference(type.getMapValue());
+    }
+  }
+
   /**
    * Replace any {@literal {@link} tags in a docString with something easier for the viewer app to
    * deal with.
    */
-  private String replaceLinks(String docString, Map<String, String> classesToPayloadNames) {
+  private String replaceLinks(String docString) {
     if (docString == null) {
       return null;
     }
