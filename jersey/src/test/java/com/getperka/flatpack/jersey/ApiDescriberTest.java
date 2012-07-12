@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collections;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.core.Response;
+
 import org.junit.Test;
 
 import com.getperka.flatpack.Configuration;
@@ -37,15 +40,26 @@ import com.getperka.flatpack.search.SearchTypeSource;
 public class ApiDescriberTest {
 
   /**
+   * Demo method.
+   */
+  @GET
+  @FlatPackResponse(ApiDescription.class)
+  public static Response sampleMethod() {
+    return null;
+  }
+
+  /**
    * Verify descriptions of flatpack-core can be read and parsed.
    * 
    * @throws IOException
    */
   @Test
-  public void test() throws IOException {
+  public void test() throws Exception {
+    Method method = ApiDescriberTest.class.getDeclaredMethod("sampleMethod");
+
     FlatPack flatpack = FlatPack.create(new Configuration()
         .addTypeSource(new SearchTypeSource("com.getperka.flatpack")));
-    ApiDescription description = new ApiDescriber(flatpack, Collections.<Method> emptyList())
+    ApiDescription description = new ApiDescriber(flatpack, Collections.singletonList(method))
         .describe();
 
     EntityDescription toCheck = null;
