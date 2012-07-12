@@ -156,7 +156,8 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
   @Override
   public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
       MediaType mediaType) {
-    return getFlatPack().isRootType(genericType) || JsonElement.class.isAssignableFrom(type);
+    return FlatPackEntity.class.equals(type) || JsonElement.class.isAssignableFrom(type)
+      || getFlatPack().isRootType(genericType);
   }
 
   @Override

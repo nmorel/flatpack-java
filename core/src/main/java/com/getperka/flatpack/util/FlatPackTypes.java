@@ -212,6 +212,17 @@ public class FlatPackTypes {
   }
 
   /**
+   * Erases {@link WildcardType} and {@link TypeVariable} instances, returning all other Types
+   * unmodified.
+   */
+  public static Type instantiable(Type type) {
+    if (type instanceof TypeVariable || type instanceof WildcardType) {
+      return erase(type);
+    }
+    return type;
+  }
+
+  /**
    * Given a class that represents a boxed primitive type, return the primitive type.
    */
   public static Class<?> unbox(Class<?> boxed) {

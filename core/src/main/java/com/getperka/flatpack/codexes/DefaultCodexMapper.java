@@ -26,6 +26,7 @@ import static com.getperka.flatpack.util.FlatPackTypes.createType;
 import static com.getperka.flatpack.util.FlatPackTypes.erase;
 import static com.getperka.flatpack.util.FlatPackTypes.getParameterization;
 import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization;
+import static com.getperka.flatpack.util.FlatPackTypes.instantiable;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -146,12 +147,7 @@ public class DefaultCodexMapper implements CodexMapper {
   }
 
   private Codex<?> getInstance(Class<?> codexType, Type type) {
-    Key<?> key;
-    try {
-      key = Key.get(createType(codexType, type));
-    } catch (ConfigurationException e) {
-      key = Key.get(createType(codexType, erase(type)));
-    }
+    Key<?> key = Key.get(createType(codexType, instantiable(type)));
     return (Codex<?>) injector.getInstance(key);
   }
 
