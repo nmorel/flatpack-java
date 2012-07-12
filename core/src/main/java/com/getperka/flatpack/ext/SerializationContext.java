@@ -20,6 +20,9 @@
 package com.getperka.flatpack.ext;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.TraversalMode;
 import com.getperka.flatpack.inject.LastModifiedTime;
 import com.getperka.flatpack.inject.PackScoped;
+import com.getperka.flatpack.inject.PrettyPrint;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.stream.JsonWriter;
 
@@ -52,6 +56,12 @@ public class SerializationContext extends BaseContext {
 
   @Inject
   private JsonWriter writer;
+
+  private final Deque<JsonWriter> writerStack = new ArrayDeque<JsonWriter>();
+
+  @Inject
+  @PrettyPrint
+  private boolean prettyPrint;
 
   SerializationContext() {}
 
@@ -105,6 +115,35 @@ public class SerializationContext extends BaseContext {
    * Returns the JsonWriter accumulating JSON to be written.
    */
   public JsonWriter getWriter() {
-    return writer;
+    if (writerStack.isEmpty()) {
+      return writer;
+    } else {
+      return writerStack.peek();
+    }
+  }
+
+  /**
+   * Restores the JsonWriter.
+   */
+  public void popWriter() throws IOException {
+    writerStack.pop().close();
+  }
+
+  /**
+   * Replace the value returned by {@link #getWriter()} with a temporary instance to allow
+   * "embedded" json payloads. Each call to this method must be paired with a call to
+   * {@link #popWriter()}.
+   * 
+   * @return an {@link Appendable} that will contain the stream of json tokens.
+   */
+  public Appendable pushWriter() {
+    StringWriter toReturn = new StringWriter();
+    JsonWriter jsonWriter = new JsonWriter(toReturn);
+    jsonWriter.setLenient(true);
+    if (prettyPrint) {
+      jsonWriter.setIndent("  ");
+    }
+    writerStack.push(jsonWriter);
+    return toReturn;
   }
 }

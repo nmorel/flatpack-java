@@ -28,12 +28,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 
 import org.joda.time.DateTime;
 
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.getperka.flatpack.util.FlatPackTypes;
+import com.google.inject.TypeLiteral;
 
 /**
  * Encapsulates a return value, the role(s) to encode the entity for, and an optional collection of
@@ -165,6 +167,14 @@ public class FlatPackEntity<T> extends TypeReference<T> {
    * Provide type information from implicit parameterization.
    */
   protected FlatPackEntity() {}
+
+  /**
+   * Allow construction via injection.
+   */
+  @Inject
+  FlatPackEntity(TypeLiteral<T> type) {
+    super(type.getType());
+  }
 
   /**
    * Only used by create methods.

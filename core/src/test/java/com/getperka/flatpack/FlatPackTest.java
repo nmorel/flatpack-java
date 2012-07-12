@@ -1,6 +1,8 @@
 package com.getperka.flatpack;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 
 import java.io.StringWriter;
 import java.io.Writer;
@@ -12,13 +14,15 @@ import javax.inject.Provider;
 import org.junit.After;
 import org.junit.Before;
 
+import com.getperka.flatpack.domain.Employee;
+import com.getperka.flatpack.domain.Manager;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.inject.FlatPackModule;
 import com.getperka.flatpack.inject.PackScope;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -30,8 +34,13 @@ import com.google.inject.TypeLiteral;
  */
 public abstract class FlatPackTest {
 
+  private int counter;
   @Inject
   private Provider<DeserializationContext> deserializationContexts;
+  @Inject
+  private Provider<Employee> employees;
+  @Inject
+  private Provider<Manager> managers;
   @Inject
   private Injector injector;
   @Inject
@@ -51,6 +60,14 @@ public abstract class FlatPackTest {
     Guice.createInjector(new FlatPackModule(getConfiguration())).injectMembers(this);
   }
 
+  protected void check(Employee expected, Employee actual) {
+    assertNotSame(expected, actual);
+    assertEquals(expected, actual);
+    assertEquals(expected.getAddress().getStreet(), actual.getAddress().getStreet());
+    assertEquals(expected.getEmployeeNumber(), actual.getEmployeeNumber());
+    assertEquals(expected.getName(), actual.getName());
+  }
+
   protected void closeContext() {
     packScope.exit();
   }
@@ -64,7 +81,22 @@ public abstract class FlatPackTest {
   }
 
   protected Configuration getConfiguration() {
-    return new Configuration();
+    return new Configuration().withPrettyPrint(true);
+  }
+
+  protected Employee makeEmployee() {
+    Employee toReturn = employees.get();
+    toReturn.setEmployeeNumber(++counter);
+    toReturn.setName("Employee Name");
+    toReturn.getAddress().setStreet("street");
+    return toReturn;
+  }
+
+  protected Manager makeManager() {
+    Manager toReturn = managers.get();
+    toReturn.setName("Manager Name");
+    toReturn.getAddress().setStreet("manager street");
+    return toReturn;
   }
 
   /**
@@ -114,7 +146,7 @@ public abstract class FlatPackTest {
 
     DeserializationContext deserialization = deserializationContext();
     try {
-      JsonElement element = new Gson().fromJson(out.toString(), JsonElement.class);
+      JsonElement element = new JsonParser().parse(out.toString());
       return codexes.get().read(element, deserialization);
     } finally {
       closeContext();

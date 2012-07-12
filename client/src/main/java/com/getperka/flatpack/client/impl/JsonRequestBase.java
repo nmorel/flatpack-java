@@ -26,10 +26,10 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 
 import com.getperka.flatpack.util.FlatPackTypes;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 /**
  * A Request that interprets the server response as JSON.
@@ -50,7 +50,7 @@ public class JsonRequestBase<R extends JsonRequestBase<R>> extends RequestBase<R
     try {
       InputStream in = isOk(statusCode) ? response.getInputStream() : response.getErrorStream();
       Reader reader = new InputStreamReader(in, FlatPackTypes.UTF8);
-      toReturn = new Gson().fromJson(reader, JsonElement.class);
+      toReturn = new JsonParser().parse(reader);
     } catch (JsonParseException ignored) {
       // Probably a 500 crash page
       toReturn = new JsonObject();

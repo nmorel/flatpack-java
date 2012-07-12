@@ -22,12 +22,15 @@ package com.getperka.flatpack.codexes;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 
+import javax.inject.Inject;
+
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
+import com.google.inject.TypeLiteral;
 
 /**
  * Attempts to handle any value-like object that has a public, one-arg constructor that accepts a
@@ -38,6 +41,22 @@ public class ToStringCodex<T> extends ValueCodex<T> {
 
   ToStringCodex(Constructor<T> constructor) {
     this.constructor = constructor;
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  ToStringCodex(TypeLiteral<T> type) {
+    Constructor<T> found = null;
+    try {
+      found = (Constructor<T>) type.getRawType().getConstructor(String.class);
+    } catch (NoSuchMethodException e) {}
+    try {
+      found = (Constructor<T>) type.getRawType().getConstructor(Object.class);
+    } catch (NoSuchMethodException e) {}
+    if (found == null) {
+      throw new IllegalArgumentException("No suitable constructors");
+    }
+    constructor = found;
   }
 
   @Override

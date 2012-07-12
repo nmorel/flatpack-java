@@ -27,7 +27,6 @@ import static com.getperka.flatpack.util.FlatPackTypes.erase;
 import static com.getperka.flatpack.util.FlatPackTypes.getParameterization;
 import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +48,7 @@ import com.google.gson.JsonElement;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.ProvisionException;
 
 /**
  * Support for all built-in types.
@@ -82,17 +82,16 @@ public class DefaultCodexMapper implements CodexMapper {
     }
 
     for (Class<?> clazz : PRIMITIVE_TYPES) {
-      clazz = box(clazz);
-      if (Number.class.isAssignableFrom(clazz)) {
+      Class<?> boxed = box(clazz);
+      if (Number.class.isAssignableFrom(boxed)) {
         @SuppressWarnings("unchecked")
-        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, clazz));
+        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, boxed));
         simpleCodexes.put(clazz, injector.getInstance(key));
       }
     }
   }
 
   @Override
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   public Codex<?> getCodex(TypeContext context, Type type) {
     // Simple types
     if (simpleCodexes.containsKey(type)) {
@@ -140,13 +139,9 @@ public class DefaultCodexMapper implements CodexMapper {
      * number of the auxiliary value types used in the model classes, mainly joda-time.
      */
     try {
-      Constructor<?> constructor = erased.getConstructor(String.class);
-      return new ToStringCodex(constructor);
-    } catch (NoSuchMethodException expected) {}
-    try {
-      Constructor<?> constructor = erased.getConstructor(Object.class);
-      return new ToStringCodex(constructor);
-    } catch (NoSuchMethodException expected) {}
+      return getInstance(ToStringCodex.class, type);
+    } catch (ProvisionException ignored) {}
+
     return null;
   }
 

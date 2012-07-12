@@ -64,9 +64,8 @@ import org.tautua.markdownpapers.ast.Text;
 import org.tautua.markdownpapers.parser.ParseException;
 import org.tautua.markdownpapers.parser.Parser;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -140,7 +139,7 @@ public class ApidocMojo extends AbstractMojo {
             // The canRead() above should prevent this
             throw new RuntimeException(e);
           }
-          JsonObject obj = new Gson().fromJson(reader, JsonElement.class).getAsJsonObject();
+          JsonObject obj = new JsonParser().parse(reader).getAsJsonObject();
           if (obj.has(key)) {
             contents = obj.get(key).getAsString();
           } else {

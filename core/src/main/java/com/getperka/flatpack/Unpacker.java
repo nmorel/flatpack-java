@@ -40,9 +40,9 @@ import com.getperka.flatpack.inject.IgnoreUnresolvableTypes;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
@@ -123,7 +123,7 @@ public class Unpacker {
      */
     Map<HasUuid, JsonObject> entityData = FlatPackCollections.mapForIteration();
     // Used to populate the entityData map
-    Gson gson = new Gson();
+    JsonParser jsonParser = new JsonParser();
     /*
      * The reader is placed in lenient mode as an aid to developers, however all output will be
      * strictly formatted.
@@ -171,7 +171,7 @@ public class Unpacker {
             // Take the n-many property objects and stash them for later decoding
             reader.beginArray();
             while (!JsonToken.END_ARRAY.equals(reader.peek())) {
-              JsonObject chunk = gson.fromJson(reader, JsonElement.class);
+              JsonObject chunk = jsonParser.parse(reader).getAsJsonObject();
               HasUuid entity = codex.allocate(chunk, context);
               toReturn.addExtraEntity(entity);
               entityData.put(entity, chunk.getAsJsonObject());
@@ -196,7 +196,7 @@ public class Unpacker {
         reader.endObject();
       } else if ("value".equals(name)) {
         // Just stash the value element in case it occurs first
-        value = gson.fromJson(reader, JsonElement.class);
+        value = jsonParser.parse(reader);
       } else if (JsonToken.STRING.equals(reader.peek()) || JsonToken.NUMBER.equals(reader.peek())) {
         // Save off any other simple properties
         toReturn.putExtraData(name, reader.nextString());

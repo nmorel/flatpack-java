@@ -48,6 +48,7 @@ import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -180,7 +181,7 @@ public class FlatPackProvider implements MessageBodyReader<Object>, MessageBodyW
     }
 
     if (JsonElement.class.isAssignableFrom(type)) {
-      return new Gson().fromJson(in, JsonElement.class);
+      return new JsonParser().parse(in);
     }
 
     FlatPackEntity<?> entity;

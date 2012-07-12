@@ -22,7 +22,6 @@ package com.getperka.flatpack.codexes;
 import static com.getperka.flatpack.util.FlatPackTypes.erase;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -277,36 +276,29 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
   }
 
   private T allocate(UUID uuid, DeserializationContext context, boolean useResolvers) {
-    try {
-      T toReturn = null;
-      boolean resolved = false;
+    T toReturn = null;
+    boolean resolved = false;
 
-      // Possibly delegate to injected resolvers
-      if (useResolvers) {
+    // Possibly delegate to injected resolvers
+    if (useResolvers) {
+      try {
         toReturn = entityResolver.resolve(clazz, uuid);
-        if (toReturn != null) {
-          resolved = true;
-        }
+      } catch (Exception e) {
+        context.fail(e);
       }
-
-      // Otherwise try to construct a new instance
-      if (toReturn == null && provider != null) {
-        toReturn = provider.get();
+      if (toReturn != null) {
+        resolved = true;
       }
-
-      toReturn.setUuid(uuid);
-      context.putEntity(uuid, toReturn, resolved);
-      return toReturn;
-    } catch (InvocationTargetException e) {
-      // Report the causal exception instead
-      context.fail(e.getCause());
-    } catch (NoSuchMethodError e) {
-      context.fail(new UnsupportedOperationException("The type " + clazz.getName()
-        + " does not have a zero-arg constructor"));
-    } catch (Exception e) {
-      context.fail(e);
     }
-    return null;
+
+    // Otherwise try to construct a new instance
+    if (toReturn == null && provider != null) {
+      toReturn = provider.get();
+    }
+
+    toReturn.setUuid(uuid);
+    context.putEntity(uuid, toReturn, resolved);
+    return toReturn;
   }
 
   /**
