@@ -28,19 +28,9 @@ import java.util.logging.Logger;
 public interface Api {
 
   /**
-   * Retrieve the current OAuth2 access token associated with the Api instance.
-   */
-  String getAccessToken();
-
-  /**
    * Retrieve the base URI used to access the server.
    */
   URI getServerBase();
-
-  /**
-   * Set the OAuth2 access token to be used when making requests.
-   */
-  void setAccessToken(String accessToken);
 
   /**
    * Set the base URI used to access the server.
