@@ -47,6 +47,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
+/**
+ * @param <T>
+ */
 public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
   private final Class<T> clazz;

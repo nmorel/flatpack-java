@@ -30,6 +30,9 @@ import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 
+/**
+ * Support for Joda's {@link DateTimeZone}, which cannot be handled by {@link ToStringCodex}.
+ */
 public class DateTimeZoneCodex extends ValueCodex<DateTimeZone> {
   public static final TypeHint HINT = TypeHint.create(DateTimeZone.class);
 

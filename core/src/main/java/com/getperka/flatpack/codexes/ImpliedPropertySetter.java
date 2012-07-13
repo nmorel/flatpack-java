@@ -34,7 +34,7 @@ import com.getperka.flatpack.util.FlatPackCollections;
  * properties may be mutated after any payload values are set.
  */
 @PostWorkOrder(100)
-public class ImpliedPropertySetter implements Callable<Void> {
+class ImpliedPropertySetter implements Callable<Void> {
   private final DeserializationContext context;
   private final Property toSet;
   private final Object target;

@@ -4,6 +4,11 @@ import java.util.Set;
 
 import com.getperka.flatpack.util.FlatPackCollections;
 
+/**
+ * Support for Sets.
+ * 
+ * @param <V> the element type of the set
+ */
 public class SetCodex<V> extends CollectionCodex<Set<V>, V> {
   SetCodex() {}
 

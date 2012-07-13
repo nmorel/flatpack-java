@@ -27,6 +27,9 @@ import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
 
+/**
+ * Support for boolean values.
+ */
 public class BooleanCodex extends ValueCodex<Boolean> {
 
   BooleanCodex() {}

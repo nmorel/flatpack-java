@@ -34,6 +34,11 @@ import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
 import com.google.inject.TypeLiteral;
 
+/**
+ * Enum support.
+ * 
+ * @param <E> the type of enum
+ */
 public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
   private final Class<E> clazz;
 

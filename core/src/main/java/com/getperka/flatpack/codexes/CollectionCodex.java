@@ -35,7 +35,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
+/**
+ * A base type to serialize a collection of objects as an array.
+ * 
+ * @param <T> the type of collection to be serialized
+ * @param <V> the value type contained in the collection
+ */
 public abstract class CollectionCodex<T extends Collection<V>, V> extends Codex<T> {
+  /**
+   * Initialized in {@link #setType(TypeLiteral, TypeContext)} so subclasses need not call an
+   * explicit super-constructor.
+   */
   private Codex<V> valueCodex;
 
   CollectionCodex() {}

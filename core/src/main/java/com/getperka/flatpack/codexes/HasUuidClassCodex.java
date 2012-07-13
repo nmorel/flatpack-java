@@ -29,6 +29,9 @@ import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
 
+/**
+ * Maps Class literals to their payload names and back.
+ */
 public class HasUuidClassCodex extends ValueCodex<Class<? extends HasUuid>> {
   @Inject
   private TypeContext typeContext;

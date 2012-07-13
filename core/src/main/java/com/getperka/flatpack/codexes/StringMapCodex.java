@@ -35,6 +35,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
+/**
+ * A map of String to a arbitrary value.
+ * 
+ * @param <V> the map value type
+ */
 public class StringMapCodex<V> extends Codex<Map<String, V>> {
   private final Codex<V> valueCodex;
 

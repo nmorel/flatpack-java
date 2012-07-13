@@ -27,6 +27,9 @@ import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
 
+/**
+ * Support for Strings.
+ */
 public class StringCodex extends ValueCodex<String> {
   StringCodex() {}
 

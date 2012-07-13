@@ -30,6 +30,11 @@ import com.getperka.flatpack.ext.Type;
 import com.google.gson.JsonElement;
 import com.google.inject.TypeLiteral;
 
+/**
+ * Primitive numberic support.
+ * 
+ * @param <N> the boxed Number type
+ */
 public class NumberCodex<N extends Number> extends ValueCodex<N> {
   private final Class<N> clazz;
 

@@ -37,6 +37,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
+/**
+ * Serializes Java arrays as a json array.
+ * 
+ * @param <T> the type of data contained in the array
+ */
 public class ArrayCodex<T> extends Codex<T[]> {
   private final Class<T> elementType;
   private final Codex<T> valueCodex;

@@ -34,7 +34,7 @@ import com.google.inject.TypeLiteral;
 
 /**
  * Attempts to handle any value-like object that has a public, one-arg constructor that accepts a
- * String.
+ * String or an Object.
  */
 public class ToStringCodex<T> extends ValueCodex<T> {
   private final Constructor<T> constructor;

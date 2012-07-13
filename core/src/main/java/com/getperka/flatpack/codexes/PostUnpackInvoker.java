@@ -30,7 +30,7 @@ import com.getperka.flatpack.ext.PostWorkOrder;
  * Invokes a list of {@link PostUnpack} methods on an unpacked object.
  */
 @PostWorkOrder(200)
-public class PostUnpackInvoker implements Callable<Void> {
+class PostUnpackInvoker implements Callable<Void> {
   private final Object instance;
   private final List<Method> toInvoke;
 

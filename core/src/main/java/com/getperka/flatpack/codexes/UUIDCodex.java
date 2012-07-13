@@ -29,6 +29,9 @@ import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 
+/**
+ * Support for UUID.
+ */
 public class UUIDCodex extends ValueCodex<UUID> {
   public static final TypeHint HINT = TypeHint.create(UUID.class);
 
