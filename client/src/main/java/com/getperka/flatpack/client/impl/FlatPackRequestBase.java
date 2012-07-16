@@ -36,7 +36,6 @@ import com.getperka.flatpack.util.FlatPackTypes;
 public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     extends RequestBase<R, FlatPackEntity<X>> implements FlatPackRequest<R, X> {
   private final Type returnType;
-  private boolean spyOnAccessToken = true;
   private FlatPackEntity<X> toSend;
 
   protected FlatPackRequestBase(ApiBase api, Type returnType, String method, String path,
@@ -59,12 +58,6 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
   @SuppressWarnings("unchecked")
   public void setEntity(Object entity) {
     toSend = (FlatPackEntity<X>) FlatPackEntity.create(Object.class, entity, null);
-  }
-
-  @Override
-  public R updateAccessToken(boolean update) {
-    this.spyOnAccessToken = update;
-    return as();
   }
 
   @Override
@@ -97,11 +90,6 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
       throw sce;
     }
 
-    // Spy on the response to see if there's a new token
-    String accessToken = entity.getExtraData().get("access_token");
-    if (spyOnAccessToken && accessToken != null) {
-      getApi().setAccessToken(accessToken);
-    }
     return entity;
   }
 

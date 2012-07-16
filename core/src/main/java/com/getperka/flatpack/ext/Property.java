@@ -182,6 +182,9 @@ public class Property extends BaseHasUuid {
     }
     for (String cred : credentials) {
       Class<?> credView = roleMapper.mapRole(cred);
+      if (credView == null) {
+        continue;
+      }
       if (required.contains(credView)) {
         return true;
       }

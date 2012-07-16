@@ -31,11 +31,4 @@ import com.getperka.flatpack.FlatPackEntity;
 public interface FlatPackRequest<R extends FlatPackRequest<R, X>, X> extends
     Request<R, FlatPackEntity<X>> {
   FlatPackEntity<X> peek();
-
-  /**
-   * By default, a FlatPackRequest will look for an {@code access_token} extra key in the payload
-   * and automatically call {@link Api#setAccessToken(String)}. This behavior can be disabled by
-   * passing {@code false} to this method.
-   */
-  R updateAccessToken(boolean update);
 }
