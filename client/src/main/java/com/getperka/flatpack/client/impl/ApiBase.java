@@ -29,7 +29,6 @@ import com.getperka.flatpack.client.Api;
  * A base class for accessing FlatPack API servers.
  */
 public abstract class ApiBase implements Api {
-  private String accessToken;
   private final FlatPack flatpack;
   private URI serverBase;
   private boolean verbose;
@@ -39,18 +38,8 @@ public abstract class ApiBase implements Api {
   }
 
   @Override
-  public String getAccessToken() {
-    return accessToken;
-  }
-
-  @Override
   public URI getServerBase() {
     return serverBase;
-  }
-
-  @Override
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
   }
 
   @Override
@@ -63,10 +52,10 @@ public abstract class ApiBase implements Api {
     this.verbose = verbose;
   }
 
+  /**
+   * Hook point for altering a connection before it is sent.
+   */
   protected HttpURLConnection filter(HttpURLConnection conn) {
-    if (accessToken != null) {
-      conn.setRequestProperty("Authorization", "Bearer: " + accessToken);
-    }
     return conn;
   }
 

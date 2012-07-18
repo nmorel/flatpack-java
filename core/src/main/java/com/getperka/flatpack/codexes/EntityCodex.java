@@ -180,6 +180,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
         if (!prop.maySet(roles)) {
           continue;
         }
+
         String simplePropertyName = prop.getName();
         context.pushPath("." + simplePropertyName);
         try {
@@ -215,17 +216,26 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
             continue;
           }
 
+          // Perhaps set the other side of a OneToMany relationship
+          Property impliedPropery = prop.getImpliedPropery();
+          if (impliedPropery != null && value != null) {
+            // Ensure that any linked property is also mutable
+            if (!impliedPropery.maySet(roles) || !checkAccess(value, context)) {
+              context.addWarning(object,
+                  "Ignoring property %s because the inverse relationship (%s) may not be set",
+                  prop.getName(), impliedPropery.getName());
+              continue;
+            }
+            context.addPostWork(new ImpliedPropertySetter(context, impliedPropery, value, object));
+          }
+
           // Set the value
           prop.getSetter().invoke(object, value);
 
           // Record the value as having been set
           context.addModified(object, prop);
-
-          // Perhaps set the other side of a OneToMany relationship
-          Property impliedPropery = prop.getImpliedPropery();
-          if (impliedPropery != null && value != null) {
-            context.addPostWork(new ImpliedPropertySetter(context, impliedPropery, value, object));
-          }
+        } catch (Exception e) {
+          context.fail(e);
         } finally {
           context.popPath();
         }
@@ -302,6 +312,25 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
     toReturn.setUuid(uuid);
     context.putEntity(uuid, toReturn, resolved);
     return toReturn;
+  }
+
+  /**
+   * A fan-out to to {@link DeserializationContext#checkAccess(HasUuid)} that will accept
+   * collections.
+   */
+  private boolean checkAccess(Object object, DeserializationContext ctx) {
+    if (object instanceof HasUuid) {
+      return ctx.checkAccess((HasUuid) object);
+    }
+    if (object instanceof Iterable) {
+      for (Object obj : ((Iterable<?>) object)) {
+        if (!checkAccess(obj, ctx)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   /**

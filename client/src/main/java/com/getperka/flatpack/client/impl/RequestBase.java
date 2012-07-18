@@ -84,9 +84,7 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
     for (Map.Entry<String, Object> entry : headers.entrySet()) {
       conn.setRequestProperty(entry.getKey(), entry.getValue().toString());
     }
-    if (api.getAccessToken() != null) {
-      conn.setRequestProperty("Authorization", "Bearer " + api.getAccessToken());
-    }
+    conn = api.filter(conn);
     writeEntity(conn);
     return execute(conn);
   }
