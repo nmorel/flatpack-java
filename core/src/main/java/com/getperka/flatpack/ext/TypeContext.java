@@ -55,6 +55,7 @@ import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
 import com.getperka.flatpack.codexes.DynamicCodex;
 import com.getperka.flatpack.inject.AllTypes;
+import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.util.FlatPackTypes;
 
 /**
@@ -314,7 +315,7 @@ public class TypeContext {
   }
 
   @Inject
-  void setAllTypes(Logger logger, @AllTypes Collection<Class<?>> allTypes) {
+  void setAllTypes(@FlatPackLogger Logger logger, @AllTypes Collection<Class<?>> allTypes) {
     this.logger = logger;
 
     if (allTypes.isEmpty()) {

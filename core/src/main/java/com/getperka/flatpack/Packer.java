@@ -38,6 +38,7 @@ import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.PrettyPrint;
 import com.getperka.flatpack.inject.Verbose;
@@ -52,6 +53,7 @@ public class Packer {
   @Inject
   private Provider<SerializationContext> contexts;
   @Inject
+  @FlatPackLogger
   private Logger logger;
   @Inject
   private PackScope packScope;

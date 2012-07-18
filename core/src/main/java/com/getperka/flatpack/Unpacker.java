@@ -36,6 +36,7 @@ import com.getperka.flatpack.codexes.EntityCodex;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.inject.IgnoreUnresolvableTypes;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.Verbose;
@@ -59,6 +60,7 @@ public class Unpacker {
   @Inject
   private boolean ignoreUnresolvableTypes;
   @Inject
+  @FlatPackLogger
   private Logger logger;
   @Inject
   private PackScope packScope;

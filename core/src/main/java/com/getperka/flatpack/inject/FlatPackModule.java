@@ -28,20 +28,22 @@ import org.slf4j.LoggerFactory;
 
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.FlatPack;
+import com.getperka.flatpack.Packer;
 import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.TraversalMode;
+import com.getperka.flatpack.Unpacker;
 import com.getperka.flatpack.codexes.DefaultCodexMapper;
 import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.ext.PrincipalMapper;
 import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.stream.JsonWriter;
-import com.google.inject.AbstractModule;
+import com.google.inject.PrivateModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.util.Providers;
 
-public class FlatPackModule extends AbstractModule {
+public class FlatPackModule extends PrivateModule {
   private final Configuration configuration;
 
   public FlatPackModule(Configuration configuration) {
@@ -50,9 +52,12 @@ public class FlatPackModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    // Bind TypeContext in singleton, because we want referential integrity
-    bind(TypeContext.class).in(Scopes.SINGLETON);
-    bind(Logger.class).toInstance(LoggerFactory.getLogger(FlatPack.class));
+    bindExposedTypes();
+
+    // Set up a module-wide Logger
+    bind(Logger.class)
+        .annotatedWith(FlatPackLogger.class)
+        .toInstance(LoggerFactory.getLogger(FlatPack.class));
 
     // Bind simple constants
     bindConstant()
@@ -70,8 +75,32 @@ public class FlatPackModule extends AbstractModule {
         .annotatedWith(AllTypes.class)
         .toInstance(configuration.getAllTypes());
 
+    bindImplementationTypes();
     bindPackScope();
     bindUserTypes();
+  }
+
+  /**
+   * Set up explicit bindings for exposed types.
+   */
+  private void bindExposedTypes() {
+    bind(FlatPack.class);
+    expose(FlatPack.class);
+    bind(Packer.class);
+    expose(Packer.class);
+    // Bind TypeContext in singleton, because we want referential integrity
+    bind(TypeContext.class).in(Scopes.SINGLETON);
+    expose(TypeContext.class);
+    bind(Unpacker.class);
+    expose(Unpacker.class);
+  }
+
+  /**
+   * Provide explicit bindings for implementation types that will require access to the private
+   * Injector (because they create types dynamically).
+   */
+  private void bindImplementationTypes() {
+    bind(DefaultCodexMapper.class);
   }
 
   /**

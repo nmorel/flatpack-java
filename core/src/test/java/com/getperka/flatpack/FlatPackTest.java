@@ -38,7 +38,7 @@ import com.getperka.flatpack.domain.Manager;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.SerializationContext;
-import com.getperka.flatpack.inject.FlatPackModule;
+import com.getperka.flatpack.inject.FlatPackTestModule;
 import com.getperka.flatpack.inject.PackScope;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
@@ -76,7 +76,7 @@ public abstract class FlatPackTest {
 
   @Before
   public void before() {
-    Guice.createInjector(new FlatPackModule(getConfiguration())).injectMembers(this);
+    Guice.createInjector(new FlatPackTestModule(getConfiguration())).injectMembers(this);
   }
 
   protected void check(Employee expected, Employee actual) {
