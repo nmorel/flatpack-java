@@ -17,36 +17,23 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack;
 
 import javax.annotation.security.PermitAll;
-import javax.inject.Inject;
-import javax.persistence.Embedded;
 
-import com.getperka.flatpack.BaseHasUuid;
-
+/**
+ * A carrier object to associate out-of-band data with serialized entities. The UUID of this object
+ * corresponds to the UUID of the entity it describes.
+ */
 @PermitAll
-public class Person extends BaseHasUuid {
-  @Inject
-  private StreetAddress address;
-  private String name;
+class EntityMetadata extends BaseHasUuid {
+  private boolean isPersistent;
 
-  Person() {}
-
-  @Embedded
-  public StreetAddress getAddress() {
-    return address;
+  public boolean isPersistent() {
+    return isPersistent;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setAddress(StreetAddress address) {
-    this.address = address;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+  public void setPersistent(boolean isPersistent) {
+    this.isPersistent = isPersistent;
   }
 }

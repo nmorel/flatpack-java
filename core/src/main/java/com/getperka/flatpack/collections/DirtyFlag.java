@@ -17,36 +17,24 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack.collections;
 
-import javax.annotation.security.PermitAll;
-import javax.inject.Inject;
-import javax.persistence.Embedded;
+import java.util.Collection;
 
-import com.getperka.flatpack.BaseHasUuid;
+/**
+ * A simple flag interface that allows the dirty-tracking collections to signal that they have been
+ * mutated by adding a string value to a collection.
+ */
+public class DirtyFlag {
+  private final Collection<String> accumulator;
+  private final String property;
 
-@PermitAll
-public class Person extends BaseHasUuid {
-  @Inject
-  private StreetAddress address;
-  private String name;
-
-  Person() {}
-
-  @Embedded
-  public StreetAddress getAddress() {
-    return address;
+  public DirtyFlag(Collection<String> accumulator, String property) {
+    this.accumulator = accumulator;
+    this.property = property;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setAddress(StreetAddress address) {
-    this.address = address;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+  public void set() {
+    accumulator.add(property);
   }
 }

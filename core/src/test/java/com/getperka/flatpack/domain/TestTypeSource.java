@@ -30,7 +30,7 @@ public class TestTypeSource implements TypeSource {
 
   public TestTypeSource() {
     types = new LinkedHashSet<Class<?>>(Arrays.<Class<?>> asList(
-        Employee.class, Manager.class, Person.class));
+        Employee.class, Manager.class, PersistentEmployee.class, Person.class));
   }
 
   @Override

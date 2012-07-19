@@ -23,9 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Type;
 
 import org.junit.Test;
 
@@ -67,20 +64,6 @@ public class PackTest extends FlatPackTest {
         fail("Unmatched employee");
       }
     }
-  }
-
-  protected <T> T deepPack(Type type, T value) throws IOException {
-    @SuppressWarnings("unchecked")
-    FlatPackEntity<T> entity = (FlatPackEntity<T>) FlatPackEntity.create(type, value, null)
-        .withTraversalMode(TraversalMode.DEEP);
-
-    StringWriter out = new StringWriter();
-    flatpack.getPacker().pack(entity, out);
-    System.out.println(out.toString());
-
-    FlatPackEntity<T> entity2 = flatpack.getUnpacker().unpack(
-        type, new StringReader(out.toString()), null);
-    return entity2.getValue();
   }
 
   @Override

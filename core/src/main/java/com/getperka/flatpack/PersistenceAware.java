@@ -17,36 +17,24 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack;
 
-import javax.annotation.security.PermitAll;
-import javax.inject.Inject;
-import javax.persistence.Embedded;
+import java.util.Set;
 
-import com.getperka.flatpack.BaseHasUuid;
+/**
+ * A capability interface for entity types that implement dirty-tracking.
+ */
+public interface PersistenceAware extends HasUuid {
+  /**
+   * Returns names of the properties of the object that should be serialized, assuming the server
+   * has prior knowledge of the entity.
+   */
+  Set<String> dirtyPropertyNames();
 
-@PermitAll
-public class Person extends BaseHasUuid {
-  @Inject
-  private StreetAddress address;
-  private String name;
+  void markPersistent();
 
-  Person() {}
-
-  @Embedded
-  public StreetAddress getAddress() {
-    return address;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setAddress(StreetAddress address) {
-    this.address = address;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
+  /**
+   * Returns {@code true} if the entity was persisted on the other side of the connection.
+   */
+  boolean wasPersistent();
 }

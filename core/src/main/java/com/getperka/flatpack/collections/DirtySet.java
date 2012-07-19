@@ -17,36 +17,16 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack.collections;
 
-import javax.annotation.security.PermitAll;
-import javax.inject.Inject;
-import javax.persistence.Embedded;
+import java.util.Set;
 
-import com.getperka.flatpack.BaseHasUuid;
-
-@PermitAll
-public class Person extends BaseHasUuid {
-  @Inject
-  private StreetAddress address;
-  private String name;
-
-  Person() {}
-
-  @Embedded
-  public StreetAddress getAddress() {
-    return address;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setAddress(StreetAddress address) {
-    this.address = address;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+/**
+ * A delegating {@link Set} implementation that will call {@link DirtyFlag#set()} when it is
+ * mutated.
+ */
+public class DirtySet<T> extends DirtyCollection<T> implements Set<T> {
+  public DirtySet(Set<T> delegate, DirtyFlag dirty) {
+    super(delegate, dirty);
   }
 }

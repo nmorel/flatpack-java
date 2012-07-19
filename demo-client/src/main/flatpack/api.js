@@ -32,15 +32,12 @@
         ],
         "entitiesUuid": [
           "9ea38475-39ce-303a-a053-5a386d017267",
-          "047a267b-694a-3e82-a9af-b14ae7431ea3",
+          "613b6e38-b098-3e7f-96f7-2f5044406bad",
           "cd92a122-b499-3101-a808-829143822e9c",
           "5135f675-9a52-3879-a356-16eceefb6f17",
-          "b8da57c7-4372-3592-b249-a6be2607760c",
+          "08ab65f2-0088-3fe2-9245-15dc2ec1c71d",
           "58983d81-b29b-315b-8299-1517bbfd6e3d",
-          "613b6e38-b098-3e7f-96f7-2f5044406bad",
-          "87b8d9da-4903-3d8c-a293-fa19679f06ad",
-          "1ee524d6-7c1a-3aa5-b8e1-dc8ac5b595fa",
-          "08ab65f2-0088-3fe2-9245-15dc2ec1c71d"
+          "87b8d9da-4903-3d8c-a293-fa19679f06ad"
         ]
       }
     ],
@@ -49,6 +46,7 @@
         "uuid": "79c18883-c98b-3425-97a6-8af848f924ce",
         "method": "POST",
         "path": "/reset",
+        "docString": "Destroy all information in the  FakeDatabase so this resource can be used by tests.",
         "roleNames": [
           "*"
         ]
@@ -67,10 +65,10 @@
         "uuid": "87969d86-7ee0-3588-a322-0f2c3b0ad34b",
         "method": "GET",
         "path": "/hello",
-        "docString": "This is a simple endpoint just to show a basic jax-rs request endpoint. The method name is\n irrelevant, all mapping information is derived from the method annotation  GET and the\n  Path annotation. Because multiple methods (e.g.  POST,  PUT) may be bound\n to the same path, but with different methods or media types, a suggested coding style is to add\n the discriminators to the end of a descriptive method name.",
         "queryParametersUuid": [
           "ac34ca0d-3e64-3894-96ad-7196d707aa9c"
         ],
+        "docString": "This is a simple endpoint just to show a basic jax-rs request endpoint. The method name is\n irrelevant, all mapping information is derived from the method annotation  GET and the\n  Path annotation. Because multiple methods (e.g.  POST,  PUT) may be bound\n to the same path, but with different methods or media types, a suggested coding style is to add\n the discriminators to the end of a descriptive method name.",
         "roleNames": [
           "*"
         ]
@@ -146,6 +144,11 @@
         "jsonKind": "STRING"
       },
       {
+        "uuid": "acee1d10-788f-394d-aaf5-1b9d8ee8494a",
+        "jsonKind": "STRING",
+        "typeHint": "java.math.BigDecimal"
+      },
+      {
         "uuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
         "name": "type",
         "jsonKind": "STRING"
@@ -174,11 +177,6 @@
         "uuid": "aaad9bd3-7a6e-3272-aebc-0c18cad6e9c1",
         "name": "property",
         "jsonKind": "STRING"
-      },
-      {
-        "uuid": "acee1d10-788f-394d-aaf5-1b9d8ee8494a",
-        "jsonKind": "STRING",
-        "typeHint": "java.math.BigDecimal"
       },
       {
         "uuid": "22176e08-d364-37ea-9478-488aa68dd24a",
@@ -225,6 +223,7 @@
           "8dc42055-f59e-3886-bcd2-480c38d7108f"
         ],
         "typeName": "apiDescription",
+        "persistent": true,
         "docString": "A description of the entities contained within an API.",
         "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
@@ -233,7 +232,21 @@
         "propertiesUuid": [
           "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb"
         ],
-        "typeName": "baseHasUuid"
+        "typeName": "baseHasUuid",
+        "persistent": true
+      },
+      {
+        "uuid": "613b6e38-b098-3e7f-96f7-2f5044406bad",
+        "propertiesUuid": [
+          "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
+          "4e786099-51b9-3134-9ccc-10fd1371f61b",
+          "0d2d906f-4f10-363a-b905-f521e4f21532",
+          "fee36383-bd93-35c9-9884-cba75fad43c3"
+        ],
+        "typeName": "product",
+        "persistent": true,
+        "docString": "A simple entity type. All properties are globally-readable, however the setters are restricted to\n just the admin role.",
+        "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
       {
         "uuid": "cd92a122-b499-3101-a808-829143822e9c",
@@ -243,12 +256,13 @@
           "a18b1330-c2f4-3923-87ba-f511d5b6a018",
           "0da7cfc0-6137-36de-b36a-870de2cbd263",
           "54431d6e-df0d-3c5e-8ab4-723d8607095e",
-          "96a0fa0a-3eda-32f2-825f-5db97e122c16",
           "5be6cbb3-3b88-383f-b557-26688d4e1a41",
           "dd799707-e571-3759-b935-8e20ffa5030d",
+          "96a0fa0a-3eda-32f2-825f-5db97e122c16",
           "424c9e0c-260a-3438-9ada-ee35161ce8d6"
         ],
         "typeName": "endpointDescription",
+        "persistent": true,
         "docString": "Describes an <code>HTTP</code> request endpoint.",
         "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
@@ -258,19 +272,31 @@
           "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
           "114d2db3-fa2b-34fb-8828-ff0142887c25",
           "661989aa-ef44-35ce-8d14-311f1bef1eaf",
+          "937ecbf4-9cdb-3794-9e57-eced56dca3da",
           "419782a1-c2a6-3034-a6ba-966a07ee8803",
           "217847a7-6e2d-3d36-a4e6-a4bcf945946f"
         ],
         "typeName": "entityDescription",
+        "persistent": true,
         "docString": "A description of an entity type.",
         "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
       {
-        "uuid": "b8da57c7-4372-3592-b249-a6be2607760c",
+        "uuid": "08ab65f2-0088-3fe2-9245-15dc2ec1c71d",
         "propertiesUuid": [
-          "cbff7c17-f0b4-3e54-a433-ab021b6c4f37"
+          "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
+          "1a4b5c02-4cd9-3148-89ac-4534eb84f2c6",
+          "e90f6755-1128-3d3c-ab3c-a7451419d014",
+          "09728c90-9892-3d80-a0fa-bf785128f8f0",
+          "aa9f52af-5ac3-3e87-8cf3-be6d76876fc7",
+          "a90873d2-1958-3776-8b3c-a4d226ca0093",
+          "9c510109-ebc1-3934-9df6-4d084f8bb89d",
+          "b652e2f2-5142-3f32-8641-8acc521c4ac8"
         ],
-        "typeName": "hasUuid"
+        "typeName": "type",
+        "persistent": true,
+        "docString": "A simple JSON type description.",
+        "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
       {
         "uuid": "58983d81-b29b-315b-8299-1517bbfd6e3d",
@@ -282,18 +308,8 @@
           "52f89510-f974-304e-9841-aa63600ab4e1"
         ],
         "typeName": "parameterDescription",
+        "persistent": true,
         "docString": "Describes a path or query parameter in <entityReference payloadName='endpointDescription'> EndpointDescription</entityReference>.",
-        "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
-      },
-      {
-        "uuid": "613b6e38-b098-3e7f-96f7-2f5044406bad",
-        "propertiesUuid": [
-          "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
-          "4e786099-51b9-3134-9ccc-10fd1371f61b",
-          "0d2d906f-4f10-363a-b905-f521e4f21532",
-          "fee36383-bd93-35c9-9884-cba75fad43c3"
-        ],
-        "typeName": "product",
         "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       },
       {
@@ -313,33 +329,8 @@
           "56f629da-2825-3abc-a481-2a0dfed14fa3"
         ],
         "typeName": "property",
+        "persistent": true,
         "docString": "An immutable view of a property that should be serialized.",
-        "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
-      },
-      {
-        "uuid": "1ee524d6-7c1a-3aa5-b8e1-dc8ac5b595fa",
-        "propertiesUuid": [
-          "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
-          "44c7b9a4-3ccc-3832-b6db-40e9cb5912a2"
-        ],
-        "typeName": "propertyPath",
-        "docString": "Represents a sequence of simple property evaluations.",
-        "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
-      },
-      {
-        "uuid": "08ab65f2-0088-3fe2-9245-15dc2ec1c71d",
-        "propertiesUuid": [
-          "e0e0884f-75dc-382a-bc5b-63ed72b0d3cb",
-          "1a4b5c02-4cd9-3148-89ac-4534eb84f2c6",
-          "e90f6755-1128-3d3c-ab3c-a7451419d014",
-          "09728c90-9892-3d80-a0fa-bf785128f8f0",
-          "aa9f52af-5ac3-3e87-8cf3-be6d76876fc7",
-          "a90873d2-1958-3776-8b3c-a4d226ca0093",
-          "9c510109-ebc1-3934-9df6-4d084f8bb89d",
-          "b652e2f2-5142-3f32-8641-8acc521c4ac8"
-        ],
-        "typeName": "type",
-        "docString": "A simple JSON type description.",
         "supertypeUuid": "047a267b-694a-3e82-a9af-b14ae7431ea3"
       }
     ],
@@ -349,6 +340,12 @@
         "name": "uuid",
         "typeUuid": "f4f93b7e-fa2d-3130-91f3-09f9affe63a9",
         "enclosingTypeName": "baseHasUuid",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -359,6 +356,12 @@
         "name": "apiName",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "apiDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -369,6 +372,12 @@
         "name": "apiVersion",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "apiDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -379,6 +388,12 @@
         "name": "endpoints",
         "typeUuid": "529dc19c-8a01-3c36-a9b6-cec5de515731",
         "enclosingTypeName": "apiDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -389,6 +404,60 @@
         "name": "entities",
         "typeUuid": "0739fd15-56ea-3fb9-bfee-66fbd08f582f",
         "enclosingTypeName": "apiDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "4e786099-51b9-3134-9ccc-10fd1371f61b",
+        "name": "name",
+        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
+        "enclosingTypeName": "product",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "ADMIN"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "0d2d906f-4f10-363a-b905-f521e4f21532",
+        "name": "notes",
+        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
+        "enclosingTypeName": "product",
+        "getterRoleNames": [
+          "ADMIN"
+        ],
+        "setterRoleNames": [
+          "ADMIN"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "fee36383-bd93-35c9-9884-cba75fad43c3",
+        "name": "price",
+        "typeUuid": "acee1d10-788f-394d-aaf5-1b9d8ee8494a",
+        "enclosingTypeName": "product",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "ADMIN"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -400,6 +469,12 @@
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "docString": "The HTTP method used to access the endpoint.",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -411,6 +486,12 @@
         "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
         "docString": "The expected contents for the HTTP response.",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -422,6 +503,12 @@
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "docString": "The path used to access the endpoint.",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -433,16 +520,12 @@
         "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
         "docString": "The expected entity type for the request. Generally, the <code>HTTP POST</code> body.",
         "enclosingTypeName": "endpointDescription",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "96a0fa0a-3eda-32f2-825f-5db97e122c16",
-        "name": "docString",
-        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
-        "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -454,6 +537,12 @@
         "typeUuid": "45ae7e6a-bbb1-3bb0-a7bc-5f58d06a75d7",
         "docString": "Describes any parameters embedded in  #getPath().",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -465,6 +554,28 @@
         "typeUuid": "45ae7e6a-bbb1-3bb0-a7bc-5f58d06a75d7",
         "docString": "Describes any query parameters for the endpoint.",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "96a0fa0a-3eda-32f2-825f-5db97e122c16",
+        "name": "docString",
+        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
+        "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -476,6 +587,12 @@
         "typeUuid": "b187269e-51c8-310e-961f-1c8130d408c6",
         "docString": "Return the role names that are allowed to access the endpoint. A <code>null</code> value means that\n all roles are allowed, while a zero-length value means that no roles are allowed.",
         "enclosingTypeName": "endpointDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -486,6 +603,12 @@
         "name": "properties",
         "typeUuid": "7e9a128d-6303-315c-8c5c-bc2a9daf0e82",
         "enclosingTypeName": "entityDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -496,6 +619,29 @@
         "name": "typeName",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "entityDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "937ecbf4-9cdb-3794-9e57-eced56dca3da",
+        "name": "persistent",
+        "typeUuid": "22176e08-d364-37ea-9478-488aa68dd24a",
+        "docString": "Indicates that instance of the the type may be persisted by the server. This hint can be used\n to reduce payload sizes by transmitting only mutated properties.",
+        "enclosingTypeName": "entityDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -506,6 +652,12 @@
         "name": "docString",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "entityDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -516,16 +668,124 @@
         "name": "supertype",
         "typeUuid": "ecd216c6-c358-3a7b-be43-8e02317e77b0",
         "enclosingTypeName": "entityDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
         "suppressDefaultValue": false
       },
       {
-        "uuid": "cbff7c17-f0b4-3e54-a433-ab021b6c4f37",
-        "name": "uuid",
-        "typeUuid": "f4f93b7e-fa2d-3130-91f3-09f9affe63a9",
-        "enclosingTypeName": "hasUuid",
+        "uuid": "1a4b5c02-4cd9-3148-89ac-4534eb84f2c6",
+        "name": "name",
+        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "e90f6755-1128-3d3c-ab3c-a7451419d014",
+        "name": "jsonKind",
+        "typeUuid": "3a3db3e1-0f1a-325d-8b44-013f15b28680",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "09728c90-9892-3d80-a0fa-bf785128f8f0",
+        "name": "enumValues",
+        "typeUuid": "b187269e-51c8-310e-961f-1c8130d408c6",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "aa9f52af-5ac3-3e87-8cf3-be6d76876fc7",
+        "name": "listElement",
+        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "a90873d2-1958-3776-8b3c-a4d226ca0093",
+        "name": "mapKey",
+        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "9c510109-ebc1-3934-9df6-4d084f8bb89d",
+        "name": "mapValue",
+        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
+        "deepTraversalOnly": false,
+        "embedded": false,
+        "inheritPrincipal": false,
+        "suppressDefaultValue": false
+      },
+      {
+        "uuid": "b652e2f2-5142-3f32-8641-8acc521c4ac8",
+        "name": "typeHint",
+        "typeUuid": "8fc89153-85bf-3fb4-b2da-cb1c364ae615",
+        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -536,6 +796,12 @@
         "name": "name",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "parameterDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -546,6 +812,12 @@
         "name": "type",
         "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
         "enclosingTypeName": "parameterDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -556,6 +828,12 @@
         "name": "docString",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "parameterDescription",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -566,36 +844,12 @@
         "name": "endpoint",
         "typeUuid": "8972f791-3eaa-3e17-8202-a4d84aa17557",
         "enclosingTypeName": "parameterDescription",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "4e786099-51b9-3134-9ccc-10fd1371f61b",
-        "name": "name",
-        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
-        "enclosingTypeName": "product",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "0d2d906f-4f10-363a-b905-f521e4f21532",
-        "name": "notes",
-        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
-        "enclosingTypeName": "product",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "fee36383-bd93-35c9-9884-cba75fad43c3",
-        "name": "price",
-        "typeUuid": "acee1d10-788f-394d-aaf5-1b9d8ee8494a",
-        "enclosingTypeName": "product",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -607,6 +861,12 @@
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "docString": "Returns the json payload name of the Property, which may differ from the bean name if a\n  JsonProperty annotation has been applied to the getter.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -618,6 +878,12 @@
         "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
         "docString": "A simplified description of the property's type.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -628,6 +894,12 @@
         "name": "docString",
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -639,6 +911,12 @@
         "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
         "docString": "The payload name of the type that defines the property.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -650,6 +928,12 @@
         "typeUuid": "b187269e-51c8-310e-961f-1c8130d408c6",
         "docString": "Returns the role names that are allowed to get the property. A value containing a single\n asterisk means that all roles may access the property.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -661,6 +945,12 @@
         "typeUuid": "aaad9bd3-7a6e-3272-aebc-0c18cad6e9c1",
         "docString": "When a new value is assigned to the current property in some instance, the implied property of\n the new value should also be updated with the current instance.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -672,6 +962,12 @@
         "typeUuid": "b187269e-51c8-310e-961f-1c8130d408c6",
         "docString": "Return the role names that are allowed to set this property. A value containing a single\n asterisk means that all roles may set the property.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -683,6 +979,12 @@
         "typeUuid": "22176e08-d364-37ea-9478-488aa68dd24a",
         "docString": "Returns <code>true</code> if the Property should be included only during a deep traversal.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -694,6 +996,12 @@
         "typeUuid": "22176e08-d364-37ea-9478-488aa68dd24a",
         "docString": "Returns <code>true</code> if an entity Property's properties should be emitted into the owning\n entity's properties.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -705,6 +1013,12 @@
         "typeUuid": "22176e08-d364-37ea-9478-488aa68dd24a",
         "docString": "Returns <code>true</code> if the referred entity's owner should also be considered an owner of the\n entity that defines the Property.",
         "enclosingTypeName": "property",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,
@@ -716,87 +1030,12 @@
         "typeUuid": "22176e08-d364-37ea-9478-488aa68dd24a",
         "docString": "If <code>true</code>, non-null properties that contain the property type's default value will not be\n serialized. For example, integer properties whose values are <code>0</code> will not be serialized.",
         "enclosingTypeName": "property",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "44c7b9a4-3ccc-3832-b6db-40e9cb5912a2",
-        "name": "path",
-        "typeUuid": "7e9a128d-6303-315c-8c5c-bc2a9daf0e82",
-        "docString": "Return an unmodifiable view of the properties that comprise the path.",
-        "enclosingTypeName": "propertyPath",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "1a4b5c02-4cd9-3148-89ac-4534eb84f2c6",
-        "name": "name",
-        "typeUuid": "41d0c340-e8c1-3592-8bf4-f69c8ea830fe",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "e90f6755-1128-3d3c-ab3c-a7451419d014",
-        "name": "jsonKind",
-        "typeUuid": "3a3db3e1-0f1a-325d-8b44-013f15b28680",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "09728c90-9892-3d80-a0fa-bf785128f8f0",
-        "name": "enumValues",
-        "typeUuid": "b187269e-51c8-310e-961f-1c8130d408c6",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "aa9f52af-5ac3-3e87-8cf3-be6d76876fc7",
-        "name": "listElement",
-        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "a90873d2-1958-3776-8b3c-a4d226ca0093",
-        "name": "mapKey",
-        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "9c510109-ebc1-3934-9df6-4d084f8bb89d",
-        "name": "mapValue",
-        "typeUuid": "ac519969-0cab-3a23-b68c-1db2cbd0bff7",
-        "enclosingTypeName": "type",
-        "deepTraversalOnly": false,
-        "embedded": false,
-        "inheritPrincipal": false,
-        "suppressDefaultValue": false
-      },
-      {
-        "uuid": "b652e2f2-5142-3f32-8641-8acc521c4ac8",
-        "name": "typeHint",
-        "typeUuid": "8fc89153-85bf-3fb4-b2da-cb1c364ae615",
-        "enclosingTypeName": "type",
+        "getterRoleNames": [
+          "*"
+        ],
+        "setterRoleNames": [
+          "*"
+        ],
         "deepTraversalOnly": false,
         "embedded": false,
         "inheritPrincipal": false,

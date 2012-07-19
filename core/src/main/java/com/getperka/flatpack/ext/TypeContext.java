@@ -53,6 +53,7 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
+import com.getperka.flatpack.PersistenceMapper;
 import com.getperka.flatpack.codexes.DynamicCodex;
 import com.getperka.flatpack.inject.AllTypes;
 import com.getperka.flatpack.inject.FlatPackLogger;
@@ -153,20 +154,33 @@ public class TypeContext {
   @Inject
   private CodexMapper codexMapper;
   private final Map<Type, Codex<?>> codexes = mapForLookup();
-  private Logger logger;
-  private final Map<Class<?>, List<Property>> properties = mapForLookup();
-  private final Map<Class<?>, List<PropertyPath>> principalPaths = mapForLookup();
-  @Inject
-  private PrincipalMapper principalMapper;
   /**
    * A DynamicCodex acts as a placeholder when type information can't be determined (which should be
    * rare).
    */
   @Inject
   private DynamicCodex dynamicCodex;
+  private Logger logger;
+  @Inject
+  private PersistenceMapper persistenceMapper;
+  private final Map<Class<?>, List<Property>> properties = mapForLookup();
+  private final Map<Class<?>, List<PropertyPath>> principalPaths = mapForLookup();
+  @Inject
+  private PrincipalMapper principalMapper;
 
   @Inject
   TypeContext() {}
+
+  /**
+   * Returns {@code true} if a {@link PersistenceMapper} is registered that provides persistence
+   * metadata for the requested type.
+   */
+  public boolean canPersist(Class<?> clazz) {
+    if (HasUuid.class.isAssignableFrom(clazz)) {
+      return persistenceMapper.canPersist(clazz.asSubclass(HasUuid.class));
+    }
+    return false;
+  }
 
   /**
    * Examine a class and return {@link Property} helpers that describe all JSON properties that the

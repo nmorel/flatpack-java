@@ -22,8 +22,10 @@ package com.getperka.flatpack.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
 import javax.persistence.OneToMany;
 
+@PermitAll
 public class Manager extends Person {
   private List<Employee> employees = new ArrayList<Employee>();
 

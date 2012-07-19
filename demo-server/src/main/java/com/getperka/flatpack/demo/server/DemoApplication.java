@@ -27,6 +27,7 @@ import javax.ws.rs.core.Application;
 
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.PersistenceMapper;
 import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.jersey.FlatPackProvider;
 import com.getperka.flatpack.jersey.FlatPackResolver;
@@ -49,6 +50,27 @@ public class DemoApplication extends Application {
     }
   }
 
+  /**
+   * Provides hints to the FlatPack stack about an entity's persistence state to enable sparse
+   * property transmission.
+   */
+  private class FakePersistenceMapper implements PersistenceMapper {
+    /**
+     * A real implementation may have separate type hierarchies for persistent and ephemeral
+     * entities.
+     */
+    @Override
+    public boolean canPersist(Class<? extends HasUuid> entityType) {
+      return true;
+    }
+
+    @Override
+    public boolean isPersisted(HasUuid entity) {
+      return db.isPersisted(entity);
+    }
+
+  }
+
   private FakeDatabase db = new FakeDatabase();
 
   @Override
@@ -63,6 +85,11 @@ public class DemoApplication extends Application {
          * may omit this configuration.
          */
         .addEntityResolver(new FakeDatabaseResolver())
+        /*
+         * The PersistenceMapper is optional and provides the FlatPack stack with hints related to a
+         * entity's persistence status.
+         */
+        .addPersistenceMapper(new FakePersistenceMapper())
         /*
          * At least one TypeSource is required. The TypeSources associated with a FlatPack stack
          * determine the complete set of entity types that can be processed. This SearchTypeSource

@@ -26,11 +26,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PostUnpack;
 import com.getperka.flatpack.PreUnpack;
@@ -42,6 +44,7 @@ import com.getperka.flatpack.ext.Property;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
@@ -338,10 +341,19 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
    * null
    */
   private void traverse(T object, boolean isEmbedded, SerializationContext context,
-      JsonWriter writer)
-      throws Exception {
+      JsonWriter writer) throws Exception {
 
     if (object == null) return;
+
+    Set<String> dirtyPropertyNames;
+    if (object instanceof PersistenceAware) {
+      dirtyPropertyNames = FlatPackCollections.setForIteration();
+      // Always write out uuid
+      dirtyPropertyNames.add("uuid");
+      dirtyPropertyNames.addAll(((PersistenceAware) object).dirtyPropertyNames());
+    } else {
+      dirtyPropertyNames = null;
+    }
 
     // Write all properties
     for (Property prop : typeContext.extractProperties(clazz)) {
@@ -355,6 +367,10 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
       }
       // Don't emit a redundant uuid property
       if (isEmbedded && "uuid".equals(prop.getName())) {
+        continue;
+      }
+      // Skip clean properties
+      if (dirtyPropertyNames != null && !dirtyPropertyNames.contains(prop.getName())) {
         continue;
       }
       context.pushPath("." + prop.getName());

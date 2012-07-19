@@ -33,12 +33,39 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.getperka.flatpack.collections.DirtyCollection;
+import com.getperka.flatpack.collections.DirtyFlag;
+import com.getperka.flatpack.collections.DirtyList;
+import com.getperka.flatpack.collections.DirtyMap;
+import com.getperka.flatpack.collections.DirtySet;
+
 /**
  * A class with factory methods that vend different types of collections based on intended use.
  * These methods exist to help ensure that code will operate with predictable iteration order where
  * iteration is required.
  */
 public class FlatPackCollections {
+
+  /**
+   * A convenience method to wrap an object that may be a collection or map with a dirty-tracking
+   * variant.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T dirtyTracking(T obj, DirtyFlag flag) {
+    if (obj instanceof Set) {
+      return (T) new DirtySet<Object>((Set<Object>) obj, flag);
+    }
+    if (obj instanceof List) {
+      return (T) new DirtyList<Object>((List<Object>) obj, flag);
+    }
+    if (obj instanceof Map) {
+      return (T) new DirtyMap<Object, Object>((Map<Object, Object>) obj, flag);
+    }
+    if (obj instanceof Collection) {
+      return (T) new DirtyCollection<Object>((Collection<Object>) obj, flag);
+    }
+    return obj;
+  }
 
   /**
    * Returns the default List implementation to use.

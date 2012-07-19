@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -158,6 +159,7 @@ public class FlatPackEntity<T> extends TypeReference<T> {
   private Set<HasUuid> extraEntities;
   private Map<String, String> extraErrors;
   private Map<String, String> extraWarnings;
+  private List<EntityMetadata> metadata;
   private Principal principal;
   private TraversalMode traversalMode = TraversalMode.SIMPLE;
   private T value;
@@ -336,5 +338,18 @@ public class FlatPackEntity<T> extends TypeReference<T> {
     }
     this.value = value;
     return this;
+  }
+
+  FlatPackEntity<T> addMetadata(EntityMetadata meta) {
+    if (metadata == null) {
+      metadata = FlatPackCollections.listForAny();
+    }
+    metadata.add(meta);
+    return this;
+  }
+
+  List<EntityMetadata> getMetadata() {
+    return metadata == null ? Collections.<EntityMetadata> emptyList() :
+        Collections.unmodifiableList(metadata);
   }
 }

@@ -265,6 +265,9 @@ public class ApiDescriber {
       entity.setDocString(replaceLinks(docString));
     }
 
+    // Determine persistence semantics
+    entity.setPersistent(ctx.canPersist(clazz));
+
     // Iterate over the properties
     for (Iterator<Property> it = entity.getProperties().iterator(); it.hasNext();) {
       Property prop = it.next();

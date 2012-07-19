@@ -56,6 +56,8 @@ public class Unpacker {
 
   @Inject
   private Provider<DeserializationContext> contexts;
+  @Inject
+  private Provider<EntityCodex<EntityMetadata>> metaCodex;
   @IgnoreUnresolvableTypes
   @Inject
   private boolean ignoreUnresolvableTypes;
@@ -196,6 +198,17 @@ public class Unpacker {
           }
         }
         reader.endObject();
+      } else if ("metadata".equals(name)) {
+        reader.beginArray();
+
+        while (!JsonToken.END_ARRAY.equals(reader.peek())) {
+          EntityMetadata meta = new EntityMetadata();
+          JsonObject metaElement = jsonParser.parse(reader).getAsJsonObject();
+          metaCodex.get().readProperties(meta, metaElement, context);
+          toReturn.addMetadata(meta);
+        }
+
+        reader.endArray();
       } else if ("value".equals(name)) {
         // Just stash the value element in case it occurs first
         value = jsonParser.parse(reader);
@@ -224,6 +237,16 @@ public class Unpacker {
 
     for (Map.Entry<UUID, String> entry : context.getWarnings().entrySet()) {
       toReturn.addWarning(entry.getKey().toString(), entry.getValue());
+    }
+
+    // Process metadata
+    for (EntityMetadata meta : toReturn.getMetadata()) {
+      if (meta.isPersistent()) {
+        HasUuid entity = context.getEntity(meta.getUuid());
+        if (entity instanceof PersistenceAware) {
+          ((PersistenceAware) entity).markPersistent();
+        }
+      }
     }
 
     context.runPostWork();
