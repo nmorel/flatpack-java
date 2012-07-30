@@ -79,7 +79,6 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
     URI sendTo = api.getServerBase().resolve(sb.toString());
 
     HttpURLConnection conn = (HttpURLConnection) sendTo.toURL().openConnection();
-    conn.setDoOutput(true);
     conn.setRequestMethod(method);
     for (Map.Entry<String, Object> entry : headers.entrySet()) {
       conn.setRequestProperty(entry.getKey(), entry.getValue().toString());

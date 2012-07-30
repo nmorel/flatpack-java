@@ -98,6 +98,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     if (getEntity() == null) {
       return;
     }
+    connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", "application/json; charset=UTF8");
     Writer out = new OutputStreamWriter(connection.getOutputStream(), FlatPackTypes.UTF8);
     getApi().getFlatPack().getPacker().pack(toSend, out);
