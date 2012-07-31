@@ -249,7 +249,7 @@ public class FlatPackTypes {
     TypeVariable<?>[] vars = ((Class<?>) raw).getTypeParameters();
 
     // If the type has no parameterizations, just return it
-    if (vars.length == 0) {
+    if (vars.length == 0 || !it.hasNext()) {
       return raw;
     }
     // Create the parameter values
