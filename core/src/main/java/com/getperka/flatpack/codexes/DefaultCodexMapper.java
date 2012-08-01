@@ -94,12 +94,12 @@ public class DefaultCodexMapper implements CodexMapper {
 
   @Override
   public Codex<?> getCodex(TypeContext context, Type type) {
-    // Simple types
-    if (simpleCodexes.containsKey(type)) {
-      return simpleCodexes.get(type);
-    }
-
     Class<?> erased = erase(type);
+
+    // Simple types
+    if (simpleCodexes.containsKey(erased)) {
+      return simpleCodexes.get(erased);
+    }
 
     // Entities
     if (HasUuid.class.isAssignableFrom(erased)) {
