@@ -36,7 +36,7 @@
   <parent>
     <groupId>com.getperka</groupId>
     <artifactId>perka-oss-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
   </parent>
 
   <!-- The eclipse-plugin project isn't listed here because it only changes 
