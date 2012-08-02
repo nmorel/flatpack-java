@@ -27,8 +27,10 @@ import com.getperka.flatpack.client.Request;
 public class ConnectionRequestBase<R extends Request<R, HttpURLConnection>> extends
     RequestBase<R, HttpURLConnection> {
 
-  protected ConnectionRequestBase(ApiBase api, String method, String path, Object... args) {
-    super(api, method, path, args);
+  protected ConnectionRequestBase(ApiBase api, String method,
+      String path, boolean hasPayload, Object... args) {
+
+    super(api, method, path, hasPayload, args);
   }
 
   @Override

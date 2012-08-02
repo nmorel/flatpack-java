@@ -119,7 +119,7 @@ public class JavaDialect implements Dialect {
   /**
    * Used at the end of the code-generation process to emit referenced enum values.
    */
-  private Set<Type> usedEnums = new LinkedHashSet<Type>();
+  private final Set<Type> usedEnums = new LinkedHashSet<Type>();
 
   @Override
   public void generate(ApiDescription api, File outputDir) throws IOException {
@@ -312,6 +312,8 @@ public class JavaDialect implements Dialect {
           } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
           }
+        } else if ("hasPayload".equals(propertyName)) {
+          return end.getEntity() != null;
         }
         return super.getProperty(interp, self, o, property, propertyName);
       }

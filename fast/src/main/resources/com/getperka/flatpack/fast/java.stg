@@ -138,7 +138,7 @@ private class <end.javaNameUpcase>Impl
     extends <names.ConnectionRequestBase>\<<end.javaNameUpcase>\>
     implements <end.javaNameUpcase> {
   public <end.javaNameUpcase>Impl(Object... args) {
-    super(<namePrefix>Api.this, "<end.method>", "<end.pathDecoded>", args);
+    super(<namePrefix>Api.this, "<end.method>", "<end.pathDecoded>", false, args);
   }
   <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
 }
@@ -164,7 +164,7 @@ private class <end.javaNameUpcase>Impl
     extends <names.FlatPackRequestBase>\<<end.javaNameUpcase>, <end.returnType>\>
     implements <end.javaNameUpcase> {
   public <end.javaNameUpcase>Impl(Object... args) {
-    super(<namePrefix>Api.this, <endpointCreateType(end.returnType)>, "<end.method>", "<end.pathDecoded>", args);
+    super(<namePrefix>Api.this, <endpointCreateType(end.returnType)>, "<end.method>", "<end.pathDecoded>", <end.hasPayload>, args);
   }
   <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
 }

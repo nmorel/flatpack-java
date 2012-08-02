@@ -44,9 +44,10 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
   private FlatPackEntity<X> toSend;
   private final boolean verbose;
 
-  protected FlatPackRequestBase(ApiBase api, Type returnType, String method, String path,
-      Object... args) {
-    super(api, method, path, args);
+  protected FlatPackRequestBase(ApiBase api, Type returnType,
+      String method, String path, boolean hasPayload, Object... args) {
+
+    super(api, method, path, hasPayload, args);
     logger = api.getLogger();
     this.returnType = returnType;
     verbose = api.isVerbose();
@@ -110,7 +111,6 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     if (getEntity() == null) {
       return;
     }
-    connection.setDoOutput(true);
     connection.setRequestProperty("Content-Type", "application/json; charset=UTF8");
     Writer out = new OutputStreamWriter(connection.getOutputStream(), FlatPackTypes.UTF8);
     if (verbose) {
