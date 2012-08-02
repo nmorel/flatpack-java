@@ -26,7 +26,9 @@ import static com.getperka.flatpack.util.FlatPackCollections.sortedMapForIterati
 import static com.getperka.flatpack.util.FlatPackTypes.decapitalize;
 import static com.getperka.flatpack.util.FlatPackTypes.erase;
 import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization;
+import static com.getperka.flatpack.util.FlatPackTypes.hasAnnotationWithSimpleName;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -43,8 +45,6 @@ import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 
@@ -113,7 +113,7 @@ public class TypeContext {
       if (m.isAnnotationPresent(RolesAllowed.class)) {
         return true;
       }
-      if (m.isAnnotationPresent(Transient.class)) {
+      if (hasAnnotationWithSimpleName(m, "Transient")) {
         return false;
       }
       if (Modifier.isPublic(m.getModifiers())) {
@@ -215,19 +215,22 @@ public class TypeContext {
          * Disable traversal of Implied / OneToMany properties unless requested. Also wire up the
          * implication relationships between properties in the two models.
          */
-        OneToMany oneToMany = m.getAnnotation(OneToMany.class);
-        Implies implies = m.getAnnotation(Implies.class);
-        String impliedPropertyName = implies != null ? implies.value()
-            : oneToMany != null ? oneToMany.mappedBy() : null;
+        String impliedPropertyName = getImpliedPropertyName(m);
         if (impliedPropertyName != null) {
           builder.withDeepTraversalOnly(true);
-          Class<?> otherModel = erase(getSingleParameterization(m.getGenericReturnType(),
-              Collection.class));
-          for (Property otherProperty : extractProperties(otherModel)) {
-            if (otherProperty.getName().equals(impliedPropertyName)) {
-              builder.withImpliedProperty(otherProperty);
-              otherProperty.setImpliedProperty(builder.peek());
-              break;
+          Type elementType = getSingleParameterization(m.getGenericReturnType(), Collection.class);
+
+          if (elementType == null) {
+            logger.error("Method {}.{} defines a OneToMany / Implies relationship but the " +
+              "return type is not a Collection", clazz.getName(), m.getName());
+          } else {
+            Class<?> otherModel = erase(elementType);
+            for (Property otherProperty : extractProperties(otherModel)) {
+              if (otherProperty.getName().equals(impliedPropertyName)) {
+                builder.withImpliedProperty(otherProperty);
+                otherProperty.setImpliedProperty(builder.peek());
+                break;
+              }
             }
           }
         } else if (HasUuid.class.isAssignableFrom(m.getReturnType())) {
@@ -422,5 +425,27 @@ public class TypeContext {
       builders.put(beanPropertyName, builder);
     }
     return builder;
+  }
+
+  /**
+   * Extract the implied property name from an Implies or OneToMany annotation.
+   */
+  private String getImpliedPropertyName(Method m) {
+    Implies implies = m.getAnnotation(Implies.class);
+    if (implies != null) {
+      return implies.value();
+    }
+
+    for (Annotation a : m.getAnnotations()) {
+      if ("javax.persistence.OneToMany".equals(a.annotationType().getName())) {
+        try {
+          return (String) a.annotationType().getMethod("mappedBy").invoke(a);
+        } catch (Exception e) {
+          logger.error("Could not extract information from @OneToMany", e);
+        }
+      }
+    }
+
+    return null;
   }
 }

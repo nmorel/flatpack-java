@@ -22,14 +22,14 @@ package com.getperka.flatpack.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.OneToMany;
+import com.getperka.flatpack.Implies;
 
 public class Manager extends Person {
   private List<Employee> employees = new ArrayList<Employee>();
 
   Manager() {}
 
-  @OneToMany(mappedBy = "manager")
+  @Implies("manager")
   public List<Employee> getEmployees() {
     return employees;
   }

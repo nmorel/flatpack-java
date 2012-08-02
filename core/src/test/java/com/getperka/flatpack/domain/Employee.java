@@ -19,8 +19,6 @@
  */
 package com.getperka.flatpack.domain;
 
-import javax.persistence.ManyToOne;
-
 import com.getperka.flatpack.PostUnpack;
 import com.getperka.flatpack.PreUnpack;
 import com.google.gson.JsonObject;
@@ -38,7 +36,6 @@ public class Employee extends Person {
     return employeeNumber;
   }
 
-  @ManyToOne
   public Manager getManager() {
     return manager;
   }

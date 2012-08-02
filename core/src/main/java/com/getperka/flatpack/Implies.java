@@ -1,4 +1,5 @@
 package com.getperka.flatpack;
+
 /*
  * #%L
  * FlatPack serialization code
@@ -26,8 +27,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Applied to property getters to indicate that a property on the referenced object(s) should be
- * updated with the entity during deserialization.
+ * Applied to a collection property getter to indicate that the named property in the collection's
+ * entities should be updated with a reference to the owning entity.
+ * <p>
+ * This essentially defines a JPA-style OneToMany relationship.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

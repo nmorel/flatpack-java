@@ -20,7 +20,6 @@
 package com.getperka.flatpack.domain;
 
 import javax.inject.Inject;
-import javax.persistence.Embedded;
 
 import com.getperka.flatpack.BaseHasUuid;
 

@@ -360,6 +360,9 @@ public class JavaDialect implements Dialect {
           return upcase(p.getName());
         } else if ("getterPermitAll".equals(propertyName)) {
           return Collections.singleton("*").equals(p.getGetterRoleNames());
+        } else if ("needsImplied".equals(propertyName)) {
+          // Returns true if the property has @Implies / @OneToMany and is a list
+          return p.getImpliedProperty() != null && p.getType().getListElement() != null;
         } else if ("setterPermitAll".equals(propertyName)) {
           return Collections.singleton("*").equals(p.getSetterRoleNames());
         }
