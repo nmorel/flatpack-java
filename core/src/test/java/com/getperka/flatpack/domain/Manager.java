@@ -22,14 +22,14 @@ package com.getperka.flatpack.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.getperka.flatpack.Implies;
+import com.getperka.flatpack.SparseCollection;
 
 public class Manager extends Person {
   private List<Employee> employees = new ArrayList<Employee>();
 
   Manager() {}
 
-  @Implies("manager")
+  @SparseCollection("manager")
   public List<Employee> getEmployees() {
     return employees;
   }

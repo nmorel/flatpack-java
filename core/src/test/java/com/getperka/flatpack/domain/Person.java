@@ -22,6 +22,7 @@ package com.getperka.flatpack.domain;
 import javax.inject.Inject;
 
 import com.getperka.flatpack.BaseHasUuid;
+import com.getperka.flatpack.Embedded;
 
 public class Person extends BaseHasUuid {
   @Inject

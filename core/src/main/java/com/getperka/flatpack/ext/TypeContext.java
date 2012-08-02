@@ -50,10 +50,10 @@ import org.slf4j.Logger;
 
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.HasUuid;
-import com.getperka.flatpack.Implies;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
+import com.getperka.flatpack.SparseCollection;
 import com.getperka.flatpack.codexes.DynamicCodex;
 import com.getperka.flatpack.inject.AllTypes;
 import com.getperka.flatpack.inject.FlatPackLogger;
@@ -211,13 +211,14 @@ public class TypeContext {
           builder.withName(beanPropertyName);
         }
         builder.withGetter(m);
+        // Look for SparseCollection, OneToMany or ManyToMany
+        builder.withDeepTraversalOnly(isDeepTraversalOnly(m));
         /*
          * Disable traversal of Implied / OneToMany properties unless requested. Also wire up the
          * implication relationships between properties in the two models.
          */
         String impliedPropertyName = getImpliedPropertyName(m);
         if (impliedPropertyName != null) {
-          builder.withDeepTraversalOnly(true);
           Type elementType = getSingleParameterization(m.getGenericReturnType(), Collection.class);
 
           if (elementType == null) {
@@ -431,12 +432,14 @@ public class TypeContext {
    * Extract the implied property name from an Implies or OneToMany annotation.
    */
   private String getImpliedPropertyName(Method m) {
-    Implies implies = m.getAnnotation(Implies.class);
+    SparseCollection implies = m.getAnnotation(SparseCollection.class);
     if (implies != null) {
-      return implies.value();
+      // Treat the default value of an empty string as just a breakpoint, without implication
+      return implies.value().isEmpty() ? null : implies.value();
     }
 
     for (Annotation a : m.getAnnotations()) {
+      // Looking for a specific type to call a method on, so don't use hasAnnotation() method
       if ("javax.persistence.OneToMany".equals(a.annotationType().getName())) {
         try {
           return (String) a.annotationType().getMethod("mappedBy").invoke(a);
@@ -447,5 +450,10 @@ public class TypeContext {
     }
 
     return null;
+  }
+
+  private boolean isDeepTraversalOnly(Method m) {
+    return m.isAnnotationPresent(SparseCollection.class)
+      || hasAnnotationWithSimpleName(m, "OneToMany");
   }
 }

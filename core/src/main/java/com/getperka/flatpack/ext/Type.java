@@ -139,6 +139,8 @@ public class Type extends BaseHasUuid {
         return "[ " + listElement + " ]";
       case MAP:
         return "{ " + mapKey + " : " + mapValue + " }";
+      default:
+        break;
     }
     if (name != null) {
       return name;

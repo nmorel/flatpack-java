@@ -43,7 +43,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.Embedded;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +57,12 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.getperka.cli.flags.Flag;
 import com.getperka.flatpack.BaseHasUuid;
+import com.getperka.flatpack.Embedded;
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
-import com.getperka.flatpack.Implies;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonTypeName;
+import com.getperka.flatpack.SparseCollection;
 import com.getperka.flatpack.SuppressDefaultValue;
 import com.getperka.flatpack.TypeReference;
 import com.getperka.flatpack.TypeSource;
@@ -108,8 +108,8 @@ public class JavaDialect implements Dialect {
       ApiBase.class, Arrays.class, ConnectionRequestBase.class, Collections.class, Embedded.class,
       FlatPack.class, FlatPackEntity.class, FlatPackRequest.class, FlatPackRequestBase.class,
       FlatPackTypes.class, HashSet.class, HttpURLConnection.class, InheritPrincipal.class,
-      Implies.class, IOException.class, JsonTypeName.class, PermitAll.class, Request.class,
-      RolesAllowed.class, Set.class, SuppressDefaultValue.class, TypeReference.class,
+      IOException.class, JsonTypeName.class, PermitAll.class, Request.class, RolesAllowed.class,
+      Set.class, SparseCollection.class, SuppressDefaultValue.class, TypeReference.class,
       TypeSource.class);
 
   private static String upcase(String typeName) {
