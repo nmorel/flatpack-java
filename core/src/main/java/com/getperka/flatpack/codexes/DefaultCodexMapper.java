@@ -32,6 +32,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -57,7 +58,7 @@ import com.google.inject.ProvisionException;
 public class DefaultCodexMapper implements CodexMapper {
 
   private final Injector injector;
-  private final Map<Class<?>, ValueCodex<?>> simpleCodexes = FlatPackCollections.mapForLookup();
+  private final Map<Class<?>, ValueCodex<?>> simpleCodexes = FlatPackCollections.mapForIteration();
 
   @Inject
   DefaultCodexMapper(Injector injector) {
@@ -99,6 +100,11 @@ public class DefaultCodexMapper implements CodexMapper {
     // Simple types
     if (simpleCodexes.containsKey(erased)) {
       return simpleCodexes.get(erased);
+    }
+    for (Entry<Class<?>, ValueCodex<?>> entry : simpleCodexes.entrySet()) {
+      if (entry.getKey().isAssignableFrom(erased)) {
+        return entry.getValue();
+      }
     }
 
     // Entities

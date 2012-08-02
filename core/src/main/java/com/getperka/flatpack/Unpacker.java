@@ -41,6 +41,7 @@ import com.getperka.flatpack.inject.IgnoreUnresolvableTypes;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
+import com.getperka.flatpack.util.VerboseReader;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

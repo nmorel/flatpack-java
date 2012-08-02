@@ -22,6 +22,9 @@ package com.getperka.flatpack.client.impl;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.client.Api;
 
@@ -32,6 +35,7 @@ public abstract class ApiBase implements Api {
   private final FlatPack flatpack;
   private URI serverBase;
   private boolean verbose;
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   protected ApiBase(FlatPack flatpack) {
     this.flatpack = flatpack;
@@ -61,6 +65,10 @@ public abstract class ApiBase implements Api {
 
   protected FlatPack getFlatPack() {
     return flatpack;
+  }
+
+  protected Logger getLogger() {
+    return logger;
   }
 
   protected boolean isVerbose() {

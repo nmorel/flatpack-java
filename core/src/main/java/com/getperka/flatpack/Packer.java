@@ -20,7 +20,6 @@
 package com.getperka.flatpack;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
@@ -43,6 +42,7 @@ import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.PrettyPrint;
 import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
+import com.getperka.flatpack.util.VerboseWriter;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -75,15 +75,10 @@ public class Packer {
    * @param out the destination output which will be closed by this method
    */
   public void pack(FlatPackEntity<?> entity, Writer out) throws IOException {
-    StringWriter verboseWriter = null;
-    Writer target;
     if (verbose) {
-      verboseWriter = new StringWriter();
-      target = verboseWriter;
-    } else {
-      target = out;
+      out = new VerboseWriter(logger, out);
     }
-    JsonWriter json = new JsonWriter(target);
+    JsonWriter json = new JsonWriter(out);
     json.setSerializeNulls(false);
     if (prettyPrint) {
       json.setIndent("  ");
@@ -94,12 +89,6 @@ public class Packer {
       pack(entity);
     } finally {
       packScope.exit();
-    }
-    if (verbose) {
-      String payload = verboseWriter.toString();
-      logger.debug("Outgoing flatpack payload:\n{}", payload);
-      out.write(payload);
-      out.close();
     }
   }
 

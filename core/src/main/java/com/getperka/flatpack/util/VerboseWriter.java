@@ -1,3 +1,4 @@
+package com.getperka.flatpack.util;
 /*
  * #%L
  * FlatPack serialization code
@@ -17,36 +18,40 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.Writer;
 
 import org.slf4j.Logger;
 
 /**
- * A simple Reader implementation that spies on the underlying Reader's contents.
+ * A simple Writer implementation that spies on its input.
  */
-class VerboseReader extends Reader {
+public class VerboseWriter extends Writer {
   private final StringBuilder builder = new StringBuilder();
   private final Logger logger;
-  private final Reader source;
+  private final Writer sink;
 
-  VerboseReader(Logger logger, Reader source) {
+  public VerboseWriter(Logger logger, Writer sink) {
     this.logger = logger;
-    this.source = source;
+    this.sink = sink;
   }
 
   @Override
   public void close() throws IOException {
-    logger.debug("Incoming flatpack payload:\n{}", builder.toString());
-    source.close();
+    logger.debug("Outgoing flatpack payload:\n{}", builder);
+    sink.close();
   }
 
   @Override
-  public int read(char[] cbuf, int off, int len) throws IOException {
-    int toReturn = source.read(cbuf, off, len);
-    builder.append(cbuf, off, toReturn);
-    return toReturn;
+  public void flush() throws IOException {
+    sink.flush();
   }
+
+  @Override
+  public void write(char[] cbuf, int off, int len) throws IOException {
+    builder.append(cbuf, off, len);
+    sink.write(cbuf, off, len);
+  }
+
 }
