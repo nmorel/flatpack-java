@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.Implies;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonProperty;
 import com.getperka.flatpack.JsonTypeName;
@@ -211,16 +212,19 @@ public class TypeContext {
         }
         builder.withGetter(m);
         /*
-         * Disable traversal of OneToMany properties unless requested. Also wire up the implication
-         * relationships between properties in the two models.
+         * Disable traversal of Implied / OneToMany properties unless requested. Also wire up the
+         * implication relationships between properties in the two models.
          */
         OneToMany oneToMany = m.getAnnotation(OneToMany.class);
-        if (oneToMany != null) {
+        Implies implies = m.getAnnotation(Implies.class);
+        String impliedPropertyName = implies != null ? implies.value()
+            : oneToMany != null ? oneToMany.mappedBy() : null;
+        if (impliedPropertyName != null) {
           builder.withDeepTraversalOnly(true);
           Class<?> otherModel = erase(getSingleParameterization(m.getGenericReturnType(),
               Collection.class));
           for (Property otherProperty : extractProperties(otherModel)) {
-            if (otherProperty.getName().equals(oneToMany.mappedBy())) {
+            if (otherProperty.getName().equals(impliedPropertyName)) {
               builder.withImpliedProperty(otherProperty);
               otherProperty.setImpliedProperty(builder.peek());
               break;

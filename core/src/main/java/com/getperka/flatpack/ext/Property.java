@@ -330,7 +330,7 @@ public class Property extends BaseHasUuid {
    * the new value should also be updated with the current instance.
    */
   @PermitAll
-  public Property getImpliedPropery() {
+  public Property getImpliedProperty() {
     return implied;
   }
 
@@ -443,10 +443,6 @@ public class Property extends BaseHasUuid {
   @Override
   protected UUID defaultUuid() {
     return UUID.nameUUIDFromBytes((getEnclosingTypeName() + "." + getName()).getBytes(UTF8));
-  }
-
-  Property getImplied() {
-    return implied;
   }
 
   void setDeepTraversalOnly(boolean deepTraversalOnly) {

@@ -69,6 +69,7 @@ getter(property) ::= <<
 <if(property.embedded)>@<names.Embedded><endif>
 <if(property.inheritPrincipal)>@<names.InheritPrincipal><endif>
 <if(property.suppressDefaultValue)>@<names.SuppressDefaultValue><endif>
+<if(property.impliedProperty)>@<names.Implies>("<property.impliedProperty.name>")<endif>
 <propertyRoles("setter")>
 public <property.type> get<property.getterName>() {
   return this.<property.getterName>;

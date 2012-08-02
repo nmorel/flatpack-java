@@ -60,6 +60,7 @@ import com.getperka.cli.flags.Flag;
 import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
+import com.getperka.flatpack.Implies;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonTypeName;
 import com.getperka.flatpack.SuppressDefaultValue;
@@ -107,8 +108,9 @@ public class JavaDialect implements Dialect {
       ApiBase.class, Arrays.class, ConnectionRequestBase.class, Collections.class, Embedded.class,
       FlatPack.class, FlatPackEntity.class, FlatPackRequest.class, FlatPackRequestBase.class,
       FlatPackTypes.class, HashSet.class, HttpURLConnection.class, InheritPrincipal.class,
-      IOException.class, JsonTypeName.class, PermitAll.class, Request.class, RolesAllowed.class,
-      Set.class, SuppressDefaultValue.class, TypeReference.class, TypeSource.class);
+      Implies.class, IOException.class, JsonTypeName.class, PermitAll.class, Request.class,
+      RolesAllowed.class, Set.class, SuppressDefaultValue.class, TypeReference.class,
+      TypeSource.class);
 
   private static String upcase(String typeName) {
     return Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
