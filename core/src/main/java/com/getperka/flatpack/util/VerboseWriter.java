@@ -1,4 +1,5 @@
 package com.getperka.flatpack.util;
+
 /*
  * #%L
  * FlatPack serialization code
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
  * A simple Writer implementation that spies on its input.
  */
 public class VerboseWriter extends Writer {
+
   private final StringBuilder builder = new StringBuilder();
   private final Logger logger;
   private final Writer sink;
@@ -39,7 +41,8 @@ public class VerboseWriter extends Writer {
 
   @Override
   public void close() throws IOException {
-    logger.debug("Outgoing flatpack payload:\n{}", builder);
+    logger.debug("Outgoing flatpack payload:\n");
+    new ChunkedLogger(logger).debug(builder);
     sink.close();
   }
 

@@ -39,7 +39,8 @@ public class VerboseReader extends Reader {
 
   @Override
   public void close() throws IOException {
-    logger.debug("Incoming flatpack payload:\n{}", builder.toString());
+    logger.debug("Incoming flatpack payload:\n");
+    new ChunkedLogger(logger).debug(builder);
     source.close();
   }
 
