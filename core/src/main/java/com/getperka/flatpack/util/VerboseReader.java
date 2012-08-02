@@ -46,7 +46,9 @@ public class VerboseReader extends Reader {
   @Override
   public int read(char[] cbuf, int off, int len) throws IOException {
     int toReturn = source.read(cbuf, off, len);
-    builder.append(cbuf, off, toReturn);
+    if (toReturn != -1) {
+      builder.append(cbuf, off, toReturn);
+    }
     return toReturn;
   }
 }
