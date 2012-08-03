@@ -22,24 +22,22 @@ package com.getperka.flatpack.util;
 import java.io.IOException;
 import java.io.Reader;
 
-import org.slf4j.Logger;
-
 /**
  * A simple Reader implementation that spies on the underlying Reader's contents.
  */
-public class VerboseReader extends Reader {
+class VerboseReader extends Reader {
   private final StringBuilder builder = new StringBuilder();
-  private final Logger logger;
+  private final LogChunker chunker;
   private final Reader source;
 
-  public VerboseReader(Logger logger, Reader source) {
-    this.logger = logger;
+  VerboseReader(LogChunker chunker, Reader source) {
+    this.chunker = chunker;
     this.source = source;
   }
 
   @Override
   public void close() throws IOException {
-    logger.debug("Incoming flatpack payload:\n{}", builder.toString());
+    chunker.info("Incoming payload:\n" + builder);
     source.close();
   }
 

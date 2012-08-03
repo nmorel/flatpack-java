@@ -100,7 +100,7 @@ public abstract class FlatPackTest {
   }
 
   protected Configuration getConfiguration() {
-    return new Configuration().withPrettyPrint(true);
+    return new Configuration().withPrettyPrint(true).withVerbose(true);
   }
 
   protected Employee makeEmployee() {
