@@ -40,6 +40,7 @@ public class Configuration {
   private List<EntityResolver> resolvers = FlatPackCollections.listForAny();
   private RoleMapper roleMapper;
   private boolean verbose;
+  private int verboseLogChunkSize = Integer.MAX_VALUE;
 
   /**
    * Add an additional CodexMapper which will be queried before any previously-added mappers.
@@ -98,6 +99,15 @@ public class Configuration {
   }
 
   /**
+   * If verbose logging is enabled, this configuration parameter can be used to break logging of
+   * large payloads across several log messages for logging systems that impose a maximum size on
+   * log messages.
+   */
+  public int getVerboseLogChunkSize() {
+    return verboseLogChunkSize;
+  }
+
+  /**
    * By default, Unpacker will refuse to process payloads that contain unresolvable types. This
    * behavior is typically desired for server operation, where an unresolvable type would typically
    * indicate a misbehaving client. However, this behavior is not appropriate for clients, because
@@ -151,6 +161,11 @@ public class Configuration {
 
   public Configuration withVerbose(boolean verbose) {
     setVerbose(verbose);
+    return this;
+  }
+
+  public Configuration withVerboseLogChunkSize(int size) {
+    this.verboseLogChunkSize = size;
     return this;
   }
 }

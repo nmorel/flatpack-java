@@ -34,15 +34,14 @@ import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.client.FlatPackRequest;
 import com.getperka.flatpack.client.StatusCodeException;
 import com.getperka.flatpack.util.FlatPackTypes;
-import com.getperka.flatpack.util.VerboseReader;
-import com.getperka.flatpack.util.VerboseWriter;
+import com.getperka.flatpack.util.IoObserver;
 
 public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     extends RequestBase<R, FlatPackEntity<X>> implements FlatPackRequest<R, X> {
   private final Logger logger;
   private final Type returnType;
   private FlatPackEntity<X> toSend;
-  private final boolean verbose;
+  private final IoObserver ioObserver;
 
   protected FlatPackRequestBase(ApiBase api, Type returnType,
       String method, String path, boolean hasPayload, Object... args) {
@@ -50,7 +49,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     super(api, method, path, hasPayload, args);
     logger = api.getLogger();
     this.returnType = returnType;
-    verbose = api.isVerbose();
+    this.ioObserver = api.getIoObserver();
   }
 
   @Override
@@ -80,9 +79,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
       reader = new InputStreamReader(conn.getInputStream(), FlatPackTypes.UTF8);
     }
 
-    if (verbose) {
-      reader = new VerboseReader(logger, reader);
-    }
+    reader = ioObserver.observe(reader);
 
     Throwable cause = null;
     FlatPackEntity<X> entity = null;
@@ -113,9 +110,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     }
     connection.setRequestProperty("Content-Type", "application/json; charset=UTF8");
     Writer out = new OutputStreamWriter(connection.getOutputStream(), FlatPackTypes.UTF8);
-    if (verbose) {
-      out = new VerboseWriter(logger, out);
-    }
+    out = ioObserver.observe(out);
     getApi().getFlatPack().getPacker().pack(toSend, out);
     out.close();
   }
