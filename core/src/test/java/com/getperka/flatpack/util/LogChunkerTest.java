@@ -1,4 +1,5 @@
 package com.getperka.flatpack.util;
+
 /*
  * #%L
  * FlatPack serialization code
@@ -41,9 +42,9 @@ public class LogChunkerTest {
 
   private Logger expectLogs(String... messages) {
     Logger logger = createStrictMock(Logger.class);
-    expect(logger.isDebugEnabled()).andReturn(true).anyTimes();
+    expect(logger.isInfoEnabled()).andReturn(true).anyTimes();
     for (String message : messages) {
-      logger.debug(message);
+      logger.info(message);
       expectLastCall();
     }
     replay(logger);
@@ -53,7 +54,7 @@ public class LogChunkerTest {
   private void test(String message, String... expected) {
     Logger logger = expectLogs(expected);
     LogChunker c = new LogChunker(logger, 3);
-    c.debug(message);
+    c.info(message);
     verify(logger);
   }
 }

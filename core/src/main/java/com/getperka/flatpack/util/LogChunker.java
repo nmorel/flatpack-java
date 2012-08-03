@@ -1,4 +1,5 @@
 package com.getperka.flatpack.util;
+
 /*
  * #%L
  * FlatPack serialization code
@@ -36,13 +37,13 @@ public class LogChunker {
     this.chunkSize = chunkSize;
   }
 
-  public void debug(CharSequence message) {
-    if (!logger.isDebugEnabled()) {
+  public void info(CharSequence message) {
+    if (!logger.isInfoEnabled()) {
       return;
     }
 
     if (message.length() <= chunkSize) {
-      logger.debug(message.toString());
+      logger.info(message.toString());
       return;
     }
 
@@ -55,12 +56,12 @@ public class LogChunker {
         case '\r':
           if (chunk.length() + line.length() >= chunkSize) {
             if (chunk.length() > 0) {
-              logger.debug(chunk.toString());
+              logger.info(chunk.toString());
               chunk.setLength(0);
             }
 
             while (line.length() >= chunkSize) {
-              logger.debug(line.substring(0, chunkSize));
+              logger.info(line.substring(0, chunkSize));
               line.delete(0, chunkSize);
             }
 
@@ -79,7 +80,7 @@ public class LogChunker {
       }
     }
     if (chunk.length() > 0) {
-      logger.debug(chunk.toString());
+      logger.info(chunk.toString());
     }
   }
 }

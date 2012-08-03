@@ -28,7 +28,7 @@ import java.io.Reader;
 class VerboseReader extends Reader {
   private final StringBuilder builder = new StringBuilder();
   private final LogChunker chunker;
-  private Reader source;
+  private final Reader source;
 
   VerboseReader(LogChunker chunker, Reader source) {
     this.chunker = chunker;
@@ -37,7 +37,7 @@ class VerboseReader extends Reader {
 
   @Override
   public void close() throws IOException {
-    chunker.debug("Incoming payload:\n" + builder);
+    chunker.info("Incoming payload:\n" + builder);
     source.close();
   }
 

@@ -39,7 +39,7 @@ class VerboseWriter extends Writer {
 
   @Override
   public void close() throws IOException {
-    chunker.debug("Outgoing payload:\n" + builder);
+    chunker.info("Outgoing payload:\n" + builder);
     sink.close();
   }
 
