@@ -40,9 +40,8 @@ import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.PrettyPrint;
-import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
-import com.getperka.flatpack.util.VerboseWriter;
+import com.getperka.flatpack.util.IoObserver;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -60,8 +59,7 @@ public class Packer {
   @Inject
   private TypeContext typeContext;
   @Inject
-  @Verbose
-  private boolean verbose;
+  private IoObserver ioObserver;
   @Inject
   @PrettyPrint
   private boolean prettyPrint;
@@ -75,9 +73,7 @@ public class Packer {
    * @param out the destination output which will be closed by this method
    */
   public void pack(FlatPackEntity<?> entity, Writer out) throws IOException {
-    if (verbose) {
-      out = new VerboseWriter(logger, out);
-    }
+    out = ioObserver.observe(out);
     JsonWriter json = new JsonWriter(out);
     json.setSerializeNulls(false);
     if (prettyPrint) {
