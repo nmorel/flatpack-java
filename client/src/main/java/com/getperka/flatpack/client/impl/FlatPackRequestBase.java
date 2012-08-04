@@ -28,20 +28,28 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 
+import org.slf4j.Logger;
+
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.client.FlatPackRequest;
 import com.getperka.flatpack.client.StatusCodeException;
 import com.getperka.flatpack.util.FlatPackTypes;
+import com.getperka.flatpack.util.IoObserver;
 
 public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     extends RequestBase<R, FlatPackEntity<X>> implements FlatPackRequest<R, X> {
+  private final Logger logger;
   private final Type returnType;
   private FlatPackEntity<X> toSend;
+  private final IoObserver ioObserver;
 
-  protected FlatPackRequestBase(ApiBase api, Type returnType, String method, String path,
-      Object... args) {
-    super(api, method, path, args);
+  protected FlatPackRequestBase(ApiBase api, Type returnType,
+      String method, String path, boolean hasPayload, Object... args) {
+
+    super(api, method, path, hasPayload, args);
+    logger = api.getLogger();
     this.returnType = returnType;
+    this.ioObserver = api.getIoObserver();
   }
 
   @Override
@@ -70,6 +78,8 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     } else {
       reader = new InputStreamReader(conn.getInputStream(), FlatPackTypes.UTF8);
     }
+
+    reader = ioObserver.observe(reader);
 
     Throwable cause = null;
     FlatPackEntity<X> entity = null;
@@ -100,6 +110,7 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
     }
     connection.setRequestProperty("Content-Type", "application/json; charset=UTF8");
     Writer out = new OutputStreamWriter(connection.getOutputStream(), FlatPackTypes.UTF8);
+    out = ioObserver.observe(out);
     getApi().getFlatPack().getPacker().pack(toSend, out);
     out.close();
   }

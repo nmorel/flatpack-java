@@ -38,6 +38,7 @@ import com.getperka.flatpack.ext.CodexMapper;
 import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.ext.PrincipalMapper;
 import com.getperka.flatpack.ext.TypeContext;
+import com.getperka.flatpack.util.IoObserver;
 import com.google.gson.stream.JsonWriter;
 import com.google.inject.PrivateModule;
 import com.google.inject.Scopes;
@@ -60,6 +61,10 @@ public class FlatPackModule extends PrivateModule {
         .annotatedWith(FlatPackLogger.class)
         .toInstance(LoggerFactory.getLogger(FlatPack.class));
 
+    // Allow spying on IO
+    bind(IoObserver.class)
+        .to(configuration.isVerbose() ? IoObserver.Verbose.class : IoObserver.Null.class);
+
     // Bind simple constants
     bindConstant()
         .annotatedWith(IgnoreUnresolvableTypes.class)
@@ -70,6 +75,9 @@ public class FlatPackModule extends PrivateModule {
     bindConstant()
         .annotatedWith(Verbose.class)
         .to(configuration.isVerbose());
+    bindConstant()
+        .annotatedWith(VerboseLogChunkSize.class)
+        .to(configuration.getVerboseLogChunkSize());
 
     // Provide all class types
     bind(new TypeLiteral<Collection<Class<?>>>() {})

@@ -25,7 +25,7 @@ import com.getperka.flatpack.FlatPackEntity;
  * A specialization of {@link Request} that allows access to the {@link FlatPackEntity} that will be
  * sent to the server.
  * 
- * @param <R> the Requset type
+ * @param <R> the Request type
  * @param <X> the type of data contained in the FlatPackEntity
  */
 public interface FlatPackRequest<R extends FlatPackRequest<R, X>, X> extends

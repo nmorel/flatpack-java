@@ -19,6 +19,8 @@
  */
 package com.getperka.flatpack.util;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
@@ -220,6 +222,18 @@ public class FlatPackTypes {
   }
 
   /**
+   * Returns {@code true} if the given element has an annotatiod with the given simple name.
+   */
+  public static boolean hasAnnotationWithSimpleName(AnnotatedElement elt, String simpleName) {
+    for (Annotation a : elt.getAnnotations()) {
+      if (simpleName.equals(a.annotationType().getSimpleName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Erases {@link WildcardType} and {@link TypeVariable} instances, returning all other Types
    * unmodified.
    */
@@ -249,7 +263,7 @@ public class FlatPackTypes {
     TypeVariable<?>[] vars = ((Class<?>) raw).getTypeParameters();
 
     // If the type has no parameterizations, just return it
-    if (vars.length == 0) {
+    if (vars.length == 0 || !it.hasNext()) {
       return raw;
     }
     // Create the parameter values

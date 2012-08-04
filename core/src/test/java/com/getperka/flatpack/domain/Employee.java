@@ -20,7 +20,6 @@
 package com.getperka.flatpack.domain;
 
 import javax.annotation.security.PermitAll;
-import javax.persistence.ManyToOne;
 
 import com.getperka.flatpack.PostUnpack;
 import com.getperka.flatpack.PreUnpack;
@@ -40,7 +39,6 @@ public class Employee extends Person {
     return employeeNumber;
   }
 
-  @ManyToOne
   public Manager getManager() {
     return manager;
   }

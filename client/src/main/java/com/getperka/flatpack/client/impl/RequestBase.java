@@ -40,12 +40,14 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
   private final String method;
   private final String path;
   private Map<String, Object> queryParams = Collections.emptyMap();
+  private final boolean hasPayload;
 
-  protected RequestBase(ApiBase api, String method, String path, Object... args) {
+  protected RequestBase(ApiBase api, String method, String path, boolean hasPayload, Object... args) {
     this.api = api;
     this.args = args;
     this.method = method;
     this.path = path;
+    this.hasPayload = hasPayload;
   }
 
   @Override
@@ -79,7 +81,7 @@ abstract class RequestBase<R extends Request<R, X>, X> implements Request<R, X> 
     URI sendTo = api.getServerBase().resolve(sb.toString());
 
     HttpURLConnection conn = (HttpURLConnection) sendTo.toURL().openConnection();
-    conn.setDoOutput(true);
+    conn.setDoOutput(hasPayload);
     conn.setRequestMethod(method);
     for (Map.Entry<String, Object> entry : headers.entrySet()) {
       conn.setRequestProperty(entry.getKey(), entry.getValue().toString());

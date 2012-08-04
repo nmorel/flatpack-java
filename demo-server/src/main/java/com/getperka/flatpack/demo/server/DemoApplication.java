@@ -110,7 +110,8 @@ public class DemoApplication extends Application {
          * security measures, roles can be used to create sets of properties to reduce payload sizes
          * (e.g. "CustomerSummary" vs. "CustomerDetail").
          */
-        .withRoleMapper(new DemoRoleMapper());
+        .withRoleMapper(new DemoRoleMapper())
+        .withVerbose(true);
     // The FlatPackResolver makes a FlatPack instance available through the Resources interface
     toReturn.add(new FlatPackResolver(configuration));
     // The FlatPackProvider installs MessageBodyReader/Writer behavior

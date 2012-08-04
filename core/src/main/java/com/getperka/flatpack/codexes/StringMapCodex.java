@@ -74,6 +74,8 @@ public class StringMapCodex<V> extends Codex<Map<String, V>> {
       try {
         V value = valueCodex.read(elt.getValue(), context);
         toReturn.put(elt.getKey().toString(), value);
+      } catch (Exception e) {
+        context.fail(e);
       } finally {
         context.popPath();
       }

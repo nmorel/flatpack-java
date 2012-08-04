@@ -39,8 +39,8 @@ import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.inject.IgnoreUnresolvableTypes;
 import com.getperka.flatpack.inject.PackScope;
-import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
+import com.getperka.flatpack.util.IoObserver;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -62,15 +62,14 @@ public class Unpacker {
   @Inject
   private boolean ignoreUnresolvableTypes;
   @Inject
+  private IoObserver ioObserver;
+  @Inject
   @FlatPackLogger
   private Logger logger;
   @Inject
   private PackScope packScope;
   @Inject
   private TypeContext typeContext;
-  @Inject
-  @Verbose
-  private boolean verbose;
 
   Unpacker() {}
 
@@ -85,10 +84,7 @@ public class Unpacker {
    */
   public <T> FlatPackEntity<T> unpack(Type returnType, Reader in, Principal principal)
       throws IOException {
-    if (verbose) {
-      in = new VerboseReader(logger, in);
-    }
-
+    ioObserver.observe(in);
     packScope.enter().withPrincipal(principal);
     try {
       return unpack(returnType, new JsonReader(in), principal);

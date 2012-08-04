@@ -19,22 +19,20 @@
  */
 package com.getperka.flatpack;
 
-import javax.persistence.OneToMany;
-
 /**
  * Controls how the entities included in a {@link FlatPackEntity} are scanned to find additional
  * entites to include in the payload.
  */
 public enum TraversalMode {
   /**
-   * All object properties, even those annotated with {@link OneToMany}, will be included in the
-   * payload. It should be enabled for "description" endpoints where the complete relationships of
-   * an object are desired.
+   * All object properties, even those annotated with {@link Implies} or
+   * {@link javax.persistence.OneToMany}, will be included in the payload. It should be enabled for
+   * "description" endpoints where the complete relationships of an object are desired.
    */
   DEEP(false, true),
   /**
-   * The default mode, which does not include properties annotated with {@link OneToMany} to reduce
-   * payload size.
+   * The default mode, which does not include properties annotated with {@link Implies} or
+   * {@link javax.persistence.OneToMany} to reduce payload size.
    */
   SIMPLE(false, false),
   /**

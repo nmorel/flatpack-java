@@ -220,7 +220,7 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
           }
 
           // Perhaps set the other side of a OneToMany relationship
-          Property impliedPropery = prop.getImpliedPropery();
+          Property impliedPropery = prop.getImpliedProperty();
           if (impliedPropery != null && value != null) {
             // Ensure that any linked property is also mutable
             if (!impliedPropery.maySet(roles) || !checkAccess(value, context)) {

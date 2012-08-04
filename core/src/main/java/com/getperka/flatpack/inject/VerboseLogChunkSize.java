@@ -17,27 +17,19 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack.inject;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import javax.annotation.security.PermitAll;
+import com.google.inject.BindingAnnotation;
 
-import com.getperka.flatpack.SparseCollection;
-
-@PermitAll
-public class Manager extends Person {
-  private List<Employee> employees = new ArrayList<Employee>();
-
-  Manager() {}
-
-  @SparseCollection("manager")
-  public List<Employee> getEmployees() {
-    return employees;
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
-  }
-}
+/**
+ * A binding annotation for an integer value indicating the size at which verbose payload messags
+ * should be broken.
+ */
+@BindingAnnotation
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+public @interface VerboseLogChunkSize {}

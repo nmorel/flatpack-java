@@ -38,8 +38,9 @@ import com.google.gson.JsonParser;
  */
 public class JsonRequestBase<R extends JsonRequestBase<R>> extends RequestBase<R, JsonElement> {
 
-  protected JsonRequestBase(ApiBase api, String method, String path, Object... args) {
-    super(api, method, path, args);
+  protected JsonRequestBase(ApiBase api, String method,
+      String path, boolean hasPayload, Object... args) {
+    super(api, method, path, hasPayload, args);
   }
 
   @Override

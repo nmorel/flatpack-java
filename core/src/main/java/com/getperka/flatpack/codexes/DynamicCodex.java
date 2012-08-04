@@ -20,9 +20,14 @@
 package com.getperka.flatpack.codexes;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
+import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
@@ -30,14 +35,25 @@ import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeContext;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 /**
- * Allows arbitrary objects to be written, but not read, by examining their type.
+ * Allows arbitrary objects to be written by examining their type and read by inferring a type from
+ * the payload.
  */
 public class DynamicCodex extends Codex<Object> {
+  private static final Pattern UUID_PATTERN = Pattern
+      .compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
   @Inject
   private TypeContext typeContext;
+
+  // Use Provider to prevent cyclic reference
+  @Inject
+  private Provider<ListCodex<Object>> listCodex;
+
+  @Inject
+  private Provider<StringMapCodex<Object>> mapCodex;
 
   DynamicCodex() {}
 
@@ -46,10 +62,46 @@ public class DynamicCodex extends Codex<Object> {
     return new Type.Builder().withJsonKind(JsonKind.ANY).build();
   }
 
+  /**
+   * Attempt to infer the type from the JsonElement presented.
+   * <ul>
+   * <li>boolean -> {@link Boolean}
+   * <li>number -> {@link BigDecimal}
+   * <li>string -> {@link HasUuid} or {@link String}
+   * <li>array -> {@link ListCodex}
+   * <li>object -> {@link StringMapCodex}
+   * </ul>
+   */
   @Override
-  public Object readNotNull(JsonElement element, DeserializationContext context)
-      throws IOException {
-    context.fail(new UnsupportedOperationException("Cannot read arbitrary type"));
+  public Object readNotNull(JsonElement element, DeserializationContext context) throws Exception {
+    if (element.isJsonPrimitive()) {
+      JsonPrimitive primitive = element.getAsJsonPrimitive();
+      if (primitive.isBoolean()) {
+        return primitive.getAsBoolean();
+      } else if (primitive.isNumber()) {
+        // Always return numbers as BigDecimals for consistency
+        return primitive.getAsBigDecimal();
+      } else {
+        String value = primitive.getAsString();
+
+        // Interpret UUIDs as entity references
+        if (UUID_PATTERN.matcher(value).matches()) {
+          UUID uuid = UUID.fromString(value);
+          HasUuid entity = context.getEntity(uuid);
+          if (entity != null) {
+            return entity;
+          }
+        }
+
+        return value;
+      }
+    } else if (element.isJsonArray()) {
+      return listCodex.get().readNotNull(element, context);
+    } else if (element.isJsonObject()) {
+      return mapCodex.get().readNotNull(element, context);
+    }
+    context.fail(new UnsupportedOperationException("Cannot infer data type for "
+      + element.toString()));
     return null;
   }
 

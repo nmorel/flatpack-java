@@ -20,6 +20,7 @@
 package com.getperka.flatpack.ext;
 
 import static com.getperka.flatpack.util.FlatPackTypes.UTF8;
+import static com.getperka.flatpack.util.FlatPackTypes.hasAnnotationWithSimpleName;
 
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
@@ -34,7 +35,6 @@ import javax.annotation.security.DenyAll;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
-import javax.persistence.Embedded;
 
 import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.InheritPrincipal;
@@ -90,7 +90,7 @@ public class Property extends BaseHasUuid {
 
         java.lang.reflect.Type returnType = getter.getGenericReturnType();
         toReturn.codex = typeContext.getCodex(returnType);
-        toReturn.embedded = getter.isAnnotationPresent(Embedded.class);
+        toReturn.embedded = hasAnnotationWithSimpleName(getter, "Embedded");
         toReturn.inheritPrincipal = getter.isAnnotationPresent(InheritPrincipal.class);
         toReturn.suppressDefaultValue = getter.isAnnotationPresent(SuppressDefaultValue.class);
         toReturn.type = toReturn.codex.describe();
@@ -330,7 +330,7 @@ public class Property extends BaseHasUuid {
    * the new value should also be updated with the current instance.
    */
   @PermitAll
-  public Property getImpliedPropery() {
+  public Property getImpliedProperty() {
     return implied;
   }
 
@@ -443,10 +443,6 @@ public class Property extends BaseHasUuid {
   @Override
   protected UUID defaultUuid() {
     return UUID.nameUUIDFromBytes((getEnclosingTypeName() + "." + getName()).getBytes(UTF8));
-  }
-
-  Property getImplied() {
-    return implied;
   }
 
   void setDeepTraversalOnly(boolean deepTraversalOnly) {

@@ -20,7 +20,6 @@
 package com.getperka.flatpack;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +40,8 @@ import com.getperka.flatpack.ext.TypeContext;
 import com.getperka.flatpack.inject.FlatPackLogger;
 import com.getperka.flatpack.inject.PackScope;
 import com.getperka.flatpack.inject.PrettyPrint;
-import com.getperka.flatpack.inject.Verbose;
 import com.getperka.flatpack.util.FlatPackCollections;
+import com.getperka.flatpack.util.IoObserver;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -56,20 +55,18 @@ public class Packer {
   @FlatPackLogger
   private Logger logger;
   @Inject
+  private Provider<EntityCodex<EntityMetadata>> metadataCodex;
+  @Inject
   private PackScope packScope;
   @Inject
   private PersistenceMapper persistenceMapper;
   @Inject
   private TypeContext typeContext;
   @Inject
-  @Verbose
-  private boolean verbose;
+  private IoObserver ioObserver;
   @Inject
   @PrettyPrint
   private boolean prettyPrint;
-
-  @Inject
-  private Provider<EntityCodex<EntityMetadata>> metadataCodex;
 
   Packer() {}
 
@@ -80,15 +77,8 @@ public class Packer {
    * @param out the destination output which will be closed by this method
    */
   public void pack(FlatPackEntity<?> entity, Writer out) throws IOException {
-    StringWriter verboseWriter = null;
-    Writer target;
-    if (verbose) {
-      verboseWriter = new StringWriter();
-      target = verboseWriter;
-    } else {
-      target = out;
-    }
-    JsonWriter json = new JsonWriter(target);
+    out = ioObserver.observe(out);
+    JsonWriter json = new JsonWriter(out);
     json.setSerializeNulls(false);
     if (prettyPrint) {
       json.setIndent("  ");
@@ -99,13 +89,6 @@ public class Packer {
       pack(entity);
     } finally {
       packScope.exit();
-    }
-    if (verbose) {
-      String payload = verboseWriter.toString();
-      logger.debug("Outgoing flatpack payload:\n{}", payload);
-      out.write(payload);
-      verboseWriter.close();
-      out.close();
     }
   }
 

@@ -79,6 +79,7 @@ public class ClientSmokeTest {
         .addTypeSource(ClientTypeSource.get());
     api = new ClientApi(FlatPack.create(config));
     api.setServerBase(UriBuilder.fromUri("http://localhost").port(PORT).build());
+    api.setVerbose(true);
     assertEquals(204, api.resetPost().execute().getResponseCode());
   }
 

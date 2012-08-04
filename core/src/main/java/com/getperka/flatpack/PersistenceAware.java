@@ -31,6 +31,10 @@ public interface PersistenceAware extends HasUuid {
    */
   Set<String> dirtyPropertyNames();
 
+  /**
+   * Called by the entity deserialization when the incoming payload indicates that the entity has
+   * been persisted on the other side of the connection.
+   */
   void markPersistent();
 
   /**

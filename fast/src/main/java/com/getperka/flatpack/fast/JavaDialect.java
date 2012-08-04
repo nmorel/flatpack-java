@@ -43,7 +43,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.persistence.Embedded;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,12 +57,14 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.getperka.cli.flags.Flag;
 import com.getperka.flatpack.BaseHasUuid;
+import com.getperka.flatpack.Embedded;
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonTypeName;
 import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.PostUnpack;
+import com.getperka.flatpack.SparseCollection;
 import com.getperka.flatpack.SuppressDefaultValue;
 import com.getperka.flatpack.TypeReference;
 import com.getperka.flatpack.TypeSource;
@@ -110,10 +111,10 @@ public class JavaDialect implements Dialect {
   private static final List<Class<?>> WELL_KNOWN_TYPES = Arrays.<Class<?>> asList(
       ApiBase.class, Arrays.class, ConnectionRequestBase.class, Collections.class, DirtyFlag.class,
       Embedded.class, FlatPack.class, FlatPackCollections.class, FlatPackEntity.class,
-      FlatPackRequest.class, FlatPackRequestBase.class, FlatPackTypes.class,
-      HashSet.class, HttpURLConnection.class, InheritPrincipal.class, IOException.class,
-      JsonTypeName.class, PermitAll.class, PersistenceAware.class, PostUnpack.class, Request.class,
-      RolesAllowed.class, Set.class, SuppressDefaultValue.class, TypeReference.class,
+      FlatPackRequest.class, FlatPackRequestBase.class, FlatPackTypes.class, HashSet.class,
+      HttpURLConnection.class, InheritPrincipal.class, IOException.class, JsonTypeName.class,
+      PermitAll.class, PersistenceAware.class, PostUnpack.class, Request.class, RolesAllowed.class,
+      Set.class, SparseCollection.class, SuppressDefaultValue.class, TypeReference.class,
       TypeSource.class);
 
   private static String upcase(String typeName) {
@@ -125,7 +126,7 @@ public class JavaDialect implements Dialect {
   /**
    * Used at the end of the code-generation process to emit referenced enum values.
    */
-  private Set<Type> usedEnums = new LinkedHashSet<Type>();
+  private final Set<Type> usedEnums = new LinkedHashSet<Type>();
 
   @Override
   public void generate(ApiDescription api, File outputDir) throws IOException {
@@ -320,6 +321,8 @@ public class JavaDialect implements Dialect {
           } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
           }
+        } else if ("hasPayload".equals(propertyName)) {
+          return end.getEntity() != null;
         }
         return super.getProperty(interp, self, o, property, propertyName);
       }
@@ -364,6 +367,9 @@ public class JavaDialect implements Dialect {
           return upcase(p.getName());
         } else if ("getterPermitAll".equals(propertyName)) {
           return Collections.singleton("*").equals(p.getGetterRoleNames());
+        } else if ("needsImplied".equals(propertyName)) {
+          // Returns true if the property has @Implies / @OneToMany and is a list
+          return p.getImpliedProperty() != null && p.getType().getListElement() != null;
         } else if ("setterPermitAll".equals(propertyName)) {
           return Collections.singleton("*").equals(p.getSetterRoleNames());
         }

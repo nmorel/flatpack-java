@@ -1,11 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.getperka.flatpack</groupId>
   <artifactId>flatpack-parent</artifactId>
   <version>2.11-SNAPSHOT</version>
   <packaging>pom</packaging>
-  
+
   <name>Flatpack</name>
   <description>An entity serialization framework</description>
   <url>https://github.com/perka/flatpack-java</url>
@@ -36,7 +37,7 @@
   <parent>
     <groupId>com.getperka</groupId>
     <artifactId>perka-oss-parent</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
   </parent>
 
   <!-- The eclipse-plugin project isn't listed here because it only changes 
@@ -60,7 +61,7 @@
       <dependency>
         <groupId>com.getperka.cli</groupId>
         <artifactId>cli</artifactId>
-        <version>1.14-SNAPSHOT</version>
+        <version>1.14</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
@@ -71,6 +72,11 @@
         <groupId>com.google.inject</groupId>
         <artifactId>guice</artifactId>
         <version>3.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.6.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

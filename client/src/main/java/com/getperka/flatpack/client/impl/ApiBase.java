@@ -22,16 +22,24 @@ package com.getperka.flatpack.client.impl;
 import java.net.HttpURLConnection;
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.client.Api;
+import com.getperka.flatpack.util.IoObserver;
+import com.getperka.flatpack.util.LogChunker;
 
 /**
  * A base class for accessing FlatPack API servers.
  */
 public abstract class ApiBase implements Api {
+  private static final String CHUNK_SIZE_PROPERTY = "flatpack.log.chunk.size";
+
   private final FlatPack flatpack;
   private URI serverBase;
-  private boolean verbose;
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private IoObserver ioObserver = new IoObserver.Null();
 
   protected ApiBase(FlatPack flatpack) {
     this.flatpack = flatpack;
@@ -49,7 +57,13 @@ public abstract class ApiBase implements Api {
 
   @Override
   public void setVerbose(boolean verbose) {
-    this.verbose = verbose;
+    if (verbose) {
+      LogChunker chunker = new LogChunker(logger,
+          Integer.getInteger(CHUNK_SIZE_PROPERTY, Integer.MAX_VALUE));
+      ioObserver = new IoObserver.Verbose(chunker);
+    } else {
+      ioObserver = new IoObserver.Null();
+    }
   }
 
   /**
@@ -63,7 +77,11 @@ public abstract class ApiBase implements Api {
     return flatpack;
   }
 
-  protected boolean isVerbose() {
-    return verbose;
+  protected IoObserver getIoObserver() {
+    return ioObserver;
+  }
+
+  protected Logger getLogger() {
+    return logger;
   }
 }
