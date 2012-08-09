@@ -28,6 +28,7 @@ public class Employee extends Person {
   public boolean employeePreUnpack;
   public boolean employeePre1Unpack;
   public boolean employeePostUnpack;
+  public String writeOnlyProperty;
   private Manager manager;
 
   Employee() {}
@@ -46,6 +47,10 @@ public class Employee extends Person {
 
   public void setManager(Manager manager) {
     this.manager = manager;
+  }
+
+  public void setWriteOnlyProperty(String value) {
+    writeOnlyProperty = value;
   }
 
   @PostUnpack

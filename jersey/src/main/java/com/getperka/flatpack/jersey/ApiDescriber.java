@@ -280,11 +280,16 @@ public class ApiDescriber {
       // Record a reference to (possibly) an entity type
       reference(prop.getType());
 
+      Method accessor = prop.getGetter();
+      if (accessor == null) {
+        accessor = prop.getSetter();
+      }
+
       // The property set include all properties defined in supertypes
-      Class<?> declaringClass = prop.getGetter().getDeclaringClass();
+      Class<?> declaringClass = accessor.getDeclaringClass();
       strings = getDocStrings(declaringClass);
       if (strings != null) {
-        String memberName = declaringClass.getName() + ":" + prop.getGetter().getName() + "()";
+        String memberName = declaringClass.getName() + ":" + accessor.getName() + "()";
         prop.setDocString(replaceLinks(strings.get(memberName)));
       }
     }

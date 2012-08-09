@@ -25,6 +25,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.StringWriter;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -82,5 +83,40 @@ public class EntityCodexTest extends FlatPackTest {
     assertTrue(e2.employeePre1Unpack);
 
     check(e1, e2);
+  }
+
+  /**
+   * Verify a property with only a setter works as a write-only property.
+   */
+  @Test
+  public void testWriteOnlyProperty() {
+    UUID uuid = UUID.randomUUID();
+
+    JsonObject obj = new JsonObject();
+    obj.addProperty("uuid", uuid.toString());
+    obj.addProperty("writeOnlyProperty", "Hello World!");
+
+    Employee e;
+    DeserializationContext d = deserializationContext();
+    try {
+      e = employeeCodex.allocate(obj, d);
+      employeeCodex.readProperties(e, obj, d);
+    } finally {
+      closeContext();
+    }
+    assertEquals("Hello World!", e.writeOnlyProperty);
+
+    StringWriter out = new StringWriter();
+    SerializationContext s = serializationContext(out);
+    try {
+      employeeCodex.writeProperties(e, s);
+    } finally {
+      closeContext();
+    }
+    obj = new JsonParser().parse(out.toString()).getAsJsonObject();
+    assertEquals(2, obj.entrySet().size());
+    assertTrue(obj.has("uuid"));
+    assertTrue(obj.has("employeeNumber"));
+    assertFalse(obj.has("writeOnlyProperty"));
   }
 }

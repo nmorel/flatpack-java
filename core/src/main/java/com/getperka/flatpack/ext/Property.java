@@ -70,11 +70,13 @@ public class Property extends BaseHasUuid {
       Property toReturn = prop;
       prop = null;
 
+      Method getter = toReturn.getGetter();
+      Method setter = toReturn.getSetter();
       if (allowAll) {
         toReturn.getterRoles = toReturn.setterRoles = allRoles;
       } else {
-        toReturn.getterRoleNames = extractRoleNames(toReturn.getter);
-        toReturn.setterRoleNames = extractRoleNames(toReturn.setter);
+        toReturn.getterRoleNames = extractRoleNames(getter);
+        toReturn.setterRoleNames = extractRoleNames(setter);
         if (toReturn.setterRoleNames == noRoleNames) {
           toReturn.setterRoleNames = toReturn.getterRoleNames;
         }
@@ -82,19 +84,24 @@ public class Property extends BaseHasUuid {
         toReturn.setterRoles = extractRoles(toReturn.roleMapper, toReturn.setterRoleNames);
       }
 
-      // Compute a stable UUID for referring to the property
-      Method getter = toReturn.getGetter();
       if (getter != null) {
         Class<?> enclosingType = getter.getDeclaringClass();
         toReturn.enclosingTypeName = typeContext.getPayloadName(enclosingType);
 
         java.lang.reflect.Type returnType = getter.getGenericReturnType();
         toReturn.codex = typeContext.getCodex(returnType);
-        toReturn.embedded = hasAnnotationWithSimpleName(getter, "Embedded");
-        toReturn.inheritPrincipal = getter.isAnnotationPresent(InheritPrincipal.class);
-        toReturn.suppressDefaultValue = getter.isAnnotationPresent(SuppressDefaultValue.class);
-        toReturn.type = toReturn.codex.describe();
+        analyzeAnnotations(toReturn, getter);
+      } else if (setter != null) {
+        Class<?> enclosingType = setter.getDeclaringClass();
+        toReturn.enclosingTypeName = typeContext.getPayloadName(enclosingType);
+
+        java.lang.reflect.Type paramType = setter.getGenericParameterTypes()[0];
+        toReturn.codex = typeContext.getCodex(paramType);
+        analyzeAnnotations(toReturn, setter);
+      } else {
+        throw new IllegalStateException("No getter or setter");
       }
+      toReturn.type = toReturn.codex.describe();
 
       return toReturn;
     }
@@ -146,6 +153,12 @@ public class Property extends BaseHasUuid {
       setter.setAccessible(true);
       prop.setter = setter;
       return this;
+    }
+
+    private void analyzeAnnotations(Property toReturn, AnnotatedElement method) {
+      toReturn.embedded = hasAnnotationWithSimpleName(method, "Embedded");
+      toReturn.inheritPrincipal = method.isAnnotationPresent(InheritPrincipal.class);
+      toReturn.suppressDefaultValue = method.isAnnotationPresent(SuppressDefaultValue.class);
     }
   }
 

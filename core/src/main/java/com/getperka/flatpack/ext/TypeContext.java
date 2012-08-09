@@ -201,16 +201,16 @@ public class TypeContext {
       if (isGetter(m)) {
         String beanPropertyName = beanPropertyName(m);
         Property.Builder builder = getBuilderForProperty(builders, beanPropertyName);
-        toReturn.add(builder.peek());
 
-        // Only use the getter to determine the actual json property name
-        JsonProperty override = m.getAnnotation(JsonProperty.class);
-        if (override != null) {
-          builder.withName(override.value());
-        } else {
-          builder.withName(beanPropertyName);
-        }
+        // Set the getter, and update the property name
         builder.withGetter(m);
+        setJsonPropertyName(builder);
+
+        // Eagerly add the property to ensure implied properties work
+        if (!toReturn.contains(builder.peek())) {
+          toReturn.add(builder.peek());
+        }
+
         // Look for SparseCollection, OneToMany or ManyToMany
         builder.withDeepTraversalOnly(isDeepTraversalOnly(m));
         /*
@@ -246,12 +246,16 @@ public class TypeContext {
       } else if (isSetter(m)) {
         Property.Builder builder = getBuilderForProperty(builders, beanPropertyName(m));
         builder.withSetter(m);
+        setJsonPropertyName(builder);
       }
     }
 
     // Finish construction
     for (Property.Builder builder : builders.values()) {
-      builder.build();
+      Property p = builder.build();
+      if (!toReturn.contains(p)) {
+        toReturn.add(p);
+      }
     }
 
     return unmodifiable;
@@ -455,5 +459,22 @@ public class TypeContext {
   private boolean isDeepTraversalOnly(Method m) {
     return m.isAnnotationPresent(SparseCollection.class)
       || hasAnnotationWithSimpleName(m, "OneToMany");
+  }
+
+  /**
+   * Set the json property name of a Property, looking for annotations on the getter or setter.
+   */
+  private void setJsonPropertyName(Property.Builder builder) {
+    Method m = builder.peek().getGetter();
+    if (m == null) {
+      m = builder.peek().getSetter();
+    }
+
+    JsonProperty override = m.getAnnotation(JsonProperty.class);
+    if (override != null) {
+      builder.withName(override.value());
+    } else {
+      builder.withName(beanPropertyName(m));
+    }
   }
 }
