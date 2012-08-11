@@ -53,6 +53,8 @@
     <module>fast-plugin</module>
     <module>jersey</module>
     <module>search</module>
+    <module>client-gwt</module>
+    <module>demo-gwt</module>
   </modules>
 
 
