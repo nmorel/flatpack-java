@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>flatpack-demo-gwt-client</artifactId>
+  <name>FlatPack Demo GWT Client</name>
+  <packaging>war</packaging>
+
+  <parent>
+    <groupId>com.getperka.flatpack</groupId>
+  <artifactId>flatpack-demo-gwt</artifactId>
+    <version>2.11-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <gwt.module>com.getperka.flatpack.demo.gwt.Demo</gwt.module>
+    <gwt.draftCompile>false</gwt.draftCompile>
+    <gwt.style>OBF</gwt.style>
+    <!-- keep in sync with flatpack-demo-gwt-server -->
+    <runTarget>http://localhost:8080/</runTarget>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.getperka.flatpack</groupId>
+      <artifactId>flatpack-client-gwt</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+     <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <configuration>
+          <module>${gwt.module}</module>
+          <strict>true</strict>
+          <draftCompile>${gwt.draftCompile}</draftCompile>
+          <style>${gwt.style}</style>
+          <noserver>true</noserver>
+          <runTarget>${runTarget}</runTarget>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <packagingExcludes>WEB-INF/**</packagingExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>draft</id>
+      <activation>
+        <property>
+          <name>draft</name>
+        </property>
+      </activation>
+      <properties>
+        <gwt.module>com.getperka.flatpack.demo.gwt.Demo_dev</gwt.module>
+        <gwt.draftCompile>true</gwt.draftCompile>
+        <gwt.style>PRETTY</gwt.style>
+      </properties>
+    </profile>
+  </profiles>
+</project>
