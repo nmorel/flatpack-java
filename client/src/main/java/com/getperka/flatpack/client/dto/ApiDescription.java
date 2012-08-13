@@ -75,6 +75,9 @@ public class ApiDescription extends BaseHasUuid {
 
   @Override
   protected UUID defaultUuid() {
+    if (apiName == null) {
+      throw new IllegalStateException();
+    }
     return UUID.nameUUIDFromBytes((getClass().getName() + ":" + apiName).getBytes(UTF8));
   }
 }

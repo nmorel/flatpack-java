@@ -83,6 +83,9 @@ public class EntityDescription extends BaseHasUuid {
 
   @Override
   protected UUID defaultUuid() {
+    if (typeName == null) {
+      throw new IllegalStateException();
+    }
     return UUID.nameUUIDFromBytes((getClass().getName() + ":" + typeName).getBytes(UTF8));
   }
 }

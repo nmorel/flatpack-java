@@ -83,6 +83,9 @@ public class ParameterDescription extends BaseHasUuid {
 
   @Override
   protected UUID defaultUuid() {
+    if (endpoint == null || name == null) {
+      throw new IllegalStateException();
+    }
     String key = endpoint.getUuid() + ":" + name;
     return UUID.nameUUIDFromBytes(key.getBytes(UTF8));
   }

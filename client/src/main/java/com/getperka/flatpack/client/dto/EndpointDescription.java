@@ -154,6 +154,9 @@ public class EndpointDescription extends BaseHasUuid {
 
   @Override
   protected UUID defaultUuid() {
+    if (method == null || path == null) {
+      throw new IllegalStateException();
+    }
     return UUID.nameUUIDFromBytes((method + ":" + path).getBytes(UTF8));
   }
 }

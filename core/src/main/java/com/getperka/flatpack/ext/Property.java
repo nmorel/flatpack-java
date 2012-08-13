@@ -85,16 +85,10 @@ public class Property extends BaseHasUuid {
       }
 
       if (getter != null) {
-        Class<?> enclosingType = getter.getDeclaringClass();
-        toReturn.enclosingTypeName = typeContext.getPayloadName(enclosingType);
-
         java.lang.reflect.Type returnType = getter.getGenericReturnType();
         toReturn.codex = typeContext.getCodex(returnType);
         analyzeAnnotations(toReturn, getter);
       } else if (setter != null) {
-        Class<?> enclosingType = setter.getDeclaringClass();
-        toReturn.enclosingTypeName = typeContext.getPayloadName(enclosingType);
-
         java.lang.reflect.Type paramType = setter.getGenericParameterTypes()[0];
         toReturn.codex = typeContext.getCodex(paramType);
         analyzeAnnotations(toReturn, setter);
@@ -136,6 +130,12 @@ public class Property extends BaseHasUuid {
     public Builder withGetter(Method getter) {
       getter.setAccessible(true);
       prop.getter = getter;
+
+      if (prop.enclosingTypeName == null) {
+        Class<?> enclosingType = getter.getDeclaringClass();
+        prop.enclosingTypeName = typeContext.getPayloadName(enclosingType);
+      }
+
       return this;
     }
 
@@ -152,6 +152,11 @@ public class Property extends BaseHasUuid {
     public Builder withSetter(Method setter) {
       setter.setAccessible(true);
       prop.setter = setter;
+
+      if (prop.enclosingTypeName == null) {
+        Class<?> enclosingType = setter.getDeclaringClass();
+        prop.enclosingTypeName = typeContext.getPayloadName(enclosingType);
+      }
       return this;
     }
 
@@ -455,6 +460,9 @@ public class Property extends BaseHasUuid {
 
   @Override
   protected UUID defaultUuid() {
+    if (getEnclosingTypeName() == null || getName() == null) {
+      throw new IllegalStateException();
+    }
     return UUID.nameUUIDFromBytes((getEnclosingTypeName() + "." + getName()).getBytes(UTF8));
   }
 
