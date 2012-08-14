@@ -21,12 +21,7 @@ package com.getperka.flatpack.demo.gwt;
 
 import java.math.BigDecimal;
 
-import javax.annotation.security.PermitAll;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import com.getperka.flatpack.BaseHasUuid;
+import com.getperka.flatpack.gwt.BaseHasUuid;
 
 /**
  * A simple entity type. All properties are globally-readable, however the setters are restricted to just the admin
@@ -38,11 +33,7 @@ public class Product
     private String name;
     private String notes;
     private BigDecimal price;
-    private double doubleProperty;
 
-    @PermitAll
-    @NotNull
-    @Size( min = 1 )
     public String getName()
     {
         return name;
@@ -53,9 +44,6 @@ public class Product
         return notes;
     }
 
-    @PermitAll
-    @Min( 0 )
-    @NotNull
     public BigDecimal getPrice()
     {
         return price;
@@ -77,14 +65,9 @@ public class Product
         this.price = price;
     }
 
-    public double getDoubleProperty()
+    @Override
+    public String toString()
     {
-        return doubleProperty;
+        return "Product [name=" + name + ", notes=" + notes + ", price=" + price + "]";
     }
-
-    public void setDoubleProperty( double doubleProperty )
-    {
-        this.doubleProperty = doubleProperty;
-    }
-
 }
