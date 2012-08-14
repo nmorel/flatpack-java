@@ -20,7 +20,6 @@
   <properties>
     <!-- Plugins version -->
     <gwt-maven-plugin.version>2.5.0-rc1</gwt-maven-plugin.version>
-    <maven-source-plugin.version>2.1.2</maven-source-plugin.version>
 
     <!-- Dependencies version -->
     <gwt.version>2.5.0-rc1</gwt.version>
@@ -40,6 +39,12 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwt-maven-plugin.version}</version>
+        <configuration>
+          <modules>
+            <module>com.getperka.flatpack.gwt.FlatPack</module>
+            <module>com.getperka.flatpack.FlatPackCore</module>
+          </modules>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -64,19 +69,6 @@
             <version>${gwt.version}</version>
           </dependency>
         </dependencies>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>${maven-source-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
 

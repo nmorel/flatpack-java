@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ import com.getperka.flatpack.HasUuid;
  * This class also provides an error-assignment mechanism that tracks the current path of the
  * serializer/deserializer through the object graph. When writing a {@link Codex} subtype, the
  * following pattern should be used:
- * 
+ *
  * <pre>
  * void read/write(BaseContext context) {
  *   context.pushPath("useful information");
@@ -126,7 +126,7 @@ public abstract class BaseContext implements Closeable {
 
   /**
    * Removes the topmost path.
-   * 
+   *
    * @return the removed path element
    */
   public String popPath() {
@@ -135,7 +135,7 @@ public abstract class BaseContext implements Closeable {
 
   /**
    * Adds a path to the error-reporting stack.
-   * 
+   *
    * @param element the path element to add
    */
   public void pushPath(String element) {
