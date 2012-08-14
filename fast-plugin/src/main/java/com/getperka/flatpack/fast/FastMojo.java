@@ -50,11 +50,44 @@ public class FastMojo extends AbstractMojo {
   protected BuildContext buildContext;
 
   /**
+   * A file containing a JSON array that lists payload type names that should be generated as base
+   * types to be implemented by a user-provided concrete type. DTOs.
+   * <p>
+   * 
+   * <pre>
+   * [ "employee", "manager" ]
+   * </pre>
+   * 
+   * <pre>
+   * public class Employee extends EmployeeBase {
+   *   // Custom code goes here
+   * }
+   * </pre>
+   * 
+   * @parameter
+   */
+  protected File baseTypes;
+
+  /**
+   * The source dialect to emit.
+   * 
+   * @parameter default-value="java"
+   */
+  protected String dialect;
+
+  /**
    * The destination directory for the generated source.
    * 
    * @parameter default-value="${project.build.directory}/generated-sources/flatpack"
    */
   protected File outputDirectory;
+
+  /**
+   * The package name the generated clasess should be emitted into.
+   * 
+   * @parameter default-value="com.getperka.fast"
+   */
+  protected String packageName;
 
   /**
    * @parameter default-value="${project}"
@@ -70,20 +103,6 @@ public class FastMojo extends AbstractMojo {
    * @required
    */
   protected File source;
-
-  /**
-   * The source dialect to emit.
-   * 
-   * @parameter default-value="java"
-   */
-  protected String dialect;
-
-  /**
-   * The package name the generated clasess should be emitted into.
-   * 
-   * @parameter default-value="com.getperka.fast"
-   */
-  protected String packageName;
 
   /**
    * The number of path segments to remove from the generated URLs when creating method names.
@@ -107,6 +126,7 @@ public class FastMojo extends AbstractMojo {
 
     try {
       JavaDialect.apiIsPublic = apiIsPublic;
+      JavaDialect.baseTypeArrayFile = baseTypes;
       JavaDialect.packageName = packageName;
       JavaDialect.stripPathSegments = stripPathSegments;
       JavaDialect.typePrefix = typePrefix == null ? "" : typePrefix;

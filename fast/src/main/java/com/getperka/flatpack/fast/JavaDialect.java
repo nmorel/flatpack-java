@@ -20,8 +20,10 @@
 package com.getperka.flatpack.fast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -80,6 +82,7 @@ import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.getperka.flatpack.util.FlatPackTypes;
+import com.google.gson.stream.JsonReader;
 
 /**
  * Generates simple Java POJO representations of a FlatPack API.
@@ -99,6 +102,11 @@ public class JavaDialect implements Dialect {
       help = "The number of path segments to strip when creating method names", defaultValue = "0")
   static Integer stripPathSegments;
 
+  @Flag(
+      tag = "baseTypeArray",
+      help = "A file containing a JSON array of payload names for DTOs that should be generated as a base type")
+  static File baseTypeArrayFile;
+
   @Flag(tag = "typePrefix", help = "A prefix to apply to all generated type names",
       defaultValue = "")
   static String typePrefix = "";
@@ -116,8 +124,8 @@ public class JavaDialect implements Dialect {
     return Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
   }
 
+  private final Set<String> baseTypes = new HashSet<String>();
   private final Logger logger = LoggerFactory.getLogger(getClass());
-
   /**
    * Used at the end of the code-generation process to emit referenced enum values.
    */
@@ -126,6 +134,7 @@ public class JavaDialect implements Dialect {
   @Override
   public void generate(ApiDescription api, File outputDir) throws IOException {
     STGroup group = loadGroup();
+    loadConcreteTypeMap();
 
     File packageDir = new File(outputDir, packageName.replace('.', '/'));
     if (!packageDir.isDirectory() && !packageDir.mkdirs()) {
@@ -157,7 +166,11 @@ public class JavaDialect implements Dialect {
           .add("entity", entity)
           .add("packageName", packageName);
 
-      render(entityST, packageDir, typePrefix + upcase(entity.getTypeName()));
+      String simpleName = typePrefix + upcase(entity.getTypeName());
+      if (baseTypes.contains(entity.getTypeName())) {
+        simpleName += "Base";
+      }
+      render(entityST, packageDir, simpleName);
     }
 
     // Render referenced enumerations
@@ -190,6 +203,23 @@ public class JavaDialect implements Dialect {
   @Override
   public String getDialectName() {
     return "java";
+  }
+
+  /**
+   * If {@value #concreteTypeMapFile} is defined, load the file into {@link #concreteTypeMap}.
+   */
+  private void loadConcreteTypeMap() throws IOException {
+    if (baseTypeArrayFile != null) {
+      JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(
+          baseTypeArrayFile), UTF8));
+      reader.setLenient(true);
+      reader.beginArray();
+      while (reader.hasNext()) {
+        baseTypes.add(reader.nextString());
+      }
+      reader.endArray();
+      reader.close();
+    }
   }
 
   /**
@@ -243,6 +273,7 @@ public class JavaDialect implements Dialect {
             }
             // Any other named type must be an entity type
             if (type.getName() != null) {
+              // Allow type to be overridden
               return typePrefix + upcase(type.getName());
             }
             // Look for a type hint
@@ -325,7 +356,9 @@ public class JavaDialect implements Dialect {
       public Object getProperty(Interpreter interp, ST self, Object o, Object property,
           String propertyName) throws STNoSuchPropertyException {
         EntityDescription entity = (EntityDescription) o;
-        if ("payloadName".equals(propertyName)) {
+        if ("baseType".equals(propertyName)) {
+          return baseTypes.contains(entity.getTypeName());
+        } else if ("payloadName".equals(propertyName)) {
           return entity.getTypeName();
         } else if ("supertype".equals(propertyName)) {
           EntityDescription supertype = entity.getSupertype();

@@ -23,7 +23,7 @@ package <packageName>;
 
 <docString(entity.docString)>
 @<names.JsonTypeName>("<entity.payloadName>")
-public class <entity.simpleName> extends <entity.supertype> {
+<entityDeclaration()> extends <entity.supertype> {
   /**
    * Returns the type name used to identify instances of <entity.simpleName> in a payload.
    */
@@ -35,6 +35,17 @@ public class <entity.simpleName> extends <entity.supertype> {
   <entity.properties:setter(); separator="\n">
 }
 >>
+
+/**
+ * Extracted to ease formatting.
+ */
+entityDeclaration() ::= <%
+<if(entity.baseType)>
+  abstract class <entity.simpleName>Base
+<else>
+  public class <entity.simpleName>
+<endif> 
+%>
 
 enum(enum, packageName) ::= <<
 // Generated File - DO NOT EDIT
