@@ -40,13 +40,13 @@ public class Unpacker
         // The return value
         FlatPackEntity<T> toReturn = new FlatPackEntity<T>();
 
-        if ( null == asJson )
+        if ( null == asJson || asJson.isEmpty() )
         {
             return toReturn;
         }
 
         // convert the json to JavaScriptObject
-        FlatPackJso asJso = JsonUtils.safeEval( asJson );
+        JavaScriptObject asJso = JsonUtils.safeEval( asJson );
         if ( null == asJso )
         {
             return toReturn;

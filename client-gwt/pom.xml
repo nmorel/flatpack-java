@@ -38,7 +38,16 @@
       <version>1.0.0.GA</version>
       <scope>provided</scope>
     </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -55,6 +64,7 @@
           <execution>
             <goals>
               <goal>resources</goal>
+              <goal>test</goal>
             </goals>
           </execution>
         </executions>
