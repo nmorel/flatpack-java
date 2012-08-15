@@ -32,14 +32,15 @@ public class UUIDCodex
     extends ValueCodex<UUID>
 {
 
-    UUIDCodex()
+    public UUIDCodex()
     {
     }
 
     @Override
-    public UUID readNotNull( JavaScriptObject element, DeserializationContext context )
+    public UUID readNotNull( Object element, DeserializationContext context )
     {
-        return UUID.fromString( readString( element ) );
+        // TODO test
+        return UUID.fromString( readString( (JavaScriptObject) element ) );
     }
 
     @Override

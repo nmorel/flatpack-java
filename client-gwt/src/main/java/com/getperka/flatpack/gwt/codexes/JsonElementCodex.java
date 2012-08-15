@@ -29,14 +29,15 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class JsonElementCodex
     extends ValueCodex<JavaScriptObject>
 {
-    JsonElementCodex()
+    public JsonElementCodex()
     {
     }
 
     @Override
-    public JavaScriptObject readNotNull( JavaScriptObject element, DeserializationContext context )
+    public JavaScriptObject readNotNull( Object element, DeserializationContext context )
     {
-        return element;
+        // TODO test
+        return (JavaScriptObject) element;
     }
 
     @Override
@@ -47,6 +48,6 @@ public class JsonElementCodex
 
     private final native String stringify( JavaScriptObject object )
     /*-{
-	    return JSON.stringify(object);
+		return JSON.stringify(object);
     }-*/;
 }

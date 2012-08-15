@@ -51,17 +51,17 @@ public abstract class Codex<T>
     }
 
     /**
-     * Reify the given {@link JavaScriptObject} into a Java value. If {@code} element is {@null} or represents a
+     * Reify the given {@link Object} into a Java value. If {@code} element is {@null} or represents a
      * Json {@code null} value, this method will return {@code null}, otherwise this method will delegate to
-     * {@link #readNotNull(JavaScriptObject, DeserializationContext)}.
+     * {@link #readNotNull(Object, DeserializationContext)}.
      *
      * @param element the element that contains the value to reify
      * @param context contextual information for the deserialization process
      * @return the requested value
      */
-    public T read( JavaScriptObject element, DeserializationContext context )
+    public T read( Object element, DeserializationContext context )
     {
-        if ( element == null || isNull( element ) )
+        if ( element == null )
         {
             return null;
         }
@@ -81,21 +81,16 @@ public abstract class Codex<T>
         }
     }
 
-    private native boolean isNull( JavaScriptObject jso )
-    /*-{
-		return jso === null;
-    }-*/;
-
     /**
-     * Reify the given {@link JavaScriptObject} into a Java value.
+     * Reify the given {@link Object} into a Java value.
      *
      * @param element the element that contains the value to reify
      * @param context contextual information for the deserialization process
      * @return the requested value
      * @throws Exception implementations of this method may throw arbitrary exceptions which will be reported by
-     * {@link #read(JavaScriptObject, DeserializationContext)}
+     * {@link #read(Object, DeserializationContext)}
      */
-    public abstract T readNotNull( JavaScriptObject element, DeserializationContext context )
+    public abstract T readNotNull( Object element, DeserializationContext context )
         throws Exception;
 
     /**
@@ -199,16 +194,16 @@ public abstract class Codex<T>
 
     protected final native JavaScriptObject getObject( JavaScriptObject jso, String key )
     /*-{
-        return jso[key];
+		return jso[key];
     }-*/;
 
     protected final native String getString( JavaScriptObject jso, String key )
     /*-{
-        return jso[key];
+		return jso[key];
     }-*/;
 
     protected final native boolean hasKey( JavaScriptObject jso, String key )
     /*-{
-        return jso.hasOwnProperty(key);
+		return jso.hasOwnProperty(key);
     }-*/;
 }

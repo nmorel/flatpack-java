@@ -32,7 +32,7 @@ public class BooleanCodex
     extends ValueCodex<Boolean>
 {
 
-    BooleanCodex()
+    public BooleanCodex()
     {
     }
 
@@ -46,9 +46,10 @@ public class BooleanCodex
     }
 
     @Override
-    public Boolean readNotNull( JavaScriptObject element, DeserializationContext context )
+    public Boolean readNotNull( Object element, DeserializationContext context )
     {
-        return readBoolean( element );
+        // TODO test
+        return readBoolean( (JavaScriptObject) element );
     }
 
     @Override

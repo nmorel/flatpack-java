@@ -21,7 +21,6 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Ignores all values.
@@ -29,7 +28,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class VoidCodex
     extends ValueCodex<Void>
 {
-    VoidCodex()
+    public VoidCodex()
     {
     }
 
@@ -43,7 +42,7 @@ public class VoidCodex
     }
 
     @Override
-    public Void readNotNull( JavaScriptObject element, DeserializationContext context )
+    public Void readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
         return null;

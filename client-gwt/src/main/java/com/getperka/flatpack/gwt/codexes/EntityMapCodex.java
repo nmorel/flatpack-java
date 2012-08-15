@@ -38,7 +38,7 @@ public class EntityMapCodex<K extends HasUuid, V>
     private final EntityCodex<K> keyCodex;
     private final Codex<V> valueCodex;
 
-    EntityMapCodex( EntityCodex<K> keyCodex, Codex<V> valueCodex )
+    public EntityMapCodex( EntityCodex<K> keyCodex, Codex<V> valueCodex )
     {
         this.keyCodex = keyCodex;
         this.valueCodex = valueCodex;
@@ -51,11 +51,12 @@ public class EntityMapCodex<K extends HasUuid, V>
     }
 
     @Override
-    public Map<K, V> readNotNull( JavaScriptObject element, DeserializationContext context )
+    public Map<K, V> readNotNull( Object element, DeserializationContext context )
         throws IOException
     {
         Map<K, V> toReturn = FlatPackCollections.mapForIteration();
-        iterate( element, toReturn, context );
+        // TODO test
+        iterate( (JavaScriptObject) element, toReturn, context );
         return toReturn;
     }
 

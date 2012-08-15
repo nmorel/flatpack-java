@@ -37,7 +37,7 @@ public class StringMapCodex<V>
 {
     private final Codex<V> valueCodex;
 
-    StringMapCodex( Codex<V> valueCodex )
+    public StringMapCodex( Codex<V> valueCodex )
     {
         this.valueCodex = valueCodex;
     }
@@ -49,10 +49,11 @@ public class StringMapCodex<V>
     }
 
     @Override
-    public Map<String, V> readNotNull( JavaScriptObject element, DeserializationContext context )
+    public Map<String, V> readNotNull( Object element, DeserializationContext context )
     {
         Map<String, V> toReturn = FlatPackCollections.mapForIteration();
-        iterate( element, toReturn, context );
+        // TODO test
+        iterate( (JavaScriptObject) element, toReturn, context );
         return toReturn;
     }
 

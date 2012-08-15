@@ -31,7 +31,7 @@ import com.getperka.flatpack.FlatPackCollections;
 public class SetCodex<V>
     extends CollectionCodex<Set<V>, V>
 {
-    SetCodex( Codex<V> valueCodex )
+    public SetCodex( Codex<V> valueCodex )
     {
         super( valueCodex );
     }

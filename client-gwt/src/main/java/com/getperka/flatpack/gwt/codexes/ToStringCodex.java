@@ -36,16 +36,17 @@ public class ToStringCodex<T>
 
     private final Constructor<T> constructor;
 
-    ToStringCodex( Constructor<T> constructor )
+    public ToStringCodex( Constructor<T> constructor )
     {
         this.constructor = constructor;
     }
 
     @Override
-    public T readNotNull( JavaScriptObject element, DeserializationContext context )
+    public T readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
-        return constructor.newInstance( readString( element ) );
+        // TODO
+        return constructor.newInstance( readString( (JavaScriptObject) element ) );
     }
 
     @Override

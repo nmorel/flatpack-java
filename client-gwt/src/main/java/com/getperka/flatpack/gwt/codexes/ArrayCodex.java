@@ -36,7 +36,7 @@ public class ArrayCodex<T>
 {
     private final Codex<T> valueCodex;
 
-    ArrayCodex( Codex<T> valueCodex )
+    public ArrayCodex( Codex<T> valueCodex )
     {
         this.valueCodex = valueCodex;
     }
@@ -48,12 +48,21 @@ public class ArrayCodex<T>
     }
 
     @Override
-    public T[] readNotNull( JavaScriptObject element, DeserializationContext context )
+    public T[] readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
+        if ( !( element instanceof JavaScriptObject ) )
+        {
+            throw new IllegalArgumentException( "element is not a JavaScriptObject : " + element.getClass().getName() );
+        }
+
+        JavaScriptObject array = (JavaScriptObject) element;
         @SuppressWarnings( "unchecked" )
-        T[] toReturn = (T[]) new Object[arraySize( element )];
-        iterate( element, toReturn, context );
+        // FIXME this isn't working. The array is still an array of Object and not T. We can : - make the codex abstract
+        // and ask the user to create the array, - only use Collection, - fix the type to Object instead of T, -
+        // generate a map in TypeContext to create an array from a class
+        T[] toReturn = (T[]) new Object[arraySize( array )];
+        iterate( array, toReturn, context );
         return toReturn;
     }
 
@@ -64,14 +73,12 @@ public class ArrayCodex<T>
 
     private final native void iterate( JavaScriptObject element, T[] toReturn, DeserializationContext context )
     /*-{
-		var count = 0;
-		for ( var object in element) {
-			this.@com.getperka.flatpack.gwt.codexes.ArrayCodex::readValue(Lcom/google/gwt/core/client/JavaScriptObject;I[Ljava/lang/Object;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(object, count, toReturn, context);
-			count++;
+		for ( var i = 0, len = element.length; value = element[i], i < len; i++) {
+			this.@com.getperka.flatpack.gwt.codexes.ArrayCodex::readValue(Ljava/lang/Object;I[Ljava/lang/Object;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(value, i, toReturn, context);
 		}
     }-*/;
 
-    private void readValue( JavaScriptObject value, int count, T[] toReturn, DeserializationContext context )
+    private void readValue( Object value, int count, T[] toReturn, DeserializationContext context )
     {
         context.pushPath( "[" + count + "]" );
         toReturn[count] = valueCodex.read( value, context );

@@ -33,7 +33,7 @@ public class NumberCodex<N extends Number>
 {
     private final Class<N> clazz;
 
-    NumberCodex( Class<N> clazz )
+    public NumberCodex( Class<N> clazz )
     {
         this.clazz = clazz;
     }
@@ -57,10 +57,11 @@ public class NumberCodex<N extends Number>
 
     @SuppressWarnings( "unchecked" )
     @Override
-    public N readNotNull( JavaScriptObject element, DeserializationContext context )
+    public N readNotNull( Object element, DeserializationContext context )
     {
         Object toReturn;
-        double value = readNumber( element );
+        // TODO test
+        double value = readNumber( (JavaScriptObject) element );
         if ( Byte.class.equals( clazz ) )
         {
             toReturn = new Double( value ).byteValue();

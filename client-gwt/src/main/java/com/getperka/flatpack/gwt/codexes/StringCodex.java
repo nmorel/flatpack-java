@@ -29,14 +29,15 @@ import com.google.gwt.core.client.JavaScriptObject;
 public class StringCodex
     extends ValueCodex<String>
 {
-    StringCodex()
+    public StringCodex()
     {
     }
 
     @Override
-    public String readNotNull( JavaScriptObject element, DeserializationContext context )
+    public String readNotNull( Object element, DeserializationContext context )
     {
-        return readString( element );
+        // TODO test we should get a String and not a JavascriptObject
+        return readString( (JavaScriptObject) element );
     }
 
     @Override

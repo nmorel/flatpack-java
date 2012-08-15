@@ -32,7 +32,7 @@ public class ListCodex<V>
     extends CollectionCodex<List<V>, V>
 {
 
-    ListCodex( Codex<V> valueCodex )
+    public ListCodex( Codex<V> valueCodex )
     {
         super( valueCodex );
     }

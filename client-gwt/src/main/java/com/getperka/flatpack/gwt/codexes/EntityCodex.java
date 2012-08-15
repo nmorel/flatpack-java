@@ -73,9 +73,13 @@ public abstract class EntityCodex<T extends HasUuid>
 
     @SuppressWarnings( "unchecked" )
     @Override
-    public T readNotNull( JavaScriptObject element, DeserializationContext context )
+    public T readNotNull( Object element, DeserializationContext context )
     {
-        UUID uuid = UUID.fromString( readString( element ) );
+        if ( !( element instanceof String ) )
+        {
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+        }
+        UUID uuid = UUID.fromString( (String) element );
         HasUuid entity = context.getEntity( uuid );
         /*
          * If the UUID is a reference to an entity that isn't in the data section, delegate to the allocate() method.

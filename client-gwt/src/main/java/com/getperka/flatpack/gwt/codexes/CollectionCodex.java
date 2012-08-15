@@ -37,7 +37,7 @@ public abstract class CollectionCodex<T extends Collection<V>, V>
 {
     private Codex<V> valueCodex;
 
-    CollectionCodex( Codex<V> valueCodex )
+    public CollectionCodex( Codex<V> valueCodex )
     {
         this.valueCodex = valueCodex;
     }
@@ -49,24 +49,27 @@ public abstract class CollectionCodex<T extends Collection<V>, V>
     }
 
     @Override
-    public T readNotNull( JavaScriptObject element, DeserializationContext context )
+    public T readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
+        if ( !( element instanceof JavaScriptObject ) )
+        {
+            throw new IllegalArgumentException( "element is not a JavaScriptObject : " + element.getClass().getName() );
+        }
+
         T toReturn = newCollection();
-        iterate( element, toReturn, context );
+        iterate( (JavaScriptObject) element, toReturn, context );
         return toReturn;
     }
 
     private final native void iterate( JavaScriptObject element, T toReturn, DeserializationContext context )
     /*-{
-		var count = 0;
-		for ( var object in element) {
-			this.@com.getperka.flatpack.gwt.codexes.CollectionCodex::readValue(Lcom/google/gwt/core/client/JavaScriptObject;ILjava/util/Collection;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(object, count, toReturn, context);
-			count++;
+		for ( var i = 0, len = element.length; value = element[i], i < len; i++) {
+			this.@com.getperka.flatpack.gwt.codexes.CollectionCodex::readValue(Ljava/lang/Object;ILjava/util/Collection;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(value, i, toReturn, context);
 		}
     }-*/;
 
-    private void readValue( JavaScriptObject value, int count, T toReturn, DeserializationContext context )
+    private void readValue( Object value, int count, T toReturn, DeserializationContext context )
     {
         context.pushPath( "[" + count++ + "]" );
         toReturn.add( valueCodex.read( value, context ) );

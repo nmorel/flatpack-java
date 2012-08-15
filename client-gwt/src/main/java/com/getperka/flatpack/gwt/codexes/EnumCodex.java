@@ -33,15 +33,16 @@ public class EnumCodex<E extends Enum<E>>
 {
     private final Class<E> clazz;
 
-    EnumCodex( Class<E> clazz )
+    public EnumCodex( Class<E> clazz )
     {
         this.clazz = clazz;
     }
 
     @Override
-    public E readNotNull( JavaScriptObject element, DeserializationContext context )
+    public E readNotNull( Object element, DeserializationContext context )
     {
-        return Enum.valueOf( clazz, readString( element ) );
+        // TODO test
+        return Enum.valueOf( clazz, readString( (JavaScriptObject) element ) );
     }
 
     @Override
