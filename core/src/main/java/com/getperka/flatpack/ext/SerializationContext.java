@@ -53,7 +53,7 @@ public class SerializationContext extends BaseContext {
   @Inject
   private JsonWriter writer;
 
-  SerializationContext() {}
+  protected SerializationContext() {}
 
   /**
    * Returns {@code true} if {@code entity} needs to be processed.

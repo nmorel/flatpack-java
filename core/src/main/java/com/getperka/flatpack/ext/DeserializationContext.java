@@ -48,7 +48,7 @@ public class DeserializationContext extends BaseContext {
   @Inject
   private TypeContext typeContext;
 
-  DeserializationContext() {}
+  protected DeserializationContext() {}
 
   /**
    * Record the modification of an entity's property.

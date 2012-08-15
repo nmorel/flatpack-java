@@ -167,7 +167,7 @@ public class TypeContext {
   private DynamicCodex dynamicCodex;
 
   @Inject
-  TypeContext() {}
+  protected TypeContext() {}
 
   /**
    * Examine a class and return {@link Property} helpers that describe all JSON properties that the

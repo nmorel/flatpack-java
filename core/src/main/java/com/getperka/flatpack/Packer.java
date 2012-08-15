@@ -64,7 +64,7 @@ public class Packer {
   @PrettyPrint
   private boolean prettyPrint;
 
-  Packer() {}
+  protected Packer() {}
 
   /**
    * Write the given entity into a {@link Writer}.

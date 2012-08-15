@@ -69,7 +69,7 @@ public class Unpacker {
   @Inject
   private TypeContext typeContext;
 
-  Unpacker() {}
+  protected Unpacker() {}
 
   /**
    * Reify a {@link FlatPackEntity} from its serialized form.
