@@ -17,27 +17,23 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
-
-import java.util.ArrayList;
-import java.util.List;
+package com.getperka.flatpack;
 
 import javax.annotation.security.PermitAll;
 
-import com.getperka.flatpack.SparseCollection;
-
+/**
+ * A carrier object to associate out-of-band data with serialized entities. The UUID of this object
+ * corresponds to the UUID of the entity it describes.
+ */
 @PermitAll
-public class Manager extends Person {
-  private List<Employee> employees = new ArrayList<Employee>();
+class EntityMetadata extends BaseHasUuid {
+  private boolean isPersistent;
 
-  Manager() {}
-
-  @SparseCollection("manager")
-  public List<Employee> getEmployees() {
-    return employees;
+  public boolean isPersistent() {
+    return isPersistent;
   }
 
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
+  public void setPersistent(boolean isPersistent) {
+    this.isPersistent = isPersistent;
   }
 }

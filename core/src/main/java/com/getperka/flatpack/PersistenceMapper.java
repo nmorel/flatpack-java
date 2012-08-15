@@ -17,27 +17,10 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface PersistenceMapper {
+  boolean canPersist(Class<? extends HasUuid> entityType);
 
-import javax.annotation.security.PermitAll;
-
-import com.getperka.flatpack.SparseCollection;
-
-@PermitAll
-public class Manager extends Person {
-  private List<Employee> employees = new ArrayList<Employee>();
-
-  Manager() {}
-
-  @SparseCollection("manager")
-  public List<Employee> getEmployees() {
-    return employees;
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
-  }
+  boolean isPersisted(HasUuid entity);
 }

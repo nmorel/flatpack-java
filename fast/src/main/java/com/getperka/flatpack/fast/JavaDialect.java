@@ -64,6 +64,8 @@ import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.InheritPrincipal;
 import com.getperka.flatpack.JsonTypeName;
+import com.getperka.flatpack.PersistenceAware;
+import com.getperka.flatpack.PostUnpack;
 import com.getperka.flatpack.SparseCollection;
 import com.getperka.flatpack.SuppressDefaultValue;
 import com.getperka.flatpack.TypeReference;
@@ -75,8 +77,10 @@ import com.getperka.flatpack.client.dto.EndpointDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
 import com.getperka.flatpack.client.dto.ParameterDescription;
 import com.getperka.flatpack.client.impl.ApiBase;
+import com.getperka.flatpack.client.impl.BasePersistenceAware;
 import com.getperka.flatpack.client.impl.ConnectionRequestBase;
 import com.getperka.flatpack.client.impl.FlatPackRequestBase;
+import com.getperka.flatpack.collections.DirtyFlag;
 import com.getperka.flatpack.ext.Property;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
@@ -113,10 +117,11 @@ public class JavaDialect implements Dialect {
 
   private static final Charset UTF8 = Charset.forName("UTF8");
   private static final List<Class<?>> WELL_KNOWN_TYPES = Arrays.<Class<?>> asList(
-      ApiBase.class, Arrays.class, ConnectionRequestBase.class, Collections.class, Embedded.class,
-      FlatPack.class, FlatPackEntity.class, FlatPackRequest.class, FlatPackRequestBase.class,
-      FlatPackTypes.class, HashSet.class, HttpURLConnection.class, InheritPrincipal.class,
-      IOException.class, JsonTypeName.class, PermitAll.class, Request.class, RolesAllowed.class,
+      ApiBase.class, Arrays.class, ConnectionRequestBase.class, Collections.class, DirtyFlag.class,
+      Embedded.class, FlatPack.class, FlatPackCollections.class, FlatPackEntity.class,
+      FlatPackRequest.class, FlatPackRequestBase.class, FlatPackTypes.class, HashSet.class,
+      HttpURLConnection.class, InheritPrincipal.class, IOException.class, JsonTypeName.class,
+      PermitAll.class, PersistenceAware.class, PostUnpack.class, Request.class, RolesAllowed.class,
       Set.class, SparseCollection.class, SuppressDefaultValue.class, TypeReference.class,
       TypeSource.class);
 
@@ -234,7 +239,9 @@ public class JavaDialect implements Dialect {
       public String toString(Object o, String formatString, Locale locale) {
         EntityDescription entity = (EntityDescription) o;
         if (entity.getTypeName().equals("baseHasUuid")) {
-          return BaseHasUuid.class.getCanonicalName();
+          // Swap out for our hand-written base class
+          return entity.isPersistent() ? BasePersistenceAware.class.getCanonicalName()
+              : BaseHasUuid.class.getCanonicalName();
         }
         return packageName + "." + typePrefix + upcase(entity.getTypeName());
       }
@@ -363,7 +370,8 @@ public class JavaDialect implements Dialect {
         } else if ("supertype".equals(propertyName)) {
           EntityDescription supertype = entity.getSupertype();
           if (supertype == null) {
-            return BaseHasUuid.class.getCanonicalName();
+            return entity.isPersistent() ? BasePersistenceAware.class.getCanonicalName()
+                : BaseHasUuid.class.getCanonicalName();
           } else {
             return supertype;
           }

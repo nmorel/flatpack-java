@@ -23,8 +23,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Type;
+import java.security.Principal;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -35,6 +39,7 @@ import org.junit.Before;
 
 import com.getperka.flatpack.domain.Employee;
 import com.getperka.flatpack.domain.Manager;
+import com.getperka.flatpack.domain.PersistentEmployee;
 import com.getperka.flatpack.ext.Codex;
 import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.SerializationContext;
@@ -67,6 +72,8 @@ public abstract class FlatPackTest {
   @Inject
   private PackScope packScope;
   @Inject
+  private Provider<PersistentEmployee> persistentEmployees;
+  @Inject
   private Provider<SerializationContext> serializationContexts;
 
   @After
@@ -89,6 +96,24 @@ public abstract class FlatPackTest {
 
   protected void closeContext() {
     packScope.exit();
+  }
+
+  protected <T> T deepPack(Type type, T value) throws IOException {
+    return deepPack(type, value, null);
+  }
+
+  protected <T> T deepPack(Type type, T value, Principal principal) throws IOException {
+    @SuppressWarnings("unchecked")
+    FlatPackEntity<T> entity = (FlatPackEntity<T>) FlatPackEntity.create(type, value, principal)
+        .withTraversalMode(TraversalMode.DEEP);
+
+    StringWriter out = new StringWriter();
+    flatpack.getPacker().pack(entity, out);
+    System.out.println(out.toString());
+
+    FlatPackEntity<T> entity2 = flatpack.getUnpacker().unpack(
+        type, new StringReader(out.toString()), principal);
+    return entity2.getValue();
   }
 
   /**
@@ -115,6 +140,14 @@ public abstract class FlatPackTest {
     Manager toReturn = managers.get();
     toReturn.setName("Manager Name");
     toReturn.getAddress().setStreet("manager street");
+    return toReturn;
+  }
+
+  protected PersistentEmployee makePersistentEmployee() {
+    PersistentEmployee toReturn = persistentEmployees.get();
+    toReturn.setEmployeeNumber(++counter);
+    toReturn.setName("Employee Name");
+    toReturn.getAddress().setStreet("street");
     return toReturn;
   }
 

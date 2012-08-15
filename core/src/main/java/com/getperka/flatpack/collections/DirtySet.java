@@ -17,27 +17,16 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack.collections;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-import javax.annotation.security.PermitAll;
-
-import com.getperka.flatpack.SparseCollection;
-
-@PermitAll
-public class Manager extends Person {
-  private List<Employee> employees = new ArrayList<Employee>();
-
-  Manager() {}
-
-  @SparseCollection("manager")
-  public List<Employee> getEmployees() {
-    return employees;
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
+/**
+ * A delegating {@link Set} implementation that will call {@link DirtyFlag#set()} when it is
+ * mutated.
+ */
+public class DirtySet<T> extends DirtyCollection<T> implements Set<T> {
+  public DirtySet(Set<T> delegate, DirtyFlag dirty) {
+    super(delegate, dirty);
   }
 }

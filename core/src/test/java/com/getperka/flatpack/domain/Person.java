@@ -19,11 +19,13 @@
  */
 package com.getperka.flatpack.domain;
 
+import javax.annotation.security.PermitAll;
 import javax.inject.Inject;
 
 import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.Embedded;
 
+@PermitAll
 public class Person extends BaseHasUuid {
   @Inject
   private StreetAddress address;

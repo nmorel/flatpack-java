@@ -66,6 +66,10 @@ public class FakeDatabase {
     return clazz.cast(allEntities.get(uuid));
   }
 
+  public boolean isPersisted(HasUuid entity) {
+    return allEntities.containsKey(entity.getUuid());
+  }
+
   /**
    * Add an entity. This will not add any referenced entities, so it isn't truly representative of
    * what a real persistence engine would do.

@@ -30,6 +30,7 @@ package <packageName>;
   public static String typeName() {
     return "<entity.payloadName>";
   }
+
   <entity.properties:field(); separator="\n">
   <entity.properties:getter(); separator="\n">
   <entity.properties:setter(); separator="\n">
@@ -93,7 +94,13 @@ public <property.type> get<property.getterName>() {
 setter(property) ::= <<
 <propertyRoles("getter")>
 public void set<property.getterName>(<property.type> value) {
+  <if(entity.persistent)>
+  <names.DirtyFlag> flag = dirtyFlag("<property.name>");
+  flag.set();
+  this.<property.getterName> = <names.FlatPackCollections>.dirtyTracking(value, flag);
+  <else>
   this.<property.getterName> = value;
+  <endif>
 }
 >>
 

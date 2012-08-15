@@ -36,6 +36,7 @@ public class Configuration {
   private List<CodexMapper> extraMappers = FlatPackCollections.listForAny();
   private boolean ignoreUnresolvableTypes = false;
   private boolean prettyPrint;
+  private List<PersistenceMapper> persistenceMappers;
   private PrincipalMapper principalMapper;
   private List<EntityResolver> resolvers = FlatPackCollections.listForAny();
   private RoleMapper roleMapper;
@@ -56,6 +57,14 @@ public class Configuration {
    */
   public Configuration addEntityResolver(EntityResolver resolver) {
     resolvers.add(0, resolver);
+    return this;
+  }
+
+  public Configuration addPersistenceMapper(PersistenceMapper mapper) {
+    if (persistenceMappers == null) {
+      persistenceMappers = FlatPackCollections.listForAny();
+    }
+    persistenceMappers.add(mapper);
     return this;
   }
 
@@ -85,6 +94,15 @@ public class Configuration {
    */
   public List<CodexMapper> getExtraMappers() {
     return Collections.unmodifiableList(extraMappers);
+  }
+
+  /**
+   * Returns an immutable view of the {@link PersistenceMapper} instances that were passed to
+   * {@link #addPersistenceMapper(PersistenceMapper)}.
+   */
+  public List<PersistenceMapper> getPersistenceMappers() {
+    return persistenceMappers == null ? Collections.<PersistenceMapper> emptyList() :
+        Collections.unmodifiableList(persistenceMappers);
   }
 
   public PrincipalMapper getPrincipalMapper() {

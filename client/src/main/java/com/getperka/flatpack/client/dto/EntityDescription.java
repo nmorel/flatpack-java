@@ -34,9 +34,10 @@ import com.getperka.flatpack.ext.Property;
  */
 public class EntityDescription extends BaseHasUuid {
   private String docString;
-  private String typeName;
+  private boolean persistent;
   private List<Property> properties;
   private EntityDescription supertype;
+  private String typeName;
 
   public EntityDescription(String typeName, List<Property> properties) {
     this.typeName = typeName;
@@ -65,8 +66,21 @@ public class EntityDescription extends BaseHasUuid {
     return typeName;
   }
 
+  /**
+   * Indicates that instance of the the type may be persisted by the server. This hint can be used
+   * to reduce payload sizes by transmitting only mutated properties.
+   */
+  @PermitAll
+  public boolean isPersistent() {
+    return persistent;
+  }
+
   public void setDocString(String docString) {
     this.docString = docString;
+  }
+
+  public void setPersistent(boolean persistent) {
+    this.persistent = persistent;
   }
 
   public void setProperties(List<Property> properties) {
