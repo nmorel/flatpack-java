@@ -59,6 +59,9 @@ public class SerializationContext extends BaseContext {
    * Returns {@code true} if {@code entity} needs to be processed.
    */
   public boolean add(HasUuid entity) {
+    if (entity == null) {
+      return false;
+    }
     if (entities.containsKey(entity)) {
       return false;
     }
