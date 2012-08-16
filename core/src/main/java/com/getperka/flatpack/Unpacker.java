@@ -84,7 +84,7 @@ public class Unpacker {
    */
   public <T> FlatPackEntity<T> unpack(Type returnType, Reader in, Principal principal)
       throws IOException {
-    ioObserver.observe(in);
+    in = ioObserver.observe(in);
     packScope.enter().withPrincipal(principal);
     try {
       return unpack(returnType, new JsonReader(in), principal);
