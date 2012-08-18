@@ -162,28 +162,6 @@ public class JsonWriter
         HTML_SAFE_REPLACEMENT_CHARS['\''] = "\\u0027";
     }
 
-    public static void main( String[] args )
-    {
-        new JsonWriter();
-        for ( int i = 0; i < REPLACEMENT_CHARS.length; i++ )
-        {
-            String s = REPLACEMENT_CHARS[i];
-            if ( null != s )
-            {
-                System.out.print( " [" + i + "," + s + "]" );
-            }
-        }
-        System.out.println();
-        for ( int i = 0; i < HTML_SAFE_REPLACEMENT_CHARS.length; i++ )
-        {
-            String s = HTML_SAFE_REPLACEMENT_CHARS[i];
-            if ( null != s )
-            {
-                System.out.print( " [" + i + "," + s + "]" );
-            }
-        }
-    }
-
     /** The output data, containing at most one top-level array or object. */
     private final StringBuilder out;
 
@@ -213,9 +191,13 @@ public class JsonWriter
     /**
      * Creates a new instance that writes a JSON-encoded stream to {@code out}.
      */
-    public JsonWriter()
+    public JsonWriter( StringBuilder out )
     {
-        this.out = new StringBuilder();
+        if ( out == null )
+        {
+            throw new NullPointerException( "out == null" );
+        }
+        this.out = out;
     }
 
     /**

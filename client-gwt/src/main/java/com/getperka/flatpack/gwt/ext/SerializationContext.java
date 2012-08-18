@@ -41,14 +41,13 @@ public class SerializationContext
     // @LastModifiedTime
     // private DateTime lastModifiedTime;
 
-    // @Inject
     private TraversalMode traversalMode;
 
-    // @Inject
     private JsonWriter writer;
 
-    SerializationContext()
+    public SerializationContext( JsonWriter writer )
     {
+        this.writer = writer;
     }
 
     /**

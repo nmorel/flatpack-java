@@ -59,13 +59,29 @@
             <module>com.getperka.flatpack.gwt.FlatPack</module>
             <module>com.getperka.flatpack.FlatPackCore</module>
           </modules>
+          <mode>htmlunit</mode>
         </configuration>
         <executions>
           <execution>
+            <id>packaging</id>
             <goals>
               <goal>resources</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test-dev-mode</id>
+            <goals>
               <goal>test</goal>
             </goals>
+          </execution>
+          <execution>
+            <id>test-prod</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <productionMode>true</productionMode>
+            </configuration>
           </execution>
         </executions>
         <dependencies>

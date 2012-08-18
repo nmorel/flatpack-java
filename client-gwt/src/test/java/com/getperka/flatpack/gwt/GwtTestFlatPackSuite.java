@@ -11,7 +11,8 @@ public class GwtTestFlatPackSuite
     public static Test suite()
     {
         GWTTestSuite suite = new GWTTestSuite();
-        suite.addTestSuite( UnpackTestGwt.class );
+        suite.addTestSuite( PackerTestGwt.class );
+        suite.addTestSuite( UnpackerTestGwt.class );
         return suite;
     }
 }

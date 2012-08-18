@@ -8,7 +8,7 @@ import java.util.UUID;
 import com.getperka.flatpack.gwt.codexes.VoidCodex;
 import com.getperka.flatpack.gwt.ext.TypeContext;
 
-public class UnpackTestGwt
+public class UnpackerTestGwt
     extends FlatPackTestCase
 {
     private static final String singleMultiplePropertiesBeanResponse =

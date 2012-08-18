@@ -42,6 +42,20 @@ public abstract class EntityCodex<T extends HasUuid>
     protected EntityCodex()
     {
         this.properties = FlatPackCollections.listForAny();
+        this.properties.add( new Property<T, UUID>( "uuid", new UUIDCodex() ) {
+
+            @Override
+            public UUID getValue( T object )
+            {
+                return object.getUuid();
+            }
+
+            @Override
+            public void setValue( T object, UUID value )
+            {
+                object.setUuid( value );
+            }
+        } );
         initProperties( properties );
     }
 

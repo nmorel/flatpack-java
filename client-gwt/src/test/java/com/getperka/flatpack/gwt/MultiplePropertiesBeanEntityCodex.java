@@ -11,7 +11,6 @@ import com.getperka.flatpack.gwt.codexes.BigDecimalCodex;
 import com.getperka.flatpack.gwt.codexes.BigIntegerCodex;
 import com.getperka.flatpack.gwt.codexes.BooleanCodex;
 import com.getperka.flatpack.gwt.codexes.ByteCodex;
-import com.getperka.flatpack.gwt.codexes.CharacterCodex;
 import com.getperka.flatpack.gwt.codexes.DoubleCodex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.codexes.EntityMapCodex;
@@ -248,34 +247,35 @@ public class MultiplePropertiesBeanEntityCodex
                 object.setBooleanBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Character>( "charPrimitive", new CharacterCodex(), true ) {
-
-            @Override
-            public Character getValue( MultiplePropertiesBean object )
-            {
-                return object.getCharPrimitive();
-            }
-
-            @Override
-            public void setValue( MultiplePropertiesBean object, Character value )
-            {
-                object.setCharPrimitive( value );
-            }
-        } );
-        properties.add( new Property<MultiplePropertiesBean, Character>( "charBoxed", new CharacterCodex() ) {
-
-            @Override
-            public Character getValue( MultiplePropertiesBean object )
-            {
-                return object.getCharBoxed();
-            }
-
-            @Override
-            public void setValue( MultiplePropertiesBean object, Character value )
-            {
-                object.setCharBoxed( value );
-            }
-        } );
+        // properties.add( new Property<MultiplePropertiesBean, Character>( "charPrimitive", new CharacterCodex(), true
+        // ) {
+        //
+        // @Override
+        // public Character getValue( MultiplePropertiesBean object )
+        // {
+        // return object.getCharPrimitive();
+        // }
+        //
+        // @Override
+        // public void setValue( MultiplePropertiesBean object, Character value )
+        // {
+        // object.setCharPrimitive( value );
+        // }
+        // } );
+        // properties.add( new Property<MultiplePropertiesBean, Character>( "charBoxed", new CharacterCodex() ) {
+        //
+        // @Override
+        // public Character getValue( MultiplePropertiesBean object )
+        // {
+        // return object.getCharBoxed();
+        // }
+        //
+        // @Override
+        // public void setValue( MultiplePropertiesBean object, Character value )
+        // {
+        // object.setCharBoxed( value );
+        // }
+        // } );
         properties.add( new Property<MultiplePropertiesBean, BigInteger>( "bigInteger", new BigIntegerCodex() ) {
 
             @Override
