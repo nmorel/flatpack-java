@@ -1,24 +1,21 @@
 package com.getperka.flatpack.gwt;
 
+import java.util.Map;
+
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
+import com.getperka.flatpack.gwt.ext.BaseTypeContext;
 
 public class MockTypeContext
-    implements TypeContext
+    extends BaseTypeContext
 {
 
     @Override
-    public Class<? extends HasUuid> getClass( String simplePayloadName )
+    protected void init( Map<String, Class<? extends HasUuid>> classes,
+                         Map<Class<? extends HasUuid>, EntityCodex<? extends HasUuid>> codexes )
     {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends HasUuid> EntityCodex<T> getCodex( Class<? extends T> clazz )
-    {
-        // TODO Auto-generated method stub
-        return null;
+        classes.put( "multiplePropertiesBean", MultiplePropertiesBean.class );
+        codexes.put( MultiplePropertiesBean.class, new MultiplePropertiesBeanEntityCodex() );
     }
 
 }

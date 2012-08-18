@@ -179,6 +179,7 @@ public abstract class EntityCodex<T extends HasUuid>
         }
         catch ( Exception e )
         {
+            System.out.println(simplePropertyName);
             context.fail( e );
         }
         finally

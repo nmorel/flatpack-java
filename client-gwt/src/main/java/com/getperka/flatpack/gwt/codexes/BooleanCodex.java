@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Support for boolean values.
@@ -48,8 +47,18 @@ public class BooleanCodex
     @Override
     public Boolean readNotNull( Object element, DeserializationContext context )
     {
-        // TODO test
-        return readBoolean( (JavaScriptObject) element );
+        if ( element instanceof Boolean )
+        {
+            return (Boolean) element;
+        }
+        else if ( element instanceof Double )
+        {
+            return ( (Double) element ).intValue() != 0;
+        }
+        else
+        {
+            throw new IllegalArgumentException( "element is not a Boolean : " + element.getClass().getName() );
+        }
     }
 
     @Override

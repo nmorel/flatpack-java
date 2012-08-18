@@ -9,6 +9,7 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
+import com.getperka.flatpack.gwt.ext.TypeContext;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.client.JsonUtils;
@@ -52,7 +53,7 @@ public class Unpacker
             return toReturn;
         }
 
-        JavaScriptObject value = extractResponse( asJso, context, entityData, toReturn );
+        Object value = extractResponse( asJso, context, entityData, toReturn );
 
         for ( Map.Entry<HasUuid, JavaScriptObject> entry : entityData.entrySet() )
         {
@@ -71,7 +72,7 @@ public class Unpacker
         return toReturn;
     }
 
-    private final native <T> JavaScriptObject extractResponse( JavaScriptObject object, DeserializationContext context,
+    private final native <T> Object extractResponse( JavaScriptObject object, DeserializationContext context,
                                                                Map<HasUuid, JavaScriptObject> entityData,
                                                                FlatPackEntity<T> toReturn )
     /*-{
@@ -129,7 +130,21 @@ public class Unpacker
         try
         {
             // Find the Codex for the requested entity type
-            EntityCodex<?> codex = typeContext.getCodex( typeContext.getClass( simpleName ) );
+            Class<? extends HasUuid> clazz = typeContext.getClass( simpleName );
+            if ( null == clazz )
+            {
+                logger.warning( "Could not find the class corresponding to '" + simpleName
+                    + "'. Did you configure the TypeContext ?" );
+                return;
+            }
+
+            EntityCodex<?> codex = typeContext.getCodex( clazz );
+            if ( null == codex )
+            {
+                logger.warning( "Could not find the entity codex corresponding to the class '" + clazz.getName()
+                    + "'. Did you configure the TypeContext ?" );
+                return;
+            }
 
             // Take the n-many property objects and stash them for later decoding
             for ( int i = 0; i < entityArray.length(); i++ )

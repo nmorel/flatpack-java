@@ -56,8 +56,16 @@ public abstract class Property<T, V>
     private boolean suppressDefaultValue;
     private boolean primitive;
 
-    public Property()
+    public Property( String name, Codex<V> codex )
     {
+        this( name, codex, false );
+    }
+
+    public Property( String name, Codex<V> codex, boolean primitive )
+    {
+        this.name = name;
+        this.codex = codex;
+        this.primitive = primitive;
     }
 
     public abstract V getValue( T object );
@@ -156,6 +164,11 @@ public abstract class Property<T, V>
     public void setName( String name )
     {
         this.name = name;
+    }
+
+    public void setCodex( Codex<V> codex )
+    {
+        this.codex = codex;
     }
 
     public void setSuppressDefaultValue( boolean suppressDefaultValue )

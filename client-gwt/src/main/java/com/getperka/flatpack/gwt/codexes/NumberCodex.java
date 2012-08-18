@@ -21,21 +21,17 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * Primitive numberic support.
+ * Primitive numeric support.
  *
  * @param <N> the boxed Number type
  */
-public class NumberCodex<N extends Number>
+public abstract class NumberCodex<N extends Number>
     extends ValueCodex<N>
 {
-    private final Class<N> clazz;
-
-    public NumberCodex( Class<N> clazz )
+    protected NumberCodex()
     {
-        this.clazz = clazz;
     }
 
     /**
@@ -48,50 +44,23 @@ public class NumberCodex<N extends Number>
         {
             return true;
         }
-        if ( Float.class.equals( clazz ) || Double.class.equals( clazz ) )
-        {
-            return value.doubleValue() == 0.0;
-        }
-        return value.intValue() == 0;
+        return isZeroValue( value );
     }
 
-    @SuppressWarnings( "unchecked" )
+    protected abstract boolean isZeroValue( N value );
+
     @Override
     public N readNotNull( Object element, DeserializationContext context )
+        throws Exception
     {
-        Object toReturn;
-        // TODO test
-        double value = readNumber( (JavaScriptObject) element );
-        if ( Byte.class.equals( clazz ) )
+        if ( !( element instanceof Double ) )
         {
-            toReturn = new Double( value ).byteValue();
+            throw new IllegalArgumentException( "element is not a Double : " + element.getClass().getName() );
         }
-        else if ( Double.class.equals( clazz ) )
-        {
-            toReturn = value;
-        }
-        else if ( Float.class.equals( clazz ) )
-        {
-            toReturn = new Float( value );
-        }
-        else if ( Integer.class.equals( clazz ) )
-        {
-            toReturn = new Integer( new Double( value ).intValue() );
-        }
-        else if ( Long.class.equals( clazz ) )
-        {
-            toReturn = new Long( new Double( value ).longValue() );
-        }
-        else if ( Short.class.equals( clazz ) )
-        {
-            toReturn = new Short( new Double( value ).shortValue() );
-        }
-        else
-        {
-            throw new UnsupportedOperationException( "Unimplemented Number type " + clazz.getName() );
-        }
-        return (N) toReturn;
+        return readDoubleNotNull( (Double) element );
     }
+
+    protected abstract N readDoubleNotNull( Double value );
 
     @Override
     public void writeNotNull( N object, SerializationContext context )

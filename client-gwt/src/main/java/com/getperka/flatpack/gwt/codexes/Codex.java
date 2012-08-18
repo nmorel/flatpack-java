@@ -51,8 +51,8 @@ public abstract class Codex<T>
     }
 
     /**
-     * Reify the given {@link Object} into a Java value. If {@code} element is {@null} or represents a
-     * Json {@code null} value, this method will return {@code null}, otherwise this method will delegate to
+     * Reify the given {@link Object} into a Java value. If {@code} element is {@null} or represents a Json
+     * {@code null} value, this method will return {@code null}, otherwise this method will delegate to
      * {@link #readNotNull(Object, DeserializationContext)}.
      *
      * @param element the element that contains the value to reify
@@ -177,24 +177,24 @@ public abstract class Codex<T>
     public abstract void writeNotNull( T object, SerializationContext context )
         throws Exception;
 
-    protected final native boolean readBoolean( JavaScriptObject jso )
-    /*-{
-		return jso === 1 || jso === "true";
-    }-*/;
-
     protected final native String readString( JavaScriptObject jso )
     /*-{
 		return jso;
     }-*/;
 
-    protected final native double readNumber( JavaScriptObject jso )
+    protected final native Object getObject( JavaScriptObject jso, String key )
     /*-{
-		return jso;
-    }-*/;
-
-    protected final native JavaScriptObject getObject( JavaScriptObject jso, String key )
-    /*-{
-		return jso[key];
+		var value = jso[key];
+		if (value === null) {
+			return null;
+		}
+		var typeValue = typeof (value);
+		if (typeValue == "number") {
+			return @java.lang.Double::valueOf(D)(value);
+		} else if (typeValue == "boolean") {
+			return @java.lang.Boolean::valueOf(Z)(value);
+		}
+		return value;
     }-*/;
 
     protected final native String getString( JavaScriptObject jso, String key )

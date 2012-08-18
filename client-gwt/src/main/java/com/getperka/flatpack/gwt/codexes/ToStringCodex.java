@@ -21,33 +21,35 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Attempts to handle any value-like object that has a public, one-arg constructor that accepts a String or an Object.
  */
-public class ToStringCodex<T>
+public abstract class ToStringCodex<T>
     extends ValueCodex<T>
 {
-    public interface Constructor<T>
+    protected ToStringCodex()
     {
-        T newInstance( String value );
-    }
-
-    private final Constructor<T> constructor;
-
-    public ToStringCodex( Constructor<T> constructor )
-    {
-        this.constructor = constructor;
     }
 
     @Override
     public T readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
-        // TODO
-        return constructor.newInstance( readString( (JavaScriptObject) element ) );
+        if ( !( element instanceof String ) )
+        {
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+        }
+        return createNewInstance( (String) element );
     }
+
+    /**
+     * Create a new instance
+     *
+     * @param value String value
+     * @return the new instance
+     */
+    protected abstract T createNewInstance( String value );
 
     @Override
     public void writeNotNull( T object, SerializationContext context )

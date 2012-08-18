@@ -21,7 +21,6 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Support for Strings.
@@ -36,8 +35,11 @@ public class StringCodex
     @Override
     public String readNotNull( Object element, DeserializationContext context )
     {
-        // TODO test we should get a String and not a JavascriptObject
-        return readString( (JavaScriptObject) element );
+        if ( !( element instanceof String ) )
+        {
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+        }
+        return (String) element;
     }
 
     @Override

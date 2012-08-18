@@ -21,6 +21,7 @@ package com.getperka.flatpack.demo.gwt;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -182,5 +183,74 @@ public class DemoResource
             map.put( product, product );
         }
         return map;
+    }
+
+    /**
+     * Return a map of products.
+     */
+    @GET
+    @Path( "single" )
+    @FlatPackResponse( Product.class )
+    public Product singleProductGet()
+    {
+        List<Product> products = productsGet();
+        if ( products == null || products.isEmpty() )
+        {
+            return null;
+        }
+        return products.get( 0 );
+    }
+
+    /**
+     * Return a map of products.
+     */
+    @GET
+    @Path( "void" )
+    @FlatPackResponse( Void.class )
+    public void voidGet()
+    {
+        return;
+    }
+
+    /**
+     * Return a map of products.
+     */
+    @GET
+    @Path( "boolean" )
+    @Produces( MediaType.TEXT_PLAIN )
+    public boolean booleanGet()
+    {
+        return true;
+    }
+
+    /**
+     * Return a map of products.
+     */
+    @GET
+    @Path( "multipleProperties" )
+    @FlatPackResponse( MultiplePropertiesBean.class )
+    public MultiplePropertiesBean multiplePropertiesGet()
+    {
+        MultiplePropertiesBean bean = new MultiplePropertiesBean();
+        bean.setString( "toto" );
+        bean.setBytePrimitive( new Integer( 34 ).byteValue() );
+        bean.setByteBoxed( new Integer( 87 ).byteValue() );
+        bean.setShortPrimitive( new Integer( 12 ).shortValue() );
+        bean.setShortBoxed( new Integer( 15 ).shortValue() );
+        bean.setIntPrimitive( 234 );
+        bean.setIntBoxed( 456 );
+        bean.setLongPrimitive( 1234l );
+        bean.setLongBoxed( 34567l );
+        bean.setDoublePrimitive( 126.23 );
+        bean.setDoubleBoxed( 1256.98 );
+        bean.setFloatPrimitive( 12.89f );
+        bean.setFloatBoxed( 67.3f );
+        bean.setBigDecimal( new BigDecimal( "12345678987654.456789" ) );
+        bean.setBigInteger( new BigInteger( "123456789098765432345678987654" ) );
+        bean.setBooleanPrimitive( true );
+        bean.setBooleanBoxed( false );
+        // bean.setCharPrimitive( '\u00e7' );
+        // bean.setCharBoxed( '\u00e8' );
+        return bean;
     }
 }
