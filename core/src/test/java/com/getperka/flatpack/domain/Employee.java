@@ -19,10 +19,13 @@
  */
 package com.getperka.flatpack.domain;
 
+import javax.annotation.security.PermitAll;
+
 import com.getperka.flatpack.PostUnpack;
 import com.getperka.flatpack.PreUnpack;
 import com.google.gson.JsonObject;
 
+@PermitAll
 public class Employee extends Person {
   private int employeeNumber;
   public boolean employeePreUnpack;

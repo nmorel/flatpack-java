@@ -17,25 +17,28 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
-import com.getperka.flatpack.TypeSource;
+/**
+ * A capability interface for entity types that implement dirty-tracking.
+ */
+public interface PersistenceAware extends HasUuid {
+  /**
+   * Returns names of the properties of the object that should be serialized, assuming the server
+   * has prior knowledge of the entity.
+   */
+  Set<String> dirtyPropertyNames();
 
-public class TestTypeSource implements TypeSource {
-  private final Set<Class<?>> types;
+  /**
+   * Called by the entity deserialization when the incoming payload indicates that the entity has
+   * been persisted on the other side of the connection.
+   */
+  void markPersistent();
 
-  public TestTypeSource() {
-    types = new LinkedHashSet<Class<?>>(Arrays.<Class<?>> asList(
-        Employee.class, Manager.class, PersistentEmployee.class, Person.class));
-  }
-
-  @Override
-  public Set<Class<?>> getTypes() {
-    return types;
-  }
-
+  /**
+   * Returns {@code true} if the entity was persisted on the other side of the connection.
+   */
+  boolean wasPersistent();
 }

@@ -55,7 +55,11 @@ public class Packer {
   @FlatPackLogger
   private Logger logger;
   @Inject
+  private Provider<EntityCodex<EntityMetadata>> metadataCodex;
+  @Inject
   private PackScope packScope;
+  @Inject
+  private PersistenceMapper persistenceMapper;
   @Inject
   private TypeContext typeContext;
   @Inject
@@ -64,7 +68,7 @@ public class Packer {
   @PrettyPrint
   private boolean prettyPrint;
 
-  Packer() {}
+  protected Packer() {}
 
   /**
    * Write the given entity into a {@link Writer}.
@@ -88,13 +92,24 @@ public class Packer {
     }
   }
 
-  private Map<Class<? extends HasUuid>, List<HasUuid>> collate(
-      Set<HasUuid> entities) {
+  /**
+   * Creates a map representing the {@code data} payload structure from an assortment of entities.
+   * This method also filters out persistent objects that do not have any local mutations.
+   */
+  private Map<Class<? extends HasUuid>, List<HasUuid>> collate(Set<HasUuid> entities) {
     Map<Class<? extends HasUuid>, List<HasUuid>> toReturn = FlatPackCollections
         .mapForIteration();
 
     for (HasUuid entity : entities) {
       Class<? extends HasUuid> key = entity.getClass();
+
+      // Ignore any dirty-tracking entity with no mutations
+      if (entity instanceof PersistenceAware) {
+        PersistenceAware maybeDirty = (PersistenceAware) entity;
+        if (maybeDirty.wasPersistent() && maybeDirty.dirtyPropertyNames().isEmpty()) {
+          continue;
+        }
+      }
 
       List<HasUuid> list = toReturn.get(key);
       if (list == null) {
@@ -147,6 +162,8 @@ public class Packer {
       json.endObject(); // errors
     }
 
+    List<HasUuid> persistent = FlatPackCollections.listForAny();
+
     // data : { 'type' : [ { ... }, { ... } ], 'otherType' : [ { ... }, { ... } ] }
     json.name("data");
     json.beginObject();
@@ -159,11 +176,28 @@ public class Packer {
       json.name(typeContext.getPayloadName(entry.getKey()));
       json.beginArray();
       for (HasUuid toWrite : entry.getValue()) {
+        if (persistenceMapper.isPersisted(toWrite)) {
+          persistent.add(toWrite);
+        }
         entityCodex.writeProperties(toWrite, context);
       }
       json.endArray();
     }
     json.endObject(); // data
+
+    // Write metadata for any entities
+    if (!persistent.isEmpty()) {
+      EntityCodex<EntityMetadata> metaCodex = metadataCodex.get();
+      json.name("metadata");
+      json.beginArray();
+      for (HasUuid toWrite : persistent) {
+        EntityMetadata meta = new EntityMetadata();
+        meta.setPersistent(true);
+        meta.setUuid(toWrite.getUuid());
+        metaCodex.writeProperties(meta, context);
+      }
+      json.endArray(); // metadata
+    }
 
     // Write extra top-level data keys, which are only used for simple side-channel data
     for (Map.Entry<String, String> entry : entity.getExtraData().entrySet()) {

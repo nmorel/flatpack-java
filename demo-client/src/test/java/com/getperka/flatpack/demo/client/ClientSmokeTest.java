@@ -152,8 +152,7 @@ public class ClientSmokeTest {
     p = new Product();
     p.setUuid(uuid);
     p.setPrice(BigDecimal.valueOf(1));
-    api.productsPut(Collections.singletonList(p))
-        .execute();
+    api.productsPut(Collections.singletonList(p)).execute();
 
     // Verify that nothing changed, as nobody
     List<Product> products = api.productsGet().execute().getValue();
@@ -189,8 +188,8 @@ public class ClientSmokeTest {
    */
   @Test
   public void testSimpleGetAndPut() throws IOException {
-    List<Product> product = api.productsGet().execute().getValue();
-    assertEquals(0, product.size());
+    List<Product> products = api.productsGet().execute().getValue();
+    assertEquals(0, products.size());
 
     // A server error would be reported as a StatusCodeException, a subclass of IOException
     api.productsPut(Arrays.asList(makeProduct(), makeProduct()))
@@ -207,10 +206,26 @@ public class ClientSmokeTest {
      * FlatPackEntity describing the response, and getValue() returns the primary value object
      * contained in the payload.
      */
-    product = api.productsGet().execute().getValue();
-    assertEquals(2, product.size());
-    assertEquals(BigDecimal.valueOf(360), product.get(0).getPrice());
-    assertEquals(BigDecimal.valueOf(948), product.get(1).getPrice());
+    FlatPackEntity<List<Product>> entity = api.productsGet().execute();
+    assertTrue(entity.getExtraErrors().toString(), entity.getExtraErrors().isEmpty());
+    assertTrue(entity.getExtraWarnings().toString(), entity.getExtraWarnings().isEmpty());
+    products = entity.getValue();
+    assertEquals(2, products.size());
+    assertEquals(BigDecimal.valueOf(360), products.get(0).getPrice());
+    assertEquals(BigDecimal.valueOf(948), products.get(1).getPrice());
+    assertTrue(products.get(0).wasPersistent());
+    assertTrue(products.get(1).wasPersistent());
+
+    // Try to update one of the objects
+    Product p = products.get(0);
+    p.setPrice(BigDecimal.valueOf(99));
+    assertEquals(Collections.singleton("price"), p.dirtyPropertyNames());
+    api.productsPut(Collections.singletonList(p)).queryParameter("isAdmin", "true").execute();
+
+    // Re-fetch and verify update
+    products = api.productsGet().execute().getValue();
+    assertEquals(99, products.get(0).getPrice().intValue());
+    assertTrue(products.get(0).dirtyPropertyNames().isEmpty());
   }
 
   private Product makeProduct() {

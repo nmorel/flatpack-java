@@ -17,27 +17,24 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.domain;
+package com.getperka.flatpack.collections;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
-import javax.annotation.security.PermitAll;
+/**
+ * A simple flag interface that allows the dirty-tracking collections to signal that they have been
+ * mutated by adding a string value to a collection.
+ */
+public class DirtyFlag {
+  private final Collection<String> accumulator;
+  private final String property;
 
-import com.getperka.flatpack.SparseCollection;
-
-@PermitAll
-public class Manager extends Person {
-  private List<Employee> employees = new ArrayList<Employee>();
-
-  Manager() {}
-
-  @SparseCollection("manager")
-  public List<Employee> getEmployees() {
-    return employees;
+  public DirtyFlag(Collection<String> accumulator, String property) {
+    this.accumulator = accumulator;
+    this.property = property;
   }
 
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
+  public void set() {
+    accumulator.add(property);
   }
 }

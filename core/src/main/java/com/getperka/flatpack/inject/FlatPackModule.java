@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.Packer;
+import com.getperka.flatpack.PersistenceMapper;
 import com.getperka.flatpack.RoleMapper;
 import com.getperka.flatpack.TraversalMode;
 import com.getperka.flatpack.Unpacker;
@@ -162,6 +163,14 @@ public class FlatPackModule extends PrivateModule {
     } else {
       bind(EntityResolver.class)
           .toInstance(new CompositeEntityResolver(configuration.getEntityResolvers()));
+    }
+
+    // PersistenceMapper
+    if (configuration.getPersistenceMappers().size() == 1) {
+      bind(PersistenceMapper.class).toInstance(configuration.getPersistenceMappers().get(0));
+    } else {
+      bind(PersistenceMapper.class)
+          .toInstance(new CompositePersistenceMapper(configuration.getPersistenceMappers()));
     }
 
     // PrincipalMapper
