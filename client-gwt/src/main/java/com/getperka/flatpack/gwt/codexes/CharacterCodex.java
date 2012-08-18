@@ -33,6 +33,12 @@ public class CharacterCodex
     }
 
     @Override
+    public boolean isDefaultValue( Character value )
+    {
+        return null == value || '\u0000' == value;
+    }
+
+    @Override
     public Character readNotNull( Object element, DeserializationContext context )
     {
         if ( !( element instanceof String ) )
