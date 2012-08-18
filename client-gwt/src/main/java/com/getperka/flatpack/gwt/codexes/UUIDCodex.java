@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Support for UUID.
@@ -39,8 +38,11 @@ public class UUIDCodex
     @Override
     public UUID readNotNull( Object element, DeserializationContext context )
     {
-        // TODO test
-        return UUID.fromString( readString( (JavaScriptObject) element ) );
+        if ( !( element instanceof String ) )
+        {
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+        }
+        return UUID.fromString( (String) element );
     }
 
     @Override

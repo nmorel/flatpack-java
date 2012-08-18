@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.gwt.JsonWriter;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
@@ -40,10 +41,16 @@ public abstract class EntityCodex<T extends HasUuid>
 
     protected EntityCodex()
     {
-        this.properties = getProperties();
+        this.properties = FlatPackCollections.listForAny();
+        initProperties( properties );
     }
 
-    protected abstract List<Property<T, ?>> getProperties();
+    /**
+     * Initialize the list of properties
+     *
+     * @param properties the list of properties to fill
+     */
+    protected abstract void initProperties( List<Property<T, ?>> properties );
 
     /**
      * Performs a minimal amount of work to create an empty stub object to fill in later.
@@ -179,7 +186,7 @@ public abstract class EntityCodex<T extends HasUuid>
         }
         catch ( Exception e )
         {
-            System.out.println(simplePropertyName);
+            System.out.println( simplePropertyName );
             context.fail( e );
         }
         finally

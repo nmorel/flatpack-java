@@ -21,7 +21,6 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Enum support.
@@ -41,8 +40,11 @@ public class EnumCodex<E extends Enum<E>>
     @Override
     public E readNotNull( Object element, DeserializationContext context )
     {
-        // TODO test
-        return Enum.valueOf( clazz, readString( (JavaScriptObject) element ) );
+        if ( !( element instanceof String ) )
+        {
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+        }
+        return Enum.valueOf( clazz, (String) element );
     }
 
     @Override

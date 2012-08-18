@@ -23,10 +23,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -45,6 +48,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Providers;
+
+import org.joda.time.LocalDateTime;
 
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
@@ -232,6 +237,7 @@ public class DemoResource
     public MultiplePropertiesBean multiplePropertiesGet()
     {
         MultiplePropertiesBean bean = new MultiplePropertiesBean();
+        bean.setUuid( UUID.fromString( "15a1bf22-f764-4e4e-abc2-81146df9f54f" ) );
         bean.setString( "toto" );
         bean.setBytePrimitive( new Integer( 34 ).byteValue() );
         bean.setByteBoxed( new Integer( 87 ).byteValue() );
@@ -249,8 +255,37 @@ public class DemoResource
         bean.setBigInteger( new BigInteger( "123456789098765432345678987654" ) );
         bean.setBooleanPrimitive( true );
         bean.setBooleanBoxed( false );
+        bean.setEnumProperty( TestEnum.FOUR );
+        bean.setUuidProperty( UUID.fromString( "99999999-9999-9999-9999-999999999999" ) );
         // bean.setCharPrimitive( '\u00e7' );
         // bean.setCharBoxed( '\u00e8' );
+
+        ChildBean child1 = new ChildBean();
+        child1.setUuid( UUID.fromString( "4de76f27-2bed-49d3-b624-4b0697cfc53f" ) );
+        child1.setChild( "child1" );
+
+        ChildBean child2 = new ChildBean();
+        child2.setUuid( UUID.fromString( "e3aa7750-21f0-410c-a228-e48bd1ee6ff9" ) );
+        child2.setChild( "child2" );
+
+        bean.setSingleEntity( child2 );
+        bean.setListEntity( Arrays.asList( child2, child1 ) );
+        bean.setSetEntity( new HashSet<ChildBean>( bean.getListEntity() ) );
+        bean.setArrayEntity( new ChildBean[] { child1, child2 } );
+
+        Map<String, ChildBean> mapStringToEntity = new HashMap<String, ChildBean>();
+        mapStringToEntity.put( child1.getChild(), child1 );
+        mapStringToEntity.put( child2.getChild(), child2 );
+        bean.setMapStringToEntity( mapStringToEntity );
+
+        Map<ChildBean, String> mapEntityToString = new HashMap<ChildBean, String>();
+        mapEntityToString.put( child1, child1.getChild() );
+        mapEntityToString.put( child2, child2.getChild() );
+        bean.setMapEntityToString( mapEntityToString );
+
+        bean.setDateJdk( new Date( new Date( 112, 7, 18, 15, 45, 56 ).getTime() + 543 ) );
+        bean.setDateJoda( new LocalDateTime( 2011, 3, 14, 21, 56, 23, 996 ) );
+
         return bean;
     }
 }

@@ -51,8 +51,12 @@ public class StringMapCodex<V>
     @Override
     public Map<String, V> readNotNull( Object element, DeserializationContext context )
     {
+        if ( !( element instanceof JavaScriptObject ) )
+        {
+            throw new IllegalArgumentException( "element is not a JavaScriptObject : " + element.getClass().getName() );
+        }
+
         Map<String, V> toReturn = FlatPackCollections.mapForIteration();
-        // TODO test
         iterate( (JavaScriptObject) element, toReturn, context );
         return toReturn;
     }
@@ -60,14 +64,14 @@ public class StringMapCodex<V>
     private final native void iterate( JavaScriptObject element, Map<String, V> toReturn, DeserializationContext context )
     /*-{
 		for ( var key in element) {
-			if (data.hasOwnProperty(key)) {
-				var object = data[key];
-				this.@com.getperka.flatpack.gwt.codexes.StringMapCodex::readObject(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;Ljava/util/Map;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(key, object, toReturn, context);
+			if (element.hasOwnProperty(key)) {
+				var object = element[key];
+				this.@com.getperka.flatpack.gwt.codexes.StringMapCodex::readObject(Ljava/lang/String;Ljava/lang/Object;Ljava/util/Map;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(key, object, toReturn, context);
 			}
 		}
     }-*/;
 
-    private void readObject( String key, JavaScriptObject object, Map<String, V> toReturn,
+    private void readObject( String key, Object object, Map<String, V> toReturn,
                              DeserializationContext context )
     {
         context.pushPath( "[" + key + "]" );

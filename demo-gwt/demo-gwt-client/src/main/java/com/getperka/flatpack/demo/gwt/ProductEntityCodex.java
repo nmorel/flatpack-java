@@ -1,15 +1,12 @@
 package com.getperka.flatpack.demo.gwt;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.getperka.flatpack.gwt.codexes.BigDecimalCodex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.codexes.StringCodex;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.Property;
-import com.google.gwt.core.client.JavaScriptObject;
 
 public class ProductEntityCodex
     extends EntityCodex<Product>
@@ -20,9 +17,8 @@ public class ProductEntityCodex
     }
 
     @Override
-    protected List<Property<Product, ?>> getProperties()
+    protected void initProperties( List<Property<Product, ?>> properties )
     {
-        List<Property<Product, ?>> properties = new ArrayList<Property<Product, ?>>();
         Property<Product, String> name = new Property<Product, String>( "name", new StringCodex() ) {
 
             @Override
@@ -70,7 +66,6 @@ public class ProductEntityCodex
             }
         };
         properties.add( price );
-        return properties;
     }
 
     @Override
@@ -83,14 +78,6 @@ public class ProductEntityCodex
     protected Product createInstance()
     {
         return new Product();
-    }
-
-    @Override
-    public void readProperties( Product entity, JavaScriptObject entityAsJso, DeserializationContext context )
-    {
-        entity.setName( getString( entityAsJso, "name" ) );
-        entity.setNotes( getString( entityAsJso, "notes" ) );
-        entity.setPrice( new BigDecimal( getString( entityAsJso, "price" ) ) );
     }
 
 }

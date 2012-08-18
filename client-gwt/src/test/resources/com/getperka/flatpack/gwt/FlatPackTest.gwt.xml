@@ -13,4 +13,5 @@
   <set-property name="gwt.logging.firebugHandler" value="ENABLED" />
   <set-property name="gwt.logging.simpleRemoteHandler" value="DISABLED" />
 
+  <set-property name="user.agent" value="gecko1_8" />
 </module>

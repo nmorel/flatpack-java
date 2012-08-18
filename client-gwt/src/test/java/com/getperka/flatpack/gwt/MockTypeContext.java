@@ -16,6 +16,9 @@ public class MockTypeContext
     {
         classes.put( "multiplePropertiesBean", MultiplePropertiesBean.class );
         codexes.put( MultiplePropertiesBean.class, new MultiplePropertiesBeanEntityCodex() );
+
+        classes.put( "childBean", ChildBean.class );
+        codexes.put( ChildBean.class, new ChildBeanEntityCodex() );
     }
 
 }

@@ -54,8 +54,12 @@ public class EntityMapCodex<K extends HasUuid, V>
     public Map<K, V> readNotNull( Object element, DeserializationContext context )
         throws IOException
     {
+        if ( !( element instanceof JavaScriptObject ) )
+        {
+            throw new IllegalArgumentException( "element is not a JavaScriptObject : " + element.getClass().getName() );
+        }
+
         Map<K, V> toReturn = FlatPackCollections.mapForIteration();
-        // TODO test
         iterate( (JavaScriptObject) element, toReturn, context );
         return toReturn;
     }
@@ -63,20 +67,19 @@ public class EntityMapCodex<K extends HasUuid, V>
     private final native void iterate( JavaScriptObject element, Map<K, V> toReturn, DeserializationContext context )
     /*-{
 		for ( var key in element) {
-			if (data.hasOwnProperty(key)) {
-				var object = data[key];
-				this.@com.getperka.flatpack.gwt.codexes.EntityMapCodex::readObject(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;Lcom/google/gwt/core/client/JavaScriptObject;Ljava/util/Map;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(key, key, object, toReturn, context);
+			if (element.hasOwnProperty(key)) {
+				var object = element[key];
+				this.@com.getperka.flatpack.gwt.codexes.EntityMapCodex::readObject(Ljava/lang/String;Ljava/lang/Object;Ljava/util/Map;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(key, object, toReturn, context);
 			}
 		}
     }-*/;
 
-    private void readObject( String keyAsString, JavaScriptObject keyAsObject, JavaScriptObject valueObject,
-                             Map<K, V> toReturn, DeserializationContext context )
+    private void readObject( String keyAsString, Object valueObject, Map<K, V> toReturn, DeserializationContext context )
     {
         context.pushPath( "." + keyAsString );
         try
         {
-            K key = keyCodex.read( keyAsObject, context );
+            K key = keyCodex.read( keyAsString, context );
             V value = valueCodex.read( valueObject, context );
             toReturn.put( key, value );
         }

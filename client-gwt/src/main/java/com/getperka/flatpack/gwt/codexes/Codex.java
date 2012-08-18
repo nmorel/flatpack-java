@@ -177,11 +177,6 @@ public abstract class Codex<T>
     public abstract void writeNotNull( T object, SerializationContext context )
         throws Exception;
 
-    protected final native String readString( JavaScriptObject jso )
-    /*-{
-		return jso;
-    }-*/;
-
     protected final native Object getObject( JavaScriptObject jso, String key )
     /*-{
 		var value = jso[key];

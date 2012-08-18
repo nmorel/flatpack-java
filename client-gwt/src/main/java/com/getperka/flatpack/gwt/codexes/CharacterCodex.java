@@ -21,36 +21,35 @@ package com.getperka.flatpack.gwt.codexes;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
-import com.google.gwt.core.client.JavaScriptObject;
 
 /**
- * A pass-through codex to allow raw access to JSON payloads.
+ * Support for Character.
  */
-public class JsonElementCodex
-    extends ValueCodex<JavaScriptObject>
+public class CharacterCodex
+    extends ValueCodex<Character>
 {
-    public JsonElementCodex()
+    public CharacterCodex()
     {
     }
 
     @Override
-    public JavaScriptObject readNotNull( Object element, DeserializationContext context )
+    public Character readNotNull( Object element, DeserializationContext context )
     {
-        if ( !( element instanceof JavaScriptObject ) )
+        if ( !( element instanceof String ) )
         {
-            throw new IllegalArgumentException( "element is not a JavaScriptObject : " + element.getClass().getName() );
+            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
         }
-        return (JavaScriptObject) element;
+        String string = (String) element;
+        if ( string.length() != 1 )
+        {
+            throw new IllegalArgumentException( "Can't convert the string '" + string + "' to a character" );
+        }
+        return string.charAt( 0 );
     }
 
     @Override
-    public void writeNotNull( JavaScriptObject object, SerializationContext context )
+    public void writeNotNull( Character object, SerializationContext context )
     {
-        context.getWriter().value( stringify( object ) );
+        context.getWriter().value( object.toString() );
     }
-
-    private final native String stringify( JavaScriptObject object )
-    /*-{
-		return JSON.stringify(object);
-    }-*/;
 }
