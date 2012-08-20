@@ -62,16 +62,14 @@ class ImpliedPropertySetter implements Callable<Void> {
       Collection<Object> collection = null;
 
       /*
-       * If the value has already been modified by a (partial) property entry in the entity's data
-       * block or by a previous ImpliedPropertySetter, retrieve the collection and update it.
-       * Otherwise, reset the value.
+       * Update implied collections in-place. If the incoming payload had an explicit value for the
+       * collection property, it will have been reset to a new collection instance already.
        */
-      if (context.getModifiedProperties(entity).contains(toSet)) {
-        @SuppressWarnings("unchecked")
-        Collection<Object> temp = (Collection<Object>) toSet.getGetter().invoke(target);
-        collection = temp;
-      }
+      @SuppressWarnings("unchecked")
+      Collection<Object> temp = (Collection<Object>) toSet.getGetter().invoke(target);
+      collection = temp;
 
+      // Create a new collection as necessary
       if (collection == null) {
         if (Set.class.isAssignableFrom(type)) {
           collection = FlatPackCollections.setForIteration();
@@ -81,6 +79,7 @@ class ImpliedPropertySetter implements Callable<Void> {
         toSet.getSetter().invoke(target, collection);
         context.addModified(entity, toSet);
       }
+      // We can't assume much about the collection's behavior
       if (!collection.contains(value)) {
         collection.add(value);
       }
