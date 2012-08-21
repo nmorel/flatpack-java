@@ -66,6 +66,8 @@ public class DefaultCodexMapper implements CodexMapper {
 
     simpleCodexes.put(boolean.class, injector.getInstance(BooleanCodex.class));
     simpleCodexes.put(Boolean.class, injector.getInstance(BooleanCodex.class));
+    simpleCodexes.put(char.class, injector.getInstance(CharacterCodex.class));
+    simpleCodexes.put(Character.class, injector.getInstance(CharacterCodex.class));
     simpleCodexes.put(Class.class, injector.getInstance(HasUuidClassCodex.class));
     simpleCodexes.put(DateTimeZone.class, injector.getInstance(DateTimeZoneCodex.class));
     simpleCodexes.put(JsonElement.class, injector.getInstance(JsonElementCodex.class));
@@ -139,6 +141,11 @@ public class DefaultCodexMapper implements CodexMapper {
       } else if (String.class.equals(params[0])) {
         return getInstance(StringMapCodex.class, params[1]);
       }
+    }
+
+    // java.util.Date and subtypes
+    if (java.util.Date.class.isAssignableFrom(erased)) {
+      return getInstance(DateCodex.class, erased);
     }
 
     /*

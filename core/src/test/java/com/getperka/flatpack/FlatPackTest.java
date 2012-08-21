@@ -167,19 +167,7 @@ public abstract class FlatPackTest {
     return serializationContext(FlatPackEntity.nullResponse(), out);
   }
 
-  /**
-   * Performs an encode/decode operation.
-   */
-  protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value) {
-    return testCodex(codexType, value, null);
-  }
-
-  /**
-   * Performs an encode/decode operation, accumulating any scanned entities.
-   */
-  protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value, Set<HasUuid> scanned) {
-    Provider<? extends Codex<T>> codexes = injector.getProvider(Key.get(codexType));
-
+  protected <T> T testCodex(Provider<? extends Codex<T>> codexes, T value, Set<HasUuid> scanned) {
     // Just smoke-test the description
     assertNotNull(codexes.get().describe());
 
@@ -203,5 +191,20 @@ public abstract class FlatPackTest {
     } finally {
       closeContext();
     }
+  }
+
+  /**
+   * Performs an encode/decode operation.
+   */
+  protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value) {
+    return testCodex(codexType, value, null);
+  }
+
+  /**
+   * Performs an encode/decode operation, accumulating any scanned entities.
+   */
+  protected <T> T testCodex(TypeLiteral<? extends Codex<T>> codexType, T value, Set<HasUuid> scanned) {
+    Provider<? extends Codex<T>> codexes = injector.getProvider(Key.get(codexType));
+    return testCodex(codexes, value, scanned);
   }
 }
