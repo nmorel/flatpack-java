@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack;
+package com.getperka.flatpack.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

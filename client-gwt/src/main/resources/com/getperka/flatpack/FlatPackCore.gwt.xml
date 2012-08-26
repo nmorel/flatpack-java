@@ -3,5 +3,6 @@
 <module>
   <inherits name="com.google.gwt.user.User" />
 
+  <!-- Those classes are exact copies of the FlatPack core. -->
   <source path="" excludes="gwt"/>
 </module>

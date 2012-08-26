@@ -22,7 +22,7 @@ package com.getperka.flatpack.gwt.ext;
 import java.util.Comparator;
 import java.util.UUID;
 
-import com.getperka.flatpack.gwt.BaseHasUuid;
+import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.gwt.codexes.Codex;
 
 /**

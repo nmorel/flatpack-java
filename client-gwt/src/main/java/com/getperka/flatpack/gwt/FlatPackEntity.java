@@ -28,8 +28,9 @@ import java.util.TreeMap;
 
 import javax.validation.ConstraintViolation;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.TraversalMode;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Encapsulates a return value and an optional collection of extra entities to include in the payload.

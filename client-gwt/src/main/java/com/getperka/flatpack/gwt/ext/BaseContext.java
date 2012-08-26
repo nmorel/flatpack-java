@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.gwt.codexes.Codex;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Contains common data that affects the serialization process.

@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,29 +17,24 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.gwt.codexes;
+package com.getperka.flatpack.collections;
 
-import java.util.List;
-
-import com.getperka.flatpack.util.FlatPackCollections;
+import java.util.Collection;
 
 /**
- * List support.
- *
- * @param <V> the element type of the list
+ * A simple flag interface that allows the dirty-tracking collections to signal that they have been
+ * mutated by adding a string value to a collection.
  */
-public class ListCodex<V>
-    extends CollectionCodex<List<V>, V>
-{
+public class DirtyFlag {
+  private final Collection<String> accumulator;
+  private final String property;
 
-    public ListCodex( Codex<V> valueCodex )
-    {
-        super( valueCodex );
-    }
+  public DirtyFlag(Collection<String> accumulator, String property) {
+    this.accumulator = accumulator;
+    this.property = property;
+  }
 
-    @Override
-    protected List<V> newCollection()
-    {
-        return FlatPackCollections.listForAny();
-    }
+  public void set() {
+    accumulator.add(property);
+  }
 }

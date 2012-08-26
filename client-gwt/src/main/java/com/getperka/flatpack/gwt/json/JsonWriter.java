@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.json;
 
 import java.io.IOException;
 import java.util.ArrayList;

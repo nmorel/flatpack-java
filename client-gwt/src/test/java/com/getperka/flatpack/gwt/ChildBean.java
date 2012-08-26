@@ -1,5 +1,7 @@
 package com.getperka.flatpack.gwt;
 
+import com.getperka.flatpack.BaseHasUuid;
+
 public class ChildBean
     extends BaseHasUuid
 {

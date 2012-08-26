@@ -22,11 +22,11 @@ package com.getperka.flatpack.gwt.codexes;
 import java.io.IOException;
 import java.util.Map;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
-import com.getperka.flatpack.gwt.JsonWriter;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
+import com.getperka.flatpack.gwt.json.JsonWriter;
+import com.getperka.flatpack.util.FlatPackCollections;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.json;
 
 /**
  * Lexical scoping elements within a JSON reader or writer.

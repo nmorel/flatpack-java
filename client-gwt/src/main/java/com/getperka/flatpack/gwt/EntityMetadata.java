@@ -21,6 +21,7 @@ package com.getperka.flatpack.gwt;
 
 import java.util.List;
 
+import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.gwt.codexes.BooleanCodex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.Property;

@@ -21,7 +21,7 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.util.Set;
 
-import com.getperka.flatpack.FlatPackCollections;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Support for Sets.

@@ -21,9 +21,9 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.util.Collection;
 
-import com.getperka.flatpack.gwt.JsonWriter;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
+import com.getperka.flatpack.gwt.json.JsonWriter;
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**

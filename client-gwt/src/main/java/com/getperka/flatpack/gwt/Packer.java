@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import javax.validation.ConstraintViolation;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.PersistenceMapper;
@@ -17,6 +16,8 @@ import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
 import com.getperka.flatpack.gwt.ext.TypeContext;
+import com.getperka.flatpack.gwt.json.JsonWriter;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 public class Packer
 {

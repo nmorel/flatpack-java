@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Contains state relating to in-process deserialization.

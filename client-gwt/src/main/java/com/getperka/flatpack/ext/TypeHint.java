@@ -17,29 +17,27 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.gwt.codexes;
-
-import java.util.List;
-
-import com.getperka.flatpack.util.FlatPackCollections;
+package com.getperka.flatpack.ext;
 
 /**
- * List support.
- *
- * @param <V> the element type of the list
+ * Indicates how certain simple {@link JsonKind} types should be interpreted as more complex values.
+ * <p>
+ * <b>GWT Implementation : removed the static method. It is only used in consultation for the ApiDescription.</b>
+ * </p>
  */
-public class ListCodex<V>
-    extends CollectionCodex<List<V>, V>
+public class TypeHint
 {
 
-    public ListCodex( Codex<V> valueCodex )
+    private final String description;
+
+    private TypeHint( String description )
     {
-        super( valueCodex );
+        this.description = description;
     }
 
-    @Override
-    protected List<V> newCollection()
+    public String getValue()
     {
-        return FlatPackCollections.listForAny();
+        return description;
     }
+
 }

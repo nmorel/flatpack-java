@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,29 +17,16 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.gwt.codexes;
+package com.getperka.flatpack.collections;
 
-import java.util.List;
-
-import com.getperka.flatpack.util.FlatPackCollections;
+import java.util.Set;
 
 /**
- * List support.
- *
- * @param <V> the element type of the list
+ * A delegating {@link Set} implementation that will call {@link DirtyFlag#set()} when it is
+ * mutated.
  */
-public class ListCodex<V>
-    extends CollectionCodex<List<V>, V>
-{
-
-    public ListCodex( Codex<V> valueCodex )
-    {
-        super( valueCodex );
-    }
-
-    @Override
-    protected List<V> newCollection()
-    {
-        return FlatPackCollections.listForAny();
-    }
+public class DirtySet<T> extends DirtyCollection<T> implements Set<T> {
+  public DirtySet(Set<T> delegate, DirtyFlag dirty) {
+    super(delegate, dirty);
+  }
 }

@@ -22,10 +22,10 @@ package com.getperka.flatpack.gwt.ext;
 import java.util.Map;
 import java.util.Set;
 
-import com.getperka.flatpack.FlatPackCollections;
 import com.getperka.flatpack.HasUuid;
-import com.getperka.flatpack.gwt.JsonWriter;
-import com.getperka.flatpack.gwt.TraversalMode;
+import com.getperka.flatpack.TraversalMode;
+import com.getperka.flatpack.gwt.json.JsonWriter;
+import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
  * Holds all of the state necessary to perform a serialization.

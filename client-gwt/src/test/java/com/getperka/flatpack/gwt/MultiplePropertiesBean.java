@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.getperka.flatpack.BaseHasUuid;
+
 /**
  * An entity with multiple properties type to test the codex
  */

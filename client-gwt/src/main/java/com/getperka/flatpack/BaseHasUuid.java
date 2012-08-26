@@ -17,14 +17,15 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack;
 
 import java.util.UUID;
 
-import com.getperka.flatpack.HasUuid;
-
 /**
  * Utility base class that provides lazy UUID generation.
+ * <p>
+ * <b>GWT Implementation : removed the isAssignableFrom which is not supported by GWT</b>
+ * </p>
  */
 public class BaseHasUuid
     implements HasUuid
