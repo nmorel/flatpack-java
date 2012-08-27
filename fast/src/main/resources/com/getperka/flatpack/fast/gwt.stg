@@ -1,0 +1,244 @@
+/*
+ * #%L
+ * FlatPack Automatic Source Tool
+ * %%
+ * Copyright (C) 2012 Perka Inc.
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+entity(entity, packageName) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+<docString(entity.docString)>
+<entityDeclaration()> extends <entity.supertype> {
+
+  /**
+   * Returns the type name used to identify instances of <entity.simpleName> in a payload.
+   */
+  public static String typeName() {
+    return "<entity.payloadName>";
+  }
+
+  <entity.properties:field(); separator="\n">
+
+  <entity.properties:getter(); separator="\n">
+
+  <entity.properties:setter(); separator="\n">
+}
+>>
+
+/**
+ * Extracted to ease formatting.
+ */
+entityDeclaration() ::= <%
+<if(entity.baseType)>
+  abstract class <entity.simpleName>Base
+<else>
+  public class <entity.simpleName>
+<endif>
+%>
+
+enum(enum, packageName) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+<docString(enum.docString)>
+public enum <enum> {
+  <enum.enumValues:{x |<x>}; separator=",\n">;
+}
+>>
+
+field(property) ::= <%
+private <property.type> <property.getterName>;
+%>
+
+/**
+ * Emit a JavaDoc string, reflowed to fit the current context.
+ */
+docString(docString) ::= <<
+<if(docString)>/**
+ * <docString.chunks; wrap="\n * ", separator=" ">
+ */<endif>
+>>
+
+/*
+ * Generate a single getter.  If the property has documentation or special semantics, the
+ * JavaDoc comment or relevant annotation(s) will be emitted. Note that the property roles
+ * applied to the getter are reversed.
+ */
+getter(property) ::= <<
+<docString(property.docString)>
+public <property.type> get<property.getterName>() {
+  return this.<property.getterName>;
+}
+>>
+
+/**
+ * Generate a single property setter.  Again, note the reversal of the property roles.
+ */
+setter(property) ::= <<
+public void set<property.getterName>(<property.type> value) {
+  <if(entity.persistent)>
+  <names.DirtyFlag> flag = dirtyFlag("<property.name>");
+  flag.set();
+  this.<property.getterName> = <names.FlatPackCollections>.dirtyTracking(value, flag);
+  <else>
+  this.<property.getterName> = value;
+  <endif>
+}
+>>
+
+/**
+ * Generate the TypeContext implementation
+ */
+typeContext(allEntities, packageName, namePrefix) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+public class <namePrefix>TypeContext extends com.getperka.flatpack.gwt.ext.BaseTypeContext {
+
+  @Override
+  protected void init() {
+    <allEntities:typeContextEntity(); separator="\n">
+  }
+
+}
+>>
+
+/**
+ * Add an entity to TypeContext.
+ */
+typeContextEntity(entity) ::= <%
+add( <entity.simpleName>.typeName(), <entity.simpleName>.class, EntityCodexFactory.get().get<entity.simpleName>Codex() );
+%>
+
+/**
+ * Generate the EntityCodexFactory.
+ */
+entityCodexFactory(allEntities, packageName) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+import com.google.gwt.core.client.GWT;
+
+/**
+ * EntityCodexFactory used to get instance of all the EntityCodex. It's main purpose is to avoid infinite loop.
+ */
+public class EntityCodexFactory {
+
+  private static EntityCodexFactory INSTANCE;
+
+  public static EntityCodexFactory get()
+  {
+    if ( null == INSTANCE )
+    {
+      INSTANCE = GWT.create( EntityCodexFactory.class );
+    }
+    return INSTANCE;
+  }
+
+  <allEntities:factoryCodexField(); separator="\n">
+
+  <allEntities:factoryCodexGetter(); separator="\n\n">
+}
+>>
+
+/**
+ * Add a codex field to the EntityCodexFactory.
+ */
+factoryCodexField(entity) ::= <%
+private <entity.simpleName>Codex <entity.simpleName>Codex;
+%>
+
+/**
+ * Add a codex getter to the EntityCodexFactory.
+ */
+factoryCodexGetter(entity) ::= <<
+/**
+ * @return a <entity.simpleName>Codex
+ */
+public <entity.simpleName>Codex get<entity.simpleName>Codex() {
+  if(null == <entity.simpleName>Codex) {
+    <entity.simpleName>Codex = new <entity.simpleName>Codex();
+    <entity.simpleName>Codex.init();
+  }
+  return <entity.simpleName>Codex;
+}
+>>
+
+/**
+ * Generate an EntityCodex.
+ */
+entityCodex(entity, properties, packageName) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+import com.getperka.flatpack.gwt.codexes.*;
+
+/**
+ * EntityCodex for the entity {@link <entity.simpleName>}
+ */
+<entityCodexDeclaration()> extends EntityCodex\<<entity.simpleName>\> {
+
+  @Override
+  protected void initProperties( java.util.List\<com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, ?\>\> properties ) {
+
+    <properties:propertyCodex(entity); separator="\n\n">
+
+  }
+
+  @Override
+  public String getName() {
+    return <entity.simpleName>.typeName();
+  }
+
+  @Override
+  protected <entity.simpleName> createInstance()
+  {
+    return new <entity.simpleName>();
+  }
+
+}
+>>
+
+/**
+ * Extracted to ease formatting.
+ */
+entityCodexDeclaration() ::= <%
+<if(entity.baseType)>
+  abstract class <entity.simpleName>BaseCodex
+<else>
+  public class <entity.simpleName>Codex
+<endif>
+%>
+
+/*
+ * Generate a property for entity codex.
+ */
+propertyCodex(prop, entity) ::= <<
+// Property <prop.property.name>
+com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <prop.property.type>\> <prop.property.name>Property = new com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <prop.property.type>\>( "<prop.property.name>", <prop.codex> ) {
+  @Override
+  public <prop.property.type> getValue( <entity.simpleName> object ) {
+    return object.get<prop.property.getterName>();
+  }
+
+  @Override
+  public void setValue( <entity.simpleName> object, <prop.property.type> value ) {
+    object.set<prop.property.getterName>( value );
+  }
+};
+properties.add( <prop.property.name>Property );
+>>

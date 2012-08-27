@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -125,20 +125,20 @@ public class JavaDialect implements Dialect {
       Set.class, SparseCollection.class, SuppressDefaultValue.class, TypeReference.class,
       TypeSource.class);
 
-  private static String upcase(String typeName) {
+  protected static String upcase(String typeName) {
     return Character.toUpperCase(typeName.charAt(0)) + typeName.substring(1);
   }
 
-  private final Set<String> baseTypes = new HashSet<String>();
+  protected final Set<String> baseTypes = new HashSet<String>();
   private final Logger logger = LoggerFactory.getLogger(getClass());
   /**
    * Used at the end of the code-generation process to emit referenced enum values.
    */
-  private final Set<Type> usedEnums = new LinkedHashSet<Type>();
+  protected final Set<Type> usedEnums = new LinkedHashSet<Type>();
 
   @Override
   public void generate(ApiDescription api, File outputDir) throws IOException {
-    STGroup group = loadGroup();
+    STGroup group = loadGroup("java.stg");
     loadConcreteTypeMap();
 
     File packageDir = new File(outputDir, packageName.replace('.', '/'));
@@ -213,7 +213,7 @@ public class JavaDialect implements Dialect {
   /**
    * If {@value #concreteTypeMapFile} is defined, load the file into {@link #concreteTypeMap}.
    */
-  private void loadConcreteTypeMap() throws IOException {
+  protected void loadConcreteTypeMap() throws IOException {
     if (baseTypeArrayFile != null) {
       JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(
           baseTypeArrayFile), UTF8));
@@ -231,8 +231,8 @@ public class JavaDialect implements Dialect {
    * Load {@code java.stg} from the classpath and configure a number of model adaptors to add
    * virtual properties to the objects being rendered.
    */
-  private STGroup loadGroup() {
-    STGroup group = new STGroupFile(getClass().getResource("java.stg"), "UTF8", '<', '>');
+  protected STGroup loadGroup(String template) {
+    STGroup group = new STGroupFile(getClass().getResource(template), "UTF8", '<', '>');
     // EntityDescription are rendered as the FQN
     group.registerRenderer(EntityDescription.class, new AttributeRenderer() {
       @Override
@@ -533,7 +533,7 @@ public class JavaDialect implements Dialect {
     return group;
   }
 
-  private void render(ST enumST, File packageDir, String typeName) throws IOException {
+  protected void render(ST enumST, File packageDir, String typeName) throws IOException {
     Writer fileWriter = new OutputStreamWriter(
         new FileOutputStream(new File(packageDir, typeName + ".java")), UTF8);
     AutoIndentWriter writer = new AutoIndentWriter(fileWriter);

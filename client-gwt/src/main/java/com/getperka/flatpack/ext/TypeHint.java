@@ -30,12 +30,18 @@ public class TypeHint
 
     private final String description;
 
-    private TypeHint( String description )
+    public TypeHint( String description )
     {
         this.description = description;
     }
 
     public String getValue()
+    {
+        return description;
+    }
+
+    @Override
+    public String toString()
     {
         return description;
     }

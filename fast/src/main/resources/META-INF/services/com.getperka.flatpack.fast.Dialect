@@ -1,2 +1,3 @@
 com.getperka.flatpack.fast.JavaDialect
 com.getperka.flatpack.fast.RbDialect
+com.getperka.flatpack.fast.GwtDialect

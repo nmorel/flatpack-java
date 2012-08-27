@@ -39,7 +39,10 @@ public abstract class EntityCodex<T extends HasUuid>
 {
     private List<Property<T, ?>> properties;
 
-    protected EntityCodex()
+    /**
+     * Initialize the codex
+     */
+    public void init()
     {
         this.properties = FlatPackCollections.listForAny();
         this.properties.add( new Property<T, UUID>( "uuid", new UUIDCodex() ) {

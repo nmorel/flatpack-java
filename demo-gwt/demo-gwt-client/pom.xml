@@ -53,6 +53,30 @@
           <packagingExcludes>WEB-INF/**</packagingExcludes>
         </configuration>
       </plugin>
+      <!-- Automatic code generation of FlatPack API and model objects -->
+      <plugin>
+        <groupId>com.getperka.flatpack</groupId>
+        <artifactId>flatpack-fast-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <dialect>gwt</dialect>
+          <!-- This api.js file is the result of starting the demo server and running "curl localhost:8080/describe".
+            Making this process file-based keeps the build process hermetic. Making an outgoing connection to a server
+            would be convenient, but would cause flaky builds. -->
+          <source>src/main/flatpack/api.js</source>
+          <!-- This contains a list of type names that should be generated as a base type where a user-provided
+            concrete type provides extra convenience methods. -->
+          <!-- <baseTypes>src/main/flatpack/baseTypes.js</baseTypes> -->
+          <packageName>com.getperka.flatpack.demo.gwt.gen</packageName>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>fast</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
