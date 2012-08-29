@@ -29,6 +29,8 @@ import static com.getperka.flatpack.util.FlatPackTypes.getSingleParameterization
 import static com.getperka.flatpack.util.FlatPackTypes.instantiable;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,10 @@ public class DefaultCodexMapper implements CodexMapper {
   DefaultCodexMapper(Injector injector) {
     this.injector = injector;
 
+    simpleCodexes.put(BigDecimal.class, (NumberCodex<?>) injector.getInstance(
+        Key.get(createType(NumberCodex.class, BigDecimal.class))));
+    simpleCodexes.put(BigInteger.class, (NumberCodex<?>) injector.getInstance(
+        Key.get(createType(NumberCodex.class, BigInteger.class))));
     simpleCodexes.put(boolean.class, injector.getInstance(BooleanCodex.class));
     simpleCodexes.put(Boolean.class, injector.getInstance(BooleanCodex.class));
     simpleCodexes.put(char.class, injector.getInstance(CharacterCodex.class));
