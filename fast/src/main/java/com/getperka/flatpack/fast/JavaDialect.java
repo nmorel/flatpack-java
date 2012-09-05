@@ -86,6 +86,7 @@ import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
 import com.getperka.flatpack.util.FlatPackCollections;
 import com.getperka.flatpack.util.FlatPackTypes;
+import com.google.gson.JsonElement;
 import com.google.gson.stream.JsonReader;
 
 /**
@@ -257,7 +258,7 @@ public class JavaDialect implements Dialect {
       protected String toString(Type type) {
         switch (type.getJsonKind()) {
           case ANY:
-            return Object.class.getCanonicalName();
+            return JsonElement.class.getCanonicalName();
           case BOOLEAN:
             return Boolean.class.getCanonicalName();
           case DOUBLE:
