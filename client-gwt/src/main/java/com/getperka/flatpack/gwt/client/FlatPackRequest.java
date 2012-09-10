@@ -17,18 +17,19 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.client;
+package com.getperka.flatpack.gwt.client;
 
-import com.getperka.flatpack.FlatPackEntity;
+import com.getperka.flatpack.gwt.FlatPackEntity;
 
 /**
- * A specialization of {@link Request} that allows access to the {@link FlatPackEntity} that will be
- * sent to the server.
+ * A specialization of {@link Request} that allows access to the {@link FlatPackEntity} that will be sent to the server.
  *
  * @param <R> the Request type
- * @param <X> the type of data contained in the FlatPackEntity
+ * @param <S> the type of data sent
+ * @param <X> the type of data returned
  */
-public interface FlatPackRequest<R extends FlatPackRequest<R, X>, X> extends
-    Request<R, FlatPackEntity<X>> {
-  FlatPackEntity<X> peek();
+public interface FlatPackRequest<R extends FlatPackRequest<R, S, X>, S, X>
+    extends Request<R, S, FlatPackEntity<X>>
+{
+    FlatPackEntity<S> peek();
 }

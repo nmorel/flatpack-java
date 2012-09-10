@@ -17,18 +17,29 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.client;
+package com.getperka.flatpack.gwt.client;
 
-import com.getperka.flatpack.FlatPackEntity;
+import java.util.logging.Logger;
 
 /**
- * A specialization of {@link Request} that allows access to the {@link FlatPackEntity} that will be
- * sent to the server.
- *
- * @param <R> the Request type
- * @param <X> the type of data contained in the FlatPackEntity
+ * A base interface for generated FlatPack API accessors.
  */
-public interface FlatPackRequest<R extends FlatPackRequest<R, X>, X> extends
-    Request<R, FlatPackEntity<X>> {
-  FlatPackEntity<X> peek();
+public interface Api
+{
+
+    /**
+     * Retrieve the base URI used to access the server.
+     */
+    String getServerBase();
+
+    /**
+     * Set the base URI used to access the server.
+     */
+    void setServerBase( String serverBase );
+
+    /**
+     * Enable verbose output via a {@link Logger}.
+     */
+    void setVerbose( boolean verbose );
+
 }

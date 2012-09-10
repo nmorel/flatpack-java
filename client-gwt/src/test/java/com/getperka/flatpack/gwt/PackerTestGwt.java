@@ -83,9 +83,8 @@ public class PackerTestGwt
         FlatPackEntity<MultiplePropertiesBean> entity = new FlatPackEntity<MultiplePropertiesBean>();
         entity.withValue( bean );
 
-        StringBuilder out = new StringBuilder();
-        packer.pack( out, entity, new MultiplePropertiesBeanEntityCodex() );
+        String out = packer.pack( entity, new MultiplePropertiesBeanEntityCodex() );
 
-        assertEquals( singleMultiplePropertiesBeanResponse, out.toString() );
+        assertEquals( singleMultiplePropertiesBeanResponse, out );
     }
 }

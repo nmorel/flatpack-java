@@ -47,9 +47,9 @@ public class Packer
         };
     }
 
-    public <T> String pack( StringBuilder out, FlatPackEntity<T> entity, Codex<T> codex )
+    public <T> String pack( FlatPackEntity<T> entity, Codex<T> codex )
     {
-        SerializationContext context = new SerializationContext( new JsonWriter( out ) );
+        SerializationContext context = new SerializationContext( new JsonWriter( new StringBuilder() ) );
 
         if ( entity.getTraversalMode().isSparse() )
         {
