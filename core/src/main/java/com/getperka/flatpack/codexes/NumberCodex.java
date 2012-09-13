@@ -29,6 +29,7 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 import com.google.inject.TypeLiteral;
 
@@ -48,12 +49,16 @@ public class NumberCodex<N extends Number> extends ValueCodex<N> {
 
   @Override
   public Type describe() {
-    if (Float.class.equals(clazz) || Double.class.equals(clazz)) {
-      return new Type.Builder().withJsonKind(JsonKind.DOUBLE).build();
-
+    Type.Builder builder = new Type.Builder();
+    if (BigDecimal.class.equals(clazz) || BigInteger.class.equals(clazz)) {
+      // Accepts strings or numbers
+      builder.withJsonKind(JsonKind.ANY);
+    } else if (Float.class.equals(clazz) || Double.class.equals(clazz)) {
+      builder.withJsonKind(JsonKind.DOUBLE);
     } else {
-      return new Type.Builder().withJsonKind(JsonKind.INTEGER).build();
+      builder.withJsonKind(JsonKind.INTEGER);
     }
+    return builder.withTypeHint(TypeHint.create(clazz)).build();
   }
 
   /**
