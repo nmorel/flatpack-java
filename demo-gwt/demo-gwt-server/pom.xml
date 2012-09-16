@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>flatpack-demo-gwt-server</artifactId>
   <name>FlatPack Demo GWT Server</name>
@@ -82,11 +82,16 @@
               <groupId>org.mortbay.jetty</groupId>
               <artifactId>jetty-maven-plugin</artifactId>
               <configuration>
-                <scanIntervalSeconds>1</scanIntervalSeconds>
+                <reload>manual</reload>
                 <webApp>
                   <baseResource implementation="org.eclipse.jetty.util.resource.ResourceCollection">
-                    <resourcesAsCSV>src/main/webapp,${basedir}/../demo-gwt-client/target/flatpack-demo-gwt-client-${project.version}/</resourcesAsCSV>
+                    <resourcesAsCSV>
+                      src/main/webapp,${basedir}/../demo-gwt-client/target/flatpack-demo-gwt-client-${project.version}/
+                    </resourcesAsCSV>
                   </baseResource>
+                  <extraClasspath>
+                    ${basedir}/../../core/target/classes;${basedir}/../../client/target/classes;${basedir}/../../search/target/classes;${basedir}/../../jersey/target/classes
+                  </extraClasspath>
                 </webApp>
               </configuration>
             </plugin>
