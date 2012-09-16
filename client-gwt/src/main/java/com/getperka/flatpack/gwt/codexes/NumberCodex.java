@@ -24,7 +24,7 @@ import com.getperka.flatpack.gwt.ext.SerializationContext;
 
 /**
  * Primitive numeric support.
- *
+ * 
  * @param <N> the boxed Number type
  */
 public abstract class NumberCodex<N extends Number>

@@ -14,7 +14,7 @@ public class PackerTestGwt
     extends FlatPackTestCase
 {
     private static final String singleMultiplePropertiesBeanResponse =
-        "{\"value\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"data\":{\"multiplePropertiesBean\":[{\"uuid\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"string\":\"toto\",\"bytePrimitive\":34,\"byteBoxed\":87,\"shortPrimitive\":12,\"shortBoxed\":15,\"intPrimitive\":234,\"intBoxed\":456,\"longPrimitive\":1234,\"longBoxed\":34567,\"doublePrimitive\":126.23,\"doubleBoxed\":1256.98,\"floatPrimitive\":12.89,\"floatBoxed\":67.3,\"booleanPrimitive\":true,\"booleanBoxed\":false,\"bigInteger\":\"123456789098765432345678987654\",\"bigDecimal\":\"12345678987654.456789\",\"enumProperty\":\"FOUR\",\"uuidProperty\":\"99999999-9999-9999-9999-999999999999\",\"singleEntityUuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"listEntityUuid\":[\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"4de76f27-2bed-49d3-b624-4b0697cfc53f\"],\"setEntityUuid\":[\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"],\"mapStringToEntityUuid\":{\"child1\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child2\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"},\"mapEntityToString\":{\"4de76f27-2bed-49d3-b624-4b0697cfc53f\":\"child1\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\":\"child2\"}}],\"childBean\":[{\"uuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"child\":\"child2\"},{\"uuid\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child\":\"child1\"}]}}";
+        "{\"value\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"data\":{\"multiplePropertiesBean\":[{\"uuid\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"string\":\"toto\",\"bytePrimitive\":34,\"byteBoxed\":87,\"shortPrimitive\":12,\"shortBoxed\":15,\"intPrimitive\":234,\"intBoxed\":456,\"longPrimitive\":1234,\"longBoxed\":34567,\"doublePrimitive\":126.23,\"doubleBoxed\":1256.98,\"floatPrimitive\":12.89,\"floatBoxed\":67.3,\"booleanPrimitive\":true,\"booleanBoxed\":false,\"bigInteger\":123456789098765432345678987654,\"bigDecimal\":12345678987654.456789,\"enumProperty\":\"FOUR\",\"uuidProperty\":\"99999999-9999-9999-9999-999999999999\",\"singleEntityUuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"listEntityUuid\":[\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"4de76f27-2bed-49d3-b624-4b0697cfc53f\"],\"setEntityUuid\":[\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"],\"mapStringToEntityUuid\":{\"child1\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child2\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"},\"mapEntityToString\":{\"4de76f27-2bed-49d3-b624-4b0697cfc53f\":\"child1\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\":\"child2\"}}],\"childBean\":[{\"uuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"child\":\"child2\"},{\"uuid\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child\":\"child1\"}]}}";
 
     private Packer packer;
 
@@ -83,7 +83,7 @@ public class PackerTestGwt
         FlatPackEntity<MultiplePropertiesBean> entity = new FlatPackEntity<MultiplePropertiesBean>();
         entity.withValue( bean );
 
-        String out = packer.pack( entity, new MultiplePropertiesBeanEntityCodex() );
+        String out = packer.pack( entity, EntityCodexFactory.get().getMultiplePropertiesBeanCodex() );
 
         assertEquals( singleMultiplePropertiesBeanResponse, out );
     }

@@ -6,7 +6,7 @@ import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.codexes.StringCodex;
 import com.getperka.flatpack.gwt.ext.Property;
 
-public class ChildBeanEntityCodex
+public class ChildBeanCodex
     extends EntityCodex<ChildBean>
 {
 

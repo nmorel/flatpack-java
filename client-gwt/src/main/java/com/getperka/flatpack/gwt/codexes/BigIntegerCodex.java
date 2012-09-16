@@ -2,26 +2,43 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.math.BigInteger;
 
+import com.getperka.flatpack.gwt.ext.DeserializationContext;
+
 public class BigIntegerCodex
-    extends ToStringCodex<BigInteger>
+    extends NumberCodex<BigInteger>
 {
 
-    public BigIntegerCodex()
+    @Override
+    protected boolean isZeroValue( BigInteger value )
     {
+        return BigInteger.ZERO.compareTo( (BigInteger) value ) == 0;
     }
 
     @Override
-    public boolean isDefaultValue( BigInteger value )
+    public BigInteger readNotNull( Object element, DeserializationContext context )
+        throws Exception
     {
-        if ( value == null )
+        if ( element instanceof Double )
         {
-            return true;
+            return readDoubleNotNull( (Double) element );
         }
-        return BigInteger.ZERO.equals( value );
+        else if ( element instanceof String )
+        {
+            return readStringNotNull( (String) element );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "element is not a Double or String : " + element.getClass().getName() );
+        }
     }
 
     @Override
-    protected BigInteger createNewInstance( String value )
+    protected BigInteger readDoubleNotNull( Double value )
+    {
+        return new BigInteger( Integer.toString( value.intValue() ) );
+    }
+
+    protected BigInteger readStringNotNull( String value )
     {
         return new BigInteger( value );
     }

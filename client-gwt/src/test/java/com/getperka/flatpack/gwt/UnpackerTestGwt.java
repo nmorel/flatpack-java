@@ -39,7 +39,8 @@ public class UnpackerTestGwt
     public void testUnpackSingleMultiplePropertiesBean()
     {
         FlatPackEntity<MultiplePropertiesBean> entity =
-            unpacker.unpack( singleMultiplePropertiesBeanResponse, new MultiplePropertiesBeanEntityCodex() );
+            unpacker.unpack( singleMultiplePropertiesBeanResponse, EntityCodexFactory.get()
+                .getMultiplePropertiesBeanCodex() );
 
         assertEquals( 3, entity.getExtraEntities().size() );
 

@@ -9,8 +9,9 @@ public class MockTypeContext
     @Override
     protected void init()
     {
-        add( "multiplePropertiesBean", MultiplePropertiesBean.class, new MultiplePropertiesBeanEntityCodex() );
-        add( "childBean", ChildBean.class, new ChildBeanEntityCodex() );
+        add( "multiplePropertiesBean", MultiplePropertiesBean.class, EntityCodexFactory.get()
+            .getMultiplePropertiesBeanCodex() );
+        add( "childBean", ChildBean.class, EntityCodexFactory.get().getChildBeanCodex() );
     }
 
 }

@@ -26,11 +26,11 @@ import com.getperka.flatpack.gwt.codexes.StringMapCodex;
 import com.getperka.flatpack.gwt.codexes.UUIDCodex;
 import com.getperka.flatpack.gwt.ext.Property;
 
-public class MultiplePropertiesBeanEntityCodex
+public class MultiplePropertiesBeanCodex
     extends EntityCodex<MultiplePropertiesBean>
 {
 
-    MultiplePropertiesBeanEntityCodex()
+    MultiplePropertiesBeanCodex()
     {
     }
 
@@ -333,7 +333,9 @@ public class MultiplePropertiesBeanEntityCodex
                 object.setUuidProperty( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, ChildBean>( "singleEntity", new ChildBeanEntityCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, ChildBean>( "singleEntity", EntityCodexFactory.get()
+            .getChildBeanCodex() )
+        {
 
             @Override
             public ChildBean getValue( MultiplePropertiesBean object )
@@ -348,7 +350,7 @@ public class MultiplePropertiesBeanEntityCodex
             }
         } );
         properties.add( new Property<MultiplePropertiesBean, List<ChildBean>>( "listEntity", new ListCodex<ChildBean>(
-            new ChildBeanEntityCodex() ) )
+            EntityCodexFactory.get().getChildBeanCodex() ) )
         {
 
             @Override
@@ -364,7 +366,7 @@ public class MultiplePropertiesBeanEntityCodex
             }
         } );
         properties.add( new Property<MultiplePropertiesBean, Set<ChildBean>>( "setEntity", new SetCodex<ChildBean>(
-            new ChildBeanEntityCodex() ) )
+            EntityCodexFactory.get().getChildBeanCodex() ) )
         {
 
             @Override
@@ -380,9 +382,9 @@ public class MultiplePropertiesBeanEntityCodex
             }
         } );
         // properties.add( new Property<MultiplePropertiesBean, ChildBean[]>( "arrayEntity",new ArrayCodex<ChildBean>(
-        // new ChildBeanEntityCodex()) ) {} );
+        // EntityCodexFactory.get().getChildBeanCodex() ) ) {} );
         properties.add( new Property<MultiplePropertiesBean, Map<String, ChildBean>>( "mapStringToEntity",
-            new StringMapCodex<ChildBean>( new ChildBeanEntityCodex() ) )
+            new StringMapCodex<ChildBean>( EntityCodexFactory.get().getChildBeanCodex() ) )
         {
             @Override
             public Map<String, ChildBean> getValue( MultiplePropertiesBean object )
@@ -397,7 +399,7 @@ public class MultiplePropertiesBeanEntityCodex
             }
         } );
         properties.add( new Property<MultiplePropertiesBean, Map<ChildBean, String>>( "mapEntityToString",
-            new EntityMapCodex<ChildBean, String>( new ChildBeanEntityCodex(), new StringCodex() ) )
+            new EntityMapCodex<ChildBean, String>( EntityCodexFactory.get().getChildBeanCodex(), new StringCodex() ) )
         {
             @Override
             public Map<ChildBean, String> getValue( MultiplePropertiesBean object )

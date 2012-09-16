@@ -2,28 +2,44 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.math.BigDecimal;
 
+import com.getperka.flatpack.gwt.ext.DeserializationContext;
+
 public class BigDecimalCodex
-    extends ToStringCodex<BigDecimal>
+    extends NumberCodex<BigDecimal>
 {
 
-    public BigDecimalCodex()
+    @Override
+    protected boolean isZeroValue( BigDecimal value )
     {
+        return BigDecimal.ZERO.compareTo( (BigDecimal) value ) == 0;
     }
 
     @Override
-    public boolean isDefaultValue( BigDecimal value )
+    public BigDecimal readNotNull( Object element, DeserializationContext context )
+        throws Exception
     {
-        if ( value == null )
+        if ( element instanceof Double )
         {
-            return true;
+            return readDoubleNotNull( (Double) element );
         }
-        return BigDecimal.ZERO.equals( value );
+        else if ( element instanceof String )
+        {
+            return readStringNotNull( (String) element );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "element is not a Double or String : " + element.getClass().getName() );
+        }
     }
 
     @Override
-    protected BigDecimal createNewInstance( String value )
+    protected BigDecimal readDoubleNotNull( Double value )
     {
         return new BigDecimal( value );
     }
 
+    protected BigDecimal readStringNotNull( String value )
+    {
+        return new BigDecimal( value );
+    }
 }
