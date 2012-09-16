@@ -54,25 +54,30 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwt-maven-plugin.version}</version>
-        <configuration>
-          <modules>
-            <module>com.getperka.flatpack.gwt.FlatPack</module>
-            <module>com.getperka.flatpack.FlatPackCore</module>
-          </modules>
-          <mode>htmlunit</mode>
-        </configuration>
         <executions>
           <execution>
             <id>packaging</id>
             <goals>
               <goal>resources</goal>
             </goals>
+            <configuration>
+              <modules>
+                <module>com.getperka.flatpack.gwt.FlatPack</module>
+                <module>com.getperka.flatpack.FlatPackCore</module>
+              </modules>
+            </configuration>
           </execution>
           <execution>
             <id>test-dev-mode</id>
             <goals>
               <goal>test</goal>
             </goals>
+            <configuration>
+              <mode>htmlunit</mode>
+              <module>com.getperka.flatpack.gwt.FlatPackTest</module>
+              <out>${project.build.directory}/gwt-test</out>
+              <userAgents>gecko1_8</userAgents>
+            </configuration>
           </execution>
           <execution>
             <id>test-prod</id>
@@ -80,7 +85,11 @@
               <goal>test</goal>
             </goals>
             <configuration>
+              <mode>htmlunit</mode>
+              <module>com.getperka.flatpack.gwt.FlatPackTest</module>
+              <out>${project.build.directory}/gwt-test</out>
               <productionMode>true</productionMode>
+              <userAgents>gecko1_8</userAgents>
             </configuration>
           </execution>
         </executions>
