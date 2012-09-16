@@ -2,6 +2,8 @@
 
 FlatPack is serialization framework used by Perka to make its JPA entities available via REST to JavaScript, iOS, and Android clients.
 
+[![Build Status](https://nmorel.ci.cloudbees.com/job/flatpack-gwt/badge/icon)](https://nmorel.ci.cloudbees.com/job/flatpack-gwt/)
+
 ## Goals
 
 * Serialize arbitrary JPA object graphs into payloads that can be processed easily in non-Java environments.
