@@ -77,6 +77,7 @@
               <module>com.getperka.flatpack.gwt.FlatPackTest</module>
               <out>${project.build.directory}/gwt-test</out>
               <userAgents>gecko1_8</userAgents>
+              <testTimeOut>120</testTimeOut>
             </configuration>
           </execution>
           <execution>
@@ -90,6 +91,7 @@
               <out>${project.build.directory}/gwt-test</out>
               <productionMode>true</productionMode>
               <userAgents>gecko1_8</userAgents>
+              <testTimeOut>120</testTimeOut>
             </configuration>
           </execution>
         </executions>
