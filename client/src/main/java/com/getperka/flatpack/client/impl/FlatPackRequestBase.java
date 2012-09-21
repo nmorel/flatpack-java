@@ -88,8 +88,10 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, X>, X>
         entity = getApi().getFlatPack().getUnpacker().unpack(returnType, reader, null);
       } catch (IOException e) {
         cause = e;
+        status = 0;
       } catch (RuntimeException e) {
         cause = e;
+        status = 0;
       }
     }
 
