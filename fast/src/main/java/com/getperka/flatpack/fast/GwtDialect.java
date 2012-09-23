@@ -21,25 +21,22 @@ package com.getperka.flatpack.fast;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.AttributeRenderer;
+import org.stringtemplate.v4.Interpreter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.misc.ObjectModelAdaptor;
+import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
 import com.getperka.flatpack.ext.Property;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.ext.TypeHint;
-import com.getperka.flatpack.fast.gwt.CodexDescription;
-import com.getperka.flatpack.fast.gwt.PropertyCodexDescription;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
@@ -101,15 +98,8 @@ public class GwtDialect
             render( entityST, packageDir, simpleName );
 
             // Render EntityCodex
-            List<PropertyCodexDescription> propertiesCodex = new ArrayList<PropertyCodexDescription>();
-            for ( Property property : entity.getProperties() )
-            {
-                propertiesCodex.add( new PropertyCodexDescription( property ) );
-            }
-
             ST entityCodexST =
-                group.getInstanceOf( "entityCodex" ).add( "entity", entity ).add( "properties", propertiesCodex )
-                    .add( "packageName", packageName );
+                group.getInstanceOf( "entityCodex" ).add( "entity", entity ).add( "packageName", packageName );
             render( entityCodexST, packageDir, simpleName + "Codex" );
         }
 
@@ -124,11 +114,10 @@ public class GwtDialect
         String namePrefix = upcase( packageName.substring( packageName.lastIndexOf( '.' ) + 1 ) );
 
         // Render the Api convenience class
-        // TODO Api GWT
-        // ST apiST =
-        // group.getInstanceOf( "api" ).add( "api", api ).add( "packageName", packageName )
-        // .add( "namePrefix", namePrefix ).add( "apiIsPublic", apiIsPublic );
-        // render( apiST, packageDir, namePrefix + "Api" );
+        ST apiST =
+            group.getInstanceOf( "api" ).add( "api", api ).add( "packageName", packageName )
+                .add( "namePrefix", namePrefix ).add( "apiIsPublic", apiIsPublic );
+        render( apiST, packageDir, namePrefix + "Api" );
 
         // Render the TypeContext
         ST typeContextST =
@@ -136,11 +125,11 @@ public class GwtDialect
                 .add( "packageName", packageName ).add( "namePrefix", namePrefix );
         render( typeContextST, packageDir, namePrefix + "TypeContext" );
 
-        // Render the EntityCodexFactory
-        ST entityCodexFactoryST =
-            group.getInstanceOf( "entityCodexFactory" ).add( "allEntities", allEntities.values() )
+        // Render the BaseCodexFactory
+        ST baseCodexFactoryST =
+            group.getInstanceOf( "codexFactory" ).add( "allEntities", allEntities.values() )
                 .add( "packageName", packageName );
-        render( entityCodexFactoryST, packageDir, "EntityCodexFactory" );
+        render( baseCodexFactoryST, packageDir, "BaseCodexFactory" );
     }
 
     @Override
@@ -148,127 +137,24 @@ public class GwtDialect
     {
         STGroup group = super.loadGroup( template );
 
-        // CodexDescription is used to render the instantiation of codex in the properties
-        group.registerRenderer( CodexDescription.class, new AttributeRenderer() {
-            @Override
-            public String toString( Object o, String formatString, Locale locale )
+        group.registerModelAdaptor( Type.class, new ObjectModelAdaptor() {
+            public Object getProperty( Interpreter interp, ST self, Object o, Object property, String propertyName )
+                throws STNoSuchPropertyException
             {
-                return toString( ( (CodexDescription) o ).getType() );
-            }
-
-            protected String toString( Type type )
-            {
-
-                switch ( type.getJsonKind() )
+                Type type = (Type) o;
+                if ( "codex".equals( propertyName ) )
                 {
-                    case ANY:
-                        return "";
-                    case BOOLEAN:
-                        return "new BooleanCodex()";
-                    case DOUBLE:
-                        return "new DoubleCodex()";
-                    case INTEGER:
-                        return "new IntegerCodex()";
-                    case LIST:
-                        return "new ListCodex<" + toStringType( type.getListElement() ) + ">("
-                            + toString( type.getListElement() ) + ")";
-                    case MAP:
-                        String stringKeyType = toStringType( type.getMapKey() );
-                        String stringValueType = toStringType( type.getMapValue() );
-                        if ( String.class.getCanonicalName().equals( stringKeyType ) )
-                        {
-                            return "new StringMapCodex<" + stringValueType + ">(" + toString( type.getMapValue() )
-                                + ")";
-                        }
-                        else
-                        {
-                            // EntityMapCodex
-                            return "new EntityMapCodex<" + stringKeyType + ", " + stringValueType + ">("
-                                + toString( type.getMapKey() ) + "," + toString( type.getMapValue() ) + ")";
-                        }
-                    case NULL:
-                        return "new VoidCodex()";
-                    case STRING:
-                    {
-                        // Look for the presence of enum values
-                        if ( type.getEnumValues() != null )
-                        {
-                            return "new EnumCodex<" + simpleName( type.getName() ) + ">(" + simpleName( type.getName() )
-                                + ".class)";
-                        }
-
-                        // Any other named type must be an entity type
-                        if ( type.getName() != null )
-                        {
-                            return "EntityCodexFactory.get().get" + simpleName( type.getName() ) + "Codex()";
-                        }
-
-                        // Look for a type hint
-                        TypeHint hint = type.getTypeHint();
-                        if ( hint != null )
-                        {
-                            // ToStringCodex like BigDecimalCodex, BigIntegerCodex, TypeHintCodex
-                            String value = hint.getValue();
-                            return "new " + value.substring( value.lastIndexOf( '.' ) + 1 ) + "Codex()";
-                        }
-
-                        // Otherwise it must be a plain string
-                        return "new StringCodex()";
-                    }
+                    return toCodexString( type );
                 }
-                throw new UnsupportedOperationException( "Unknown JsonKind " + type.getJsonKind() );
-            }
-
-            private String simpleName( String typeName )
-            {
-                return typePrefix + upcase( typeName );
-            }
-
-            protected String toStringType( Type type )
-            {
-                switch ( type.getJsonKind() )
-                {
-                    case ANY:
-                        return Object.class.getCanonicalName();
-                    case BOOLEAN:
-                        return Boolean.class.getCanonicalName();
-                    case DOUBLE:
-                        return Double.class.getCanonicalName();
-                    case INTEGER:
-                        return Integer.class.getCanonicalName();
-                    case LIST:
-                        return List.class.getCanonicalName() + "<" + toStringType( type.getListElement() ) + ">";
-                    case MAP:
-                        return Map.class.getCanonicalName() + "<" + toStringType( type.getMapKey() ) + ","
-                            + toStringType( type.getMapValue() ) + ">";
-                    case NULL:
-                        return Void.class.getCanonicalName();
-                    case STRING:
-                    {
-                        // Look for the presence of enum values
-                        if ( type.getEnumValues() != null )
-                        {
-                            return simpleName( type.getName() );
-                        }
-                        // Any other named type must be an entity type
-                        if ( type.getName() != null )
-                        {
-                            // Allow type to be overridden
-                            return simpleName( type.getName() );
-                        }
-                        // Look for a type hint
-                        TypeHint hint = type.getTypeHint();
-                        if ( hint != null )
-                        {
-                            return hint.getValue();
-                        }
-                        // Otherwise it must be a plain string
-                        return String.class.getCanonicalName();
-                    }
-                }
-                throw new UnsupportedOperationException( "Unknown JsonKind " + type.getJsonKind() );
-            }
+                return super.getProperty( interp, self, o, property, propertyName );
+            };
         } );
+
+        Map<String, Object> namesMap = group.rawGetDictionary( "names" );
+        namesMap.put( "ApiBase", "com.getperka.flatpack.gwt.client.impl.ApiBase" );
+        namesMap.put( "FlatPackRequest", "com.getperka.flatpack.gwt.client.FlatPackRequest" );
+        namesMap.put( "FlatPackRequestBase", "com.getperka.flatpack.gwt.client.impl.FlatPackRequestBase" );
+        namesMap.put( "AbstractCodexFactory", "com.getperka.flatpack.gwt.codexes.AbstractCodexFactory" );
 
         return group;
     }
@@ -278,4 +164,107 @@ public class GwtDialect
     {
         return "gwt";
     }
+
+    protected String toCodexString( Type type )
+    {
+        switch ( type.getJsonKind() )
+        {
+            case ANY:
+                return "";
+            case BOOLEAN:
+                return "BaseCodexFactory.get().booleanCodex()";
+            case DOUBLE:
+                return "BaseCodexFactory.get().doubleCodex()";
+            case INTEGER:
+                return "BaseCodexFactory.get().integerCodex()";
+            case LIST:
+                return "BaseCodexFactory.get().listCodex(" + toCodexString( type.getListElement() ) + ")";
+            case MAP:
+                if ( null == type.getMapKey().getTypeHint() && null == type.getMapKey().getEnumValues()
+                    && null == type.getMapKey().getName() )
+                {
+                    return "BaseCodexFactory.get().stringMapCodex(" + toCodexString( type.getMapValue() ) + ")";
+                }
+                else
+                {
+                    // EntityMapCodex
+                    return "BaseCodexFactory.get().entityMapCodex(" + toCodexString( type.getMapKey() ) + ","
+                        + toCodexString( type.getMapValue() ) + ")";
+                }
+            case NULL:
+                return "BaseCodexFactory.get().voidCodex()";
+            case STRING:
+            {
+                // Look for the presence of enum values
+                if ( type.getEnumValues() != null )
+                {
+                    return "BaseCodexFactory.get().enumCodex(" + typeToClassName( type.getName() ) + ".class)";
+                }
+
+                // Any other named type must be an entity type
+                if ( type.getName() != null )
+                {
+                    return "BaseCodexFactory.get()." + type.getName() + "Codex()";
+                }
+
+                // Look for a type hint
+                TypeHint hint = type.getTypeHint();
+                if ( hint != null )
+                {
+                    // ToStringCodex like BigDecimalCodex, BigIntegerCodex, TypeHintCodex
+                    String value = hint.getValue();
+                    return "BaseCodexFactory.get()." + toLowerCamel( value.substring( value.lastIndexOf( '.' ) + 1 ) )
+                        + "Codex()";
+                }
+
+                // Otherwise it must be a plain string
+                return "BaseCodexFactory.get().stringCodex()";
+            }
+        }
+        throw new UnsupportedOperationException( "Unknown JsonKind " + type.getJsonKind() );
+    }
+
+    private String typeToClassName( String typeName )
+    {
+        return toUpperCamel( typePrefix + toUpperCamel( typeName ) );
+    }
+
+    /**
+     * @return the string to Java and C++ class naming convention, e.g., "UpperCamel".
+     */
+    private String toUpperCamel( String string )
+    {
+        if ( null == string || string.isEmpty() )
+        {
+            return string;
+        }
+        else if ( string.length() == 1 )
+        {
+            return string.toLowerCase();
+        }
+        else
+        {
+            return string.substring( 0, 1 ).toUpperCase() + string.substring( 1 );
+        }
+    }
+
+    /**
+     * @return the string to Java variable naming convention, e.g., "lowerCamel".
+     */
+    private String toLowerCamel( String string )
+    {
+        if ( null == string || string.isEmpty() )
+        {
+            return string;
+        }
+        else if ( string.length() == 1 )
+        {
+            return string.toLowerCase();
+        }
+        else
+        {
+            return string.substring( 0, 1 ).toLowerCase() + string.substring( 1 );
+        }
+    }
+
 }

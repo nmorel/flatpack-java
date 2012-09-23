@@ -61,7 +61,7 @@ public enum <enum> {
 >>
 
 field(property) ::= <%
-private <property.type> <property.getterName>;
+private <property.type> <property.name>;
 %>
 
 /**
@@ -81,7 +81,7 @@ docString(docString) ::= <<
 getter(property) ::= <<
 <docString(property.docString)>
 public <property.type> get<property.getterName>() {
-  return this.<property.getterName>;
+  return this.<property.name>;
 }
 >>
 
@@ -93,9 +93,9 @@ public void set<property.getterName>(<property.type> value) {
   <if(entity.persistent)>
   <names.DirtyFlag> flag = dirtyFlag("<property.name>");
   flag.set();
-  this.<property.getterName> = <names.FlatPackCollections>.dirtyTracking(value, flag);
+  this.<property.name> = <names.FlatPackCollections>.dirtyTracking(value, flag);
   <else>
-  this.<property.getterName> = value;
+  this.<property.name> = value;
   <endif>
 }
 >>
@@ -121,30 +121,28 @@ public class <namePrefix>TypeContext extends com.getperka.flatpack.gwt.ext.BaseT
  * Add an entity to TypeContext.
  */
 typeContextEntity(entity) ::= <%
-add( <entity.simpleName>.typeName(), <entity.simpleName>.class, EntityCodexFactory.get().get<entity.simpleName>Codex() );
+add( <entity.simpleName>.typeName(), <entity.simpleName>.class, BaseCodexFactory.get().<entity.typeName>Codex() );
 %>
 
 /**
- * Generate the EntityCodexFactory.
+ * Generate the BaseCodexFactory.
  */
-entityCodexFactory(allEntities, packageName) ::= <<
+codexFactory(allEntities, packageName) ::= <<
 // Generated File - DO NOT EDIT
 package <packageName>;
 
-import com.google.gwt.core.client.GWT;
-
 /**
- * EntityCodexFactory used to get instance of all the EntityCodex. It's main purpose is to avoid infinite loop.
+ * BaseCodexFactory used to get instance of all the Codex.
  */
-public class EntityCodexFactory {
+public class BaseCodexFactory extends <names.AbstractCodexFactory> {
 
-  private static EntityCodexFactory INSTANCE;
+  private static BaseCodexFactory INSTANCE;
 
-  public static EntityCodexFactory get()
+  public static BaseCodexFactory get()
   {
     if ( null == INSTANCE )
     {
-      INSTANCE = GWT.create( EntityCodexFactory.class );
+      INSTANCE = com.google.gwt.core.client.GWT.create( BaseCodexFactory.class );
     }
     return INSTANCE;
   }
@@ -156,32 +154,32 @@ public class EntityCodexFactory {
 >>
 
 /**
- * Add a codex field to the EntityCodexFactory.
+ * Add a codex field to the BaseCodexFactory.
  */
 factoryCodexField(entity) ::= <%
-private <entity.simpleName>Codex <entity.simpleName>Codex;
+private <entity.simpleName>Codex <entity.typeName>Codex;
 %>
 
 /**
- * Add a codex getter to the EntityCodexFactory.
+ * Add a codex getter to the BaseCodexFactory.
  */
 factoryCodexGetter(entity) ::= <<
 /**
- * @return a <entity.simpleName>Codex
+ * @return a {@link <entity.simpleName>Codex}
  */
-public <entity.simpleName>Codex get<entity.simpleName>Codex() {
-  if(null == <entity.simpleName>Codex) {
-    <entity.simpleName>Codex = new <entity.simpleName>Codex();
-    <entity.simpleName>Codex.init();
+public <entity.simpleName>Codex <entity.typeName>Codex() {
+  if(null == <entity.typeName>Codex) {
+    <entity.typeName>Codex = new <entity.simpleName>Codex();
+    <entity.typeName>Codex.init();
   }
-  return <entity.simpleName>Codex;
+  return <entity.typeName>Codex;
 }
 >>
 
 /**
  * Generate an EntityCodex.
  */
-entityCodex(entity, properties, packageName) ::= <<
+entityCodex(entity, packageName) ::= <<
 // Generated File - DO NOT EDIT
 package <packageName>;
 
@@ -195,7 +193,7 @@ import com.getperka.flatpack.gwt.codexes.*;
   @Override
   protected void initProperties( java.util.List\<com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, ?\>\> properties ) {
 
-    <properties:propertyCodex(entity); separator="\n\n">
+    <entity.properties:propertyCodex(entity); separator="\n\n">
 
   }
 
@@ -227,18 +225,106 @@ entityCodexDeclaration() ::= <%
 /*
  * Generate a property for entity codex.
  */
-propertyCodex(prop, entity) ::= <<
-// Property <prop.property.name>
-com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <prop.property.type>\> <prop.property.name>Property = new com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <prop.property.type>\>( "<prop.property.name>", <prop.codex> ) {
-  @Override
-  public <prop.property.type> getValue( <entity.simpleName> object ) {
-    return object.get<prop.property.getterName>();
+propertyCodex(property, entity) ::= <<
+// Property <property.name>
+com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\> <property.name>Property =
+  new com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\>( "<property.name>", <property.type.codex> ) {
+    @Override
+    public <property.type> getValue( <entity.simpleName> object ) {
+      return object.get<property.getterName>();
+    }
+
+    @Override
+    public void setValue( <entity.simpleName> object, <property.type> value ) {
+      object.set<property.getterName>( value );
+    }
+  };
+properties.add( <property.name>Property );
+>>
+
+/**
+ * Generate an API accessor stub.
+ */
+api(api, packageName, namePrefix, apiIsPublic) ::= <<
+// Generated File - DO NOT EDIT
+package <packageName>;
+
+<if(apiIsPublic)>public<endif> class <namePrefix>Api extends <names.ApiBase> {
+  public <namePrefix>Api() {
+    super(new <namePrefix>TypeContext());
   }
 
-  @Override
-  public void setValue( <entity.simpleName> object, <prop.property.type> value ) {
-    object.set<prop.property.getterName>( value );
+  public <namePrefix>Api(com.getperka.flatpack.gwt.ext.TypeContext typeContext) {
+    super(typeContext);
   }
-};
-properties.add( <prop.property.name>Property );
+
+  <api.endpoints:endpoint(); separator="\n">
+}
+>>
+
+/**
+ * Select the kind of endpoint, either one that's documented to return a FlatPackEntity
+ * or just return a HttpURLConnection for anything else.
+ */
+endpoint(end) ::= <%
+<if(end.returnType)>
+  <endpointFlatPack(end)>
+<endif>
+%>
+
+/**
+ * Generates interfaces and methods for API methods that are fully-flatpacked.
+ */
+endpointFlatPack(end) ::= <<
+public interface <end.javaNameUpcase> extends <names.FlatPackRequest>\<<end.javaNameUpcase>, <if(end.entity)><end.entity><else>Void<endif>, <end.returnType>\> {
+  <end.queryParameters:endpointQueryParameterStub(); separator="\n">
+}
+
+private class <end.javaNameUpcase>Impl
+    extends <names.FlatPackRequestBase>\<<end.javaNameUpcase>, <if(end.entity)><end.entity><else>Void<endif>, <end.returnType>\>
+    implements <end.javaNameUpcase> {
+  public <end.javaNameUpcase>Impl(Object... args) {
+    super(<namePrefix>Api.this, com.google.gwt.http.client.RequestBuilder.<end.method>, "<end.pathDecoded>", <end.hasPayload>, <if(end.entity)><end.entity.codex><else>BaseCodexFactory.get().voidCodex()<endif>, <end.returnType.codex>, args);
+  }
+  <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
+}
+
+<docString(end.docString)>
+public <end.javaNameUpcase> <end.javaName>(<endpointArgList()>) {
+  <end.javaNameUpcase>Impl toReturn =
+      new <end.javaNameUpcase>Impl(<end.pathParameters:{x|<x.name>}; separator=", ">);
+  <if(end.entity)>toReturn.setEntity(entity);<endif>
+  return toReturn;
+}
+>>
+
+endpointArgList() ::= <%
+<if(end.entity && end.pathParameters)>
+  <end.entity> entity, <end.pathParameters:{x |<x.type> <x.name>}; separator=", ">
+<elseif(end.entity)>
+  <end.entity> entity
+<else>
+  <end.pathParameters:{x |<x.type> <x.name>}; separator=", ">
+<endif>
+%>
+
+/**
+ * The names of the path parameter arguments.
+ */
+endpointPathParameters() ::= <%
+<end.pathParameters:{x |<x.name>}; separator=", ">
+%>
+
+/**
+ * Create a stub method declaration for a request interface.
+ */
+endpointQueryParameterStub(param) ::= <<
+<docString(param.docString)>
+<end.javaNameUpcase> with<param.javaNameUpcase>(<param.type> <param.name>);
+>>
+
+endpointQueryParameterImpl(param) ::= <<
+public <end.javaNameUpcase> with<param.javaNameUpcase>(<param.type> <param.name>) {
+  return queryParameter("<param.name>", <param.name>);
+}
 >>
