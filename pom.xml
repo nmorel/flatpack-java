@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.getperka.flatpack</groupId>
   <artifactId>flatpack-parent</artifactId>
-  <version>2.15</version>
+  <version>2.16-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Flatpack</name>
@@ -20,7 +20,7 @@
     <url>https://github.com/perka/flatpack-java</url>
     <connection>scm:git:git@github.com:perka/flatpack-java.git</connection>
     <developerConnection>scm:git:git@github.com:perka/flatpack-java.git</developerConnection>
-    <tag>flatpack-2.15</tag>
+    <tag>HEAD</tag>
   </scm>
   <developers>
     <developer>
