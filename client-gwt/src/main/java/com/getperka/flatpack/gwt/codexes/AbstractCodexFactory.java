@@ -2,6 +2,8 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +15,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 /**
  * Base codex factory to create all the codex in one place. It allows to define a custom factory via differed binding.
- * 
+ *
  * @author Nicolas Morel
  */
 public class AbstractCodexFactory
@@ -57,6 +59,14 @@ public class AbstractCodexFactory
     public Codex<Character> characterCodex()
     {
         return new CharacterCodex();
+    }
+
+    /**
+     * @return a {@link java.util.Date} codex
+     */
+    public Codex<java.util.Date> dateCodex()
+    {
+        return new DateCodex();
     }
 
     /**
@@ -142,6 +152,30 @@ public class AbstractCodexFactory
     public Codex<Short> shortCodex()
     {
         return new ShortCodex();
+    }
+
+    /**
+     * @return a {@link java.sql.Date} codex
+     */
+    public Codex<java.sql.Date> sqlDateCodex()
+    {
+        return new SqlDateCodex();
+    }
+
+    /**
+     * @return a {@link Time} codex
+     */
+    public Codex<Time> sqlTimeCodex()
+    {
+        return new SqlTimeCodex();
+    }
+
+    /**
+     * @return a {@link Timestamp} codex
+     */
+    public Codex<Timestamp> sqlTimestampCodex()
+    {
+        return new SqlTimestampCodex();
     }
 
     /**

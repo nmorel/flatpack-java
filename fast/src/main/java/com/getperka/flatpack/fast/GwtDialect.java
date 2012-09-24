@@ -21,8 +21,11 @@ package com.getperka.flatpack.fast;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,7 +173,7 @@ public class GwtDialect
         switch ( type.getJsonKind() )
         {
             case ANY:
-                return "";
+                return "BaseCodexFactory.get().jsonCodex()";
             case BOOLEAN:
                 return "BaseCodexFactory.get().booleanCodex()";
             case DOUBLE:
@@ -213,8 +216,35 @@ public class GwtDialect
                 {
                     // ToStringCodex like BigDecimalCodex, BigIntegerCodex, TypeHintCodex
                     String value = hint.getValue();
-                    return "BaseCodexFactory.get()." + toLowerCamel( value.substring( value.lastIndexOf( '.' ) + 1 ) )
-                        + "Codex()";
+
+                    StringBuilder builder = new StringBuilder( "BaseCodexFactory.get()." );
+
+                    if ( java.util.Date.class.getCanonicalName().equals( value ) )
+                    {
+                        builder.append( "date" );
+                    }
+                    else if ( java.sql.Date.class.getCanonicalName().equals( value ) )
+                    {
+                        builder.append( "sqlDate" );
+                    }
+                    else if ( Time.class.getCanonicalName().equals( value ) )
+                    {
+                        builder.append( "sqlTime" );
+                    }
+                    else if ( Timestamp.class.getCanonicalName().equals( value ) )
+                    {
+                        builder.append( "sqlTimestamp" );
+                    }
+                    else if ( UUID.class.getCanonicalName().equals( value ) )
+                    {
+                        builder.append( "uuid" );
+                    }
+                    else
+                    {
+                        builder.append( toLowerCamel( value.substring( value.lastIndexOf( '.' ) + 1 ) ) );
+                    }
+                    builder.append( "Codex()" );
+                    return builder.toString();
                 }
 
                 // Otherwise it must be a plain string

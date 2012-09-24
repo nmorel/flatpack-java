@@ -242,6 +242,8 @@ public class JavaDialect implements Dialect {
           // Swap out for our hand-written base class
           return entity.isPersistent() ? BasePersistenceAware.class.getCanonicalName()
               : BaseHasUuid.class.getCanonicalName();
+        } else if (entity.getTypeName().equals("basePersistenceAware")) {
+            return BasePersistenceAware.class.getCanonicalName();
         }
         return packageName + "." + typePrefix + upcase(entity.getTypeName());
       }
