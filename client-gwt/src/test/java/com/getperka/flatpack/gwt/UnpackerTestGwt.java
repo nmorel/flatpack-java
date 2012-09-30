@@ -2,17 +2,25 @@ package com.getperka.flatpack.gwt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map.Entry;
 import java.util.UUID;
 
 import com.getperka.flatpack.gwt.codexes.VoidCodex;
 import com.getperka.flatpack.gwt.ext.TypeContext;
+import com.getperka.flatpack.gwt.stub.ChildBean;
+import com.getperka.flatpack.gwt.stub.MultiplePropertiesBean;
+import com.getperka.flatpack.gwt.stub.TestCodexFactory;
+import com.getperka.flatpack.gwt.stub.TestEnum;
+import com.getperka.flatpack.gwt.stub.TestTypeContext;
 
 public class UnpackerTestGwt
     extends FlatPackTestCase
 {
     private static final String singleMultiplePropertiesBeanResponse =
-        "{\"value\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"data\":{\"multiplePropertiesBean\":[{\"uuid\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"bytePrimitive\":34,\"byteBoxed\":87,\"shortPrimitive\":12,\"shortBoxed\":15,\"intPrimitive\":234,\"intBoxed\":456,\"longPrimitive\":1234,\"longBoxed\":34567,\"doublePrimitive\":126.23,\"doubleBoxed\":1256.98,\"floatPrimitive\":12.89,\"floatBoxed\":67.3,\"booleanPrimitive\":true,\"booleanBoxed\":false,\"enumProperty\":\"FOUR\",\"uuidProperty\":\"99999999-9999-9999-9999-999999999999\",\"singleEntityUuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"setEntityUuid\":[\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"],\"mapStringToEntityUuid\":{\"child1\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child2\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"},\"mapEntityToString\":{\"4de76f27-2bed-49d3-b624-4b0697cfc53f\":\"child1\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\":\"child2\"},\"arrayEntityUuid\":[\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"],\"dateJdk\":\"Sat Aug 18 15:45:56 CEST 2012\",\"dateJoda\":\"2011-03-14T21:56:23.996\",\"string\":\"toto\",\"bigDecimal\":\"12345678987654.456789\",\"bigInteger\":\"123456789098765432345678987654\",\"listEntityUuid\":[\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"4de76f27-2bed-49d3-b624-4b0697cfc53f\"]}],\"childBean\":[{\"uuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"child\":\"child2\"},{\"uuid\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child\":\"child1\"}]}}";
+        "{\"value\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"data\":{\"multiplePropertiesBean\":[{\"uuid\":\"15a1bf22-f764-4e4e-abc2-81146df9f54f\",\"string\":\"toto\",\"bytePrimitive\":34,\"byteBoxed\":87,\"shortPrimitive\":12,\"shortBoxed\":15,\"intPrimitive\":234,\"intBoxed\":456,\"longPrimitive\":1234,\"longBoxed\":34567,\"doublePrimitive\":126.23,\"doubleBoxed\":1256.98,\"floatPrimitive\":12.89,\"floatBoxed\":67.3,\"booleanPrimitive\":true,\"booleanBoxed\":false,\"charPrimitive\":\"ç\",\"charBoxed\":\"è\",\"bigInteger\":\"123456789098765432345678987654\",\"bigDecimal\":\"12345678987654.456789\",\"enumProperty\":\"FOUR\",\"uuidProperty\":\"99999999-9999-9999-9999-999999999999\",\"singleEntityUuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"listEntityUuid\":[\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"4de76f27-2bed-49d3-b624-4b0697cfc53f\"],\"setEntityUuid\":[\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"],\"mapStringToEntityUuid\":{\"child1\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child2\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\"},\"mapEntityToString\":{\"4de76f27-2bed-49d3-b624-4b0697cfc53f\":\"child1\",\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\":\"child2\"},\"date\":\"2012-08-18T17:45:56.543+00:00\",\"sqlDate\":\"2012-08-18T17:45:56.544+00:00\",\"sqlTime\":\"2012-08-18T17:45:56.545+00:00\",\"sqlTimestamp\":\"2012-08-18T17:45:56.546+00:00\"}],\"childBean\":[{\"uuid\":\"e3aa7750-21f0-410c-a228-e48bd1ee6ff9\",\"child\":\"child2\"},{\"uuid\":\"4de76f27-2bed-49d3-b624-4b0697cfc53f\",\"child\":\"child1\"}]}}";
 
     private Unpacker unpacker;
 
@@ -22,7 +30,7 @@ public class UnpackerTestGwt
     protected void gwtSetUp()
         throws Exception
     {
-        typeContextMock = new MockTypeContext();
+        typeContextMock = new TestTypeContext();
         unpacker = new Unpacker( typeContextMock );
     }
 
@@ -39,8 +47,8 @@ public class UnpackerTestGwt
     public void testUnpackSingleMultiplePropertiesBean()
     {
         FlatPackEntity<MultiplePropertiesBean> entity =
-            unpacker.unpack( singleMultiplePropertiesBeanResponse, EntityCodexFactory.get()
-                .getMultiplePropertiesBeanCodex() );
+            unpacker
+                .unpack( singleMultiplePropertiesBeanResponse, TestCodexFactory.get().multiplePropertiesBeanCodex() );
 
         assertEquals( 3, entity.getExtraEntities().size() );
 
@@ -62,10 +70,8 @@ public class UnpackerTestGwt
         assertEquals( new Double( 67.3 ).floatValue(), bean.getFloatBoxed() );
         assertTrue( bean.isBooleanPrimitive() );
         assertFalse( bean.getBooleanBoxed() );
-        // assertEquals( '\u00e7', bean.getCharPrimitive() );
-        // assertEquals( '\u00e8', bean.getCharBoxed() );
-        assertEquals( '\u0000', bean.getCharPrimitive() );
-        assertNull( bean.getCharBoxed() );
+        assertEquals( '\u00e7', bean.getCharPrimitive() );
+        assertEquals( (Character) '\u00e8', bean.getCharBoxed() );
         assertEquals( new BigInteger( "123456789098765432345678987654" ), bean.getBigInteger() );
         assertEquals( new BigDecimal( "12345678987654.456789" ), bean.getBigDecimal() );
         assertEquals( TestEnum.FOUR, bean.getEnumProperty() );
@@ -108,8 +114,9 @@ public class UnpackerTestGwt
 
         assertEquals( child2Expected, bean.getSingleEntity() );
 
-        // TODO once the date codex are ready
-        assertNull( bean.getDateJdk() );
-        assertNull( bean.getDateJoda() );
+        assertEquals( new Date( Date.UTC( 112, 7, 18, 17, 45, 56 ) + 543 ), bean.getDate() );
+        assertEquals( new java.sql.Date( Date.UTC( 112, 7, 18, 17, 45, 56 ) + 544 ), bean.getSqlDate() );
+        assertEquals( new Time( Date.UTC( 112, 7, 18, 17, 45, 56 ) + 545 ), bean.getSqlTime() );
+        assertEquals( new Timestamp( Date.UTC( 112, 7, 18, 17, 45, 56 ) + 546 ), bean.getSqlTimestamp() );
     }
 }

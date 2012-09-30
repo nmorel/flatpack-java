@@ -1,21 +1,18 @@
-// Generated File - DO NOT EDIT
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.stub;
 
+import com.getperka.flatpack.gwt.codexes.AbstractCodexFactory;
 import com.google.gwt.core.client.GWT;
 
-/**
- * EntityCodexFactory used to get instance of all the EntityCodex. It's main purpose is to avoid infinite loop.
- */
-public class EntityCodexFactory
+public class TestCodexFactory
+    extends AbstractCodexFactory
 {
+    private static TestCodexFactory INSTANCE;
 
-    private static EntityCodexFactory INSTANCE;
-
-    public static EntityCodexFactory get()
+    public static TestCodexFactory get()
     {
         if ( null == INSTANCE )
         {
-            INSTANCE = GWT.create( EntityCodexFactory.class );
+            INSTANCE = GWT.create( TestCodexFactory.class );
         }
         return INSTANCE;
     }
@@ -24,9 +21,9 @@ public class EntityCodexFactory
     private ChildBeanCodex ChildBeanCodex;
 
     /**
-     * @return a MultiplePropertiesBeanCodex
+     * @return a {@link MultiplePropertiesBeanCodex}
      */
-    public MultiplePropertiesBeanCodex getMultiplePropertiesBeanCodex()
+    public MultiplePropertiesBeanCodex multiplePropertiesBeanCodex()
     {
         if ( null == MultiplePropertiesBeanCodex )
         {
@@ -37,9 +34,9 @@ public class EntityCodexFactory
     }
 
     /**
-     * @return a ChildBeanCodex
+     * @return a {@link ChildBeanCodex}
      */
-    public ChildBeanCodex getChildBeanCodex()
+    public ChildBeanCodex childBeanCodex()
     {
         if ( null == ChildBeanCodex )
         {

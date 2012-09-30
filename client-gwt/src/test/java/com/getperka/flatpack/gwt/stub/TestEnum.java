@@ -1,4 +1,4 @@
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.stub;
 
 public enum TestEnum
 {

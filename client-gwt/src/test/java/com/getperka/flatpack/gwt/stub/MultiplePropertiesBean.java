@@ -17,11 +17,10 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.stub;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,8 +61,10 @@ public class MultiplePropertiesBean
     private Map<String, ChildBean> mapStringToEntity;
     private Map<ChildBean, String> mapEntityToString;
     private ChildBean[] arrayEntity;
-    private Date dateJdk;
-    private Date dateJoda;
+    private java.util.Date date;
+    private java.sql.Date sqlDate;
+    private java.sql.Time sqlTime;
+    private java.sql.Timestamp sqlTimestamp;
 
     public String getString()
     {
@@ -335,24 +336,44 @@ public class MultiplePropertiesBean
         this.arrayEntity = arrayEntity;
     }
 
-    public Date getDateJdk()
+    public java.util.Date getDate()
     {
-        return dateJdk;
+        return date;
     }
 
-    public void setDateJdk( Date dateJdk )
+    public void setDate( java.util.Date date )
     {
-        this.dateJdk = dateJdk;
+        this.date = date;
     }
 
-    public Date getDateJoda()
+    public java.sql.Date getSqlDate()
     {
-        return dateJoda;
+        return sqlDate;
     }
 
-    public void setDateJoda( Date dateJoda )
+    public void setSqlDate( java.sql.Date sqlDate )
     {
-        this.dateJoda = dateJoda;
+        this.sqlDate = sqlDate;
+    }
+
+    public java.sql.Time getSqlTime()
+    {
+        return sqlTime;
+    }
+
+    public void setSqlTime( java.sql.Time sqlTime )
+    {
+        this.sqlTime = sqlTime;
+    }
+
+    public java.sql.Timestamp getSqlTimestamp()
+    {
+        return sqlTimestamp;
+    }
+
+    public void setSqlTimestamp( java.sql.Timestamp sqlTimestamp )
+    {
+        this.sqlTimestamp = sqlTimestamp;
     }
 
 }

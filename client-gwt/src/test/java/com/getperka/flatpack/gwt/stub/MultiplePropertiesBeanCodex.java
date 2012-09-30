@@ -1,29 +1,16 @@
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.stub;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.getperka.flatpack.gwt.codexes.BigDecimalCodex;
-import com.getperka.flatpack.gwt.codexes.BigIntegerCodex;
-import com.getperka.flatpack.gwt.codexes.BooleanCodex;
-import com.getperka.flatpack.gwt.codexes.ByteCodex;
-import com.getperka.flatpack.gwt.codexes.DoubleCodex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
-import com.getperka.flatpack.gwt.codexes.EntityMapCodex;
-import com.getperka.flatpack.gwt.codexes.EnumCodex;
-import com.getperka.flatpack.gwt.codexes.FloatCodex;
-import com.getperka.flatpack.gwt.codexes.IntegerCodex;
-import com.getperka.flatpack.gwt.codexes.ListCodex;
-import com.getperka.flatpack.gwt.codexes.LongCodex;
-import com.getperka.flatpack.gwt.codexes.SetCodex;
-import com.getperka.flatpack.gwt.codexes.ShortCodex;
-import com.getperka.flatpack.gwt.codexes.StringCodex;
-import com.getperka.flatpack.gwt.codexes.StringMapCodex;
-import com.getperka.flatpack.gwt.codexes.UUIDCodex;
 import com.getperka.flatpack.gwt.ext.Property;
 
 public class MultiplePropertiesBeanCodex
@@ -37,7 +24,7 @@ public class MultiplePropertiesBeanCodex
     @Override
     protected void initProperties( List<Property<MultiplePropertiesBean, ?>> properties )
     {
-        properties.add( new Property<MultiplePropertiesBean, String>( "string", new StringCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, String>( "string", TestCodexFactory.get().stringCodex() ) {
 
             @Override
             public String getValue( MultiplePropertiesBean object )
@@ -51,7 +38,9 @@ public class MultiplePropertiesBeanCodex
                 object.setString( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Byte>( "bytePrimitive", new ByteCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Byte>( "bytePrimitive",
+            TestCodexFactory.get().byteCodex(), true )
+        {
 
             @Override
             public Byte getValue( MultiplePropertiesBean object )
@@ -65,7 +54,7 @@ public class MultiplePropertiesBeanCodex
                 object.setBytePrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Byte>( "byteBoxed", new ByteCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Byte>( "byteBoxed", TestCodexFactory.get().byteCodex() ) {
 
             @Override
             public Byte getValue( MultiplePropertiesBean object )
@@ -79,7 +68,9 @@ public class MultiplePropertiesBeanCodex
                 object.setByteBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Short>( "shortPrimitive", new ShortCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Short>( "shortPrimitive", TestCodexFactory.get()
+            .shortCodex(), true )
+        {
 
             @Override
             public Short getValue( MultiplePropertiesBean object )
@@ -93,7 +84,8 @@ public class MultiplePropertiesBeanCodex
                 object.setShortPrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Short>( "shortBoxed", new ShortCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Short>( "shortBoxed", TestCodexFactory.get().shortCodex() )
+        {
 
             @Override
             public Short getValue( MultiplePropertiesBean object )
@@ -107,7 +99,9 @@ public class MultiplePropertiesBeanCodex
                 object.setShortBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Integer>( "intPrimitive", new IntegerCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Integer>( "intPrimitive", TestCodexFactory.get()
+            .integerCodex(), true )
+        {
 
             @Override
             public Integer getValue( MultiplePropertiesBean object )
@@ -121,7 +115,9 @@ public class MultiplePropertiesBeanCodex
                 object.setIntPrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Integer>( "intBoxed", new IntegerCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Integer>( "intBoxed", TestCodexFactory.get()
+            .integerCodex() )
+        {
 
             @Override
             public Integer getValue( MultiplePropertiesBean object )
@@ -135,7 +131,9 @@ public class MultiplePropertiesBeanCodex
                 object.setIntBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Long>( "longPrimitive", new LongCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Long>( "longPrimitive",
+            TestCodexFactory.get().longCodex(), true )
+        {
 
             @Override
             public Long getValue( MultiplePropertiesBean object )
@@ -149,7 +147,7 @@ public class MultiplePropertiesBeanCodex
                 object.setLongPrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Long>( "longBoxed", new LongCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Long>( "longBoxed", TestCodexFactory.get().longCodex() ) {
 
             @Override
             public Long getValue( MultiplePropertiesBean object )
@@ -163,7 +161,9 @@ public class MultiplePropertiesBeanCodex
                 object.setLongBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Double>( "doublePrimitive", new DoubleCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Double>( "doublePrimitive", TestCodexFactory.get()
+            .doubleCodex(), true )
+        {
 
             @Override
             public Double getValue( MultiplePropertiesBean object )
@@ -177,7 +177,9 @@ public class MultiplePropertiesBeanCodex
                 object.setDoublePrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Double>( "doubleBoxed", new DoubleCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Double>( "doubleBoxed", TestCodexFactory.get()
+            .doubleCodex() )
+        {
 
             @Override
             public Double getValue( MultiplePropertiesBean object )
@@ -191,7 +193,9 @@ public class MultiplePropertiesBeanCodex
                 object.setDoubleBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Float>( "floatPrimitive", new FloatCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Float>( "floatPrimitive", TestCodexFactory.get()
+            .floatCodex(), true )
+        {
 
             @Override
             public Float getValue( MultiplePropertiesBean object )
@@ -205,7 +209,8 @@ public class MultiplePropertiesBeanCodex
                 object.setFloatPrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Float>( "floatBoxed", new FloatCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Float>( "floatBoxed", TestCodexFactory.get().floatCodex() )
+        {
 
             @Override
             public Float getValue( MultiplePropertiesBean object )
@@ -219,7 +224,9 @@ public class MultiplePropertiesBeanCodex
                 object.setFloatBoxed( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Boolean>( "booleanPrimitive", new BooleanCodex(), true ) {
+        properties.add( new Property<MultiplePropertiesBean, Boolean>( "booleanPrimitive", TestCodexFactory.get()
+            .booleanCodex(), true )
+        {
 
             @Override
             public Boolean getValue( MultiplePropertiesBean object )
@@ -233,7 +240,9 @@ public class MultiplePropertiesBeanCodex
                 object.setBooleanPrimitive( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Boolean>( "booleanBoxed", new BooleanCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Boolean>( "booleanBoxed", TestCodexFactory.get()
+            .booleanCodex() )
+        {
 
             @Override
             public Boolean getValue( MultiplePropertiesBean object )
@@ -247,36 +256,41 @@ public class MultiplePropertiesBeanCodex
                 object.setBooleanBoxed( value );
             }
         } );
-        // properties.add( new Property<MultiplePropertiesBean, Character>( "charPrimitive", new CharacterCodex(), true
-        // ) {
-        //
-        // @Override
-        // public Character getValue( MultiplePropertiesBean object )
-        // {
-        // return object.getCharPrimitive();
-        // }
-        //
-        // @Override
-        // public void setValue( MultiplePropertiesBean object, Character value )
-        // {
-        // object.setCharPrimitive( value );
-        // }
-        // } );
-        // properties.add( new Property<MultiplePropertiesBean, Character>( "charBoxed", new CharacterCodex() ) {
-        //
-        // @Override
-        // public Character getValue( MultiplePropertiesBean object )
-        // {
-        // return object.getCharBoxed();
-        // }
-        //
-        // @Override
-        // public void setValue( MultiplePropertiesBean object, Character value )
-        // {
-        // object.setCharBoxed( value );
-        // }
-        // } );
-        properties.add( new Property<MultiplePropertiesBean, BigInteger>( "bigInteger", new BigIntegerCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Character>( "charPrimitive", TestCodexFactory.get()
+            .characterCodex(), true )
+        {
+
+            @Override
+            public Character getValue( MultiplePropertiesBean object )
+            {
+                return object.getCharPrimitive();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, Character value )
+            {
+                object.setCharPrimitive( value );
+            }
+        } );
+        properties.add( new Property<MultiplePropertiesBean, Character>( "charBoxed", TestCodexFactory.get()
+            .characterCodex() )
+        {
+
+            @Override
+            public Character getValue( MultiplePropertiesBean object )
+            {
+                return object.getCharBoxed();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, Character value )
+            {
+                object.setCharBoxed( value );
+            }
+        } );
+        properties.add( new Property<MultiplePropertiesBean, BigInteger>( "bigInteger", TestCodexFactory.get()
+            .bigIntegerCodex() )
+        {
 
             @Override
             public BigInteger getValue( MultiplePropertiesBean object )
@@ -290,7 +304,9 @@ public class MultiplePropertiesBeanCodex
                 object.setBigInteger( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, BigDecimal>( "bigDecimal", new BigDecimalCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, BigDecimal>( "bigDecimal", TestCodexFactory.get()
+            .bigDecimalCodex() )
+        {
 
             @Override
             public BigDecimal getValue( MultiplePropertiesBean object )
@@ -304,8 +320,8 @@ public class MultiplePropertiesBeanCodex
                 object.setBigDecimal( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, TestEnum>( "enumProperty", new EnumCodex<TestEnum>(
-            TestEnum.class ) )
+        properties.add( new Property<MultiplePropertiesBean, TestEnum>( "enumProperty", TestCodexFactory.get()
+            .enumCodex( TestEnum.class ) )
         {
             @Override
             public TestEnum getValue( MultiplePropertiesBean object )
@@ -319,7 +335,8 @@ public class MultiplePropertiesBeanCodex
                 object.setEnumProperty( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, UUID>( "uuidProperty", new UUIDCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, UUID>( "uuidProperty", TestCodexFactory.get().uuidCodex() )
+        {
 
             @Override
             public UUID getValue( MultiplePropertiesBean object )
@@ -333,8 +350,8 @@ public class MultiplePropertiesBeanCodex
                 object.setUuidProperty( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, ChildBean>( "singleEntity", EntityCodexFactory.get()
-            .getChildBeanCodex() )
+        properties.add( new Property<MultiplePropertiesBean, ChildBean>( "singleEntity", TestCodexFactory.get()
+            .childBeanCodex() )
         {
 
             @Override
@@ -349,8 +366,8 @@ public class MultiplePropertiesBeanCodex
                 object.setSingleEntity( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, List<ChildBean>>( "listEntity", new ListCodex<ChildBean>(
-            EntityCodexFactory.get().getChildBeanCodex() ) )
+        properties.add( new Property<MultiplePropertiesBean, List<ChildBean>>( "listEntity", TestCodexFactory.get()
+            .listCodex( TestCodexFactory.get().childBeanCodex() ) )
         {
 
             @Override
@@ -365,8 +382,8 @@ public class MultiplePropertiesBeanCodex
                 object.setListEntity( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Set<ChildBean>>( "setEntity", new SetCodex<ChildBean>(
-            EntityCodexFactory.get().getChildBeanCodex() ) )
+        properties.add( new Property<MultiplePropertiesBean, Set<ChildBean>>( "setEntity", TestCodexFactory.get()
+            .setCodex( TestCodexFactory.get().childBeanCodex() ) )
         {
 
             @Override
@@ -384,7 +401,7 @@ public class MultiplePropertiesBeanCodex
         // properties.add( new Property<MultiplePropertiesBean, ChildBean[]>( "arrayEntity",new ArrayCodex<ChildBean>(
         // EntityCodexFactory.get().getChildBeanCodex() ) ) {} );
         properties.add( new Property<MultiplePropertiesBean, Map<String, ChildBean>>( "mapStringToEntity",
-            new StringMapCodex<ChildBean>( EntityCodexFactory.get().getChildBeanCodex() ) )
+            TestCodexFactory.get().stringMapCodex( TestCodexFactory.get().childBeanCodex() ) )
         {
             @Override
             public Map<String, ChildBean> getValue( MultiplePropertiesBean object )
@@ -399,7 +416,8 @@ public class MultiplePropertiesBeanCodex
             }
         } );
         properties.add( new Property<MultiplePropertiesBean, Map<ChildBean, String>>( "mapEntityToString",
-            new EntityMapCodex<ChildBean, String>( EntityCodexFactory.get().getChildBeanCodex(), new StringCodex() ) )
+            TestCodexFactory.get().entityMapCodex( TestCodexFactory.get().childBeanCodex(),
+                TestCodexFactory.get().stringCodex() ) )
         {
             @Override
             public Map<ChildBean, String> getValue( MultiplePropertiesBean object )
@@ -413,8 +431,62 @@ public class MultiplePropertiesBeanCodex
                 object.setMapEntityToString( value );
             }
         } );
-        // properties.add( new Property<MultiplePropertiesBean, Date>( "dateJdk", new ChildBeanEntityCodex() ) {});
-        // properties.add( new Property<MultiplePropertiesBean, Date>( "dateJoda", new ChildBeanEntityCodex() ) {});
+        properties.add( new Property<MultiplePropertiesBean, Date>( "date", TestCodexFactory.get().dateCodex() ) {
+
+            @Override
+            public Date getValue( MultiplePropertiesBean object )
+            {
+                return object.getDate();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, Date value )
+            {
+                object.setDate( value );
+            }
+        } );
+        properties.add( new Property<MultiplePropertiesBean, java.sql.Date>( "sqlDate", TestCodexFactory.get().sqlDateCodex() ) {
+
+            @Override
+            public java.sql.Date getValue( MultiplePropertiesBean object )
+            {
+                return object.getSqlDate();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, java.sql.Date value )
+            {
+                object.setSqlDate( value );
+            }
+        } );
+        properties.add( new Property<MultiplePropertiesBean, Time>( "sqlTime", TestCodexFactory.get().sqlTimeCodex() ) {
+
+            @Override
+            public Time getValue( MultiplePropertiesBean object )
+            {
+                return object.getSqlTime();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, Time value )
+            {
+                object.setSqlTime( value );
+            }
+        } );
+        properties.add( new Property<MultiplePropertiesBean, Timestamp>( "sqlTimestamp", TestCodexFactory.get().sqlTimestampCodex() ) {
+
+            @Override
+            public Timestamp getValue( MultiplePropertiesBean object )
+            {
+                return object.getSqlTimestamp();
+            }
+
+            @Override
+            public void setValue( MultiplePropertiesBean object, Timestamp value )
+            {
+                object.setSqlTimestamp( value );
+            }
+        } );
     }
 
     @Override

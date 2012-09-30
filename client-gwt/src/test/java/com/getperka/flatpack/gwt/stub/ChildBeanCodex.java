@@ -1,9 +1,8 @@
-package com.getperka.flatpack.gwt;
+package com.getperka.flatpack.gwt.stub;
 
 import java.util.List;
 
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
-import com.getperka.flatpack.gwt.codexes.StringCodex;
 import com.getperka.flatpack.gwt.ext.Property;
 
 public class ChildBeanCodex
@@ -13,7 +12,7 @@ public class ChildBeanCodex
     @Override
     protected void initProperties( List<Property<ChildBean, ?>> properties )
     {
-        properties.add( new Property<ChildBean, String>( "child", new StringCodex() ) {
+        properties.add( new Property<ChildBean, String>( "child", TestCodexFactory.get().stringCodex() ) {
 
             @Override
             public String getValue( ChildBean object )
