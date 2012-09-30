@@ -21,13 +21,13 @@ package com.getperka.flatpack.demo.gwt;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import org.joda.time.LocalDateTime;
 
 import com.getperka.flatpack.BaseHasUuid;
 
@@ -52,9 +52,8 @@ public class MultiplePropertiesBean
     private Float floatBoxed;
     private boolean booleanPrimitive;
     private Boolean booleanBoxed;
-    // TODO not working
-    // private char charPrimitive;
-    // private Character charBoxed;
+    private char charPrimitive;
+    private Character charBoxed;
     private BigInteger bigInteger;
     private BigDecimal bigDecimal;
     private TestEnum enumProperty;
@@ -66,7 +65,11 @@ public class MultiplePropertiesBean
     private Map<ChildBean, String> mapEntityToString;
     private ChildBean[] arrayEntity;
     private Date dateJdk;
-    private LocalDateTime dateJoda;
+    private java.sql.Date sqlDate;
+    private Time sqlTime;
+    private Timestamp sqlTimestamp;
+
+    // private LocalDateTime dateJoda;
 
     public String getString()
     {
@@ -218,25 +221,25 @@ public class MultiplePropertiesBean
         this.booleanBoxed = booleanBoxed;
     }
 
-    // public char getCharPrimitive()
-    // {
-    // return charPrimitive;
-    // }
-    //
-    // public void setCharPrimitive( char charPrimitive )
-    // {
-    // this.charPrimitive = charPrimitive;
-    // }
-    //
-    // public Character getCharBoxed()
-    // {
-    // return charBoxed;
-    // }
-    //
-    // public void setCharBoxed( Character charBoxed )
-    // {
-    // this.charBoxed = charBoxed;
-    // }
+    public char getCharPrimitive()
+    {
+        return charPrimitive;
+    }
+
+    public void setCharPrimitive( char charPrimitive )
+    {
+        this.charPrimitive = charPrimitive;
+    }
+
+    public Character getCharBoxed()
+    {
+        return charBoxed;
+    }
+
+    public void setCharBoxed( Character charBoxed )
+    {
+        this.charBoxed = charBoxed;
+    }
 
     public BigInteger getBigInteger()
     {
@@ -348,14 +351,34 @@ public class MultiplePropertiesBean
         this.dateJdk = dateJdk;
     }
 
-    public LocalDateTime getDateJoda()
+    public java.sql.Date getSqlDate()
     {
-        return dateJoda;
+        return sqlDate;
     }
 
-    public void setDateJoda( LocalDateTime dateJoda )
+    public void setSqlDate( java.sql.Date sqlDate )
     {
-        this.dateJoda = dateJoda;
+        this.sqlDate = sqlDate;
+    }
+
+    public Time getSqlTime()
+    {
+        return sqlTime;
+    }
+
+    public void setSqlTime( Time sqlTime )
+    {
+        this.sqlTime = sqlTime;
+    }
+
+    public Timestamp getSqlTimestamp()
+    {
+        return sqlTimestamp;
+    }
+
+    public void setSqlTimestamp( Timestamp sqlTimestamp )
+    {
+        this.sqlTimestamp = sqlTimestamp;
     }
 
 }

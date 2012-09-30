@@ -22,6 +22,8 @@ package com.getperka.flatpack.demo.gwt;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,8 +50,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Providers;
-
-import org.joda.time.LocalDateTime;
 
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
@@ -209,28 +209,7 @@ public class DemoResource
     /**
      * Return a map of products.
      */
-    @GET
-    @Path( "void" )
-    @FlatPackResponse( Void.class )
-    public void voidGet()
-    {
-        return;
-    }
-
-    /**
-     * Return a map of products.
-     */
-    @GET
-    @Path( "boolean" )
-    @Produces( MediaType.TEXT_PLAIN )
-    public boolean booleanGet()
-    {
-        return true;
-    }
-
-    /**
-     * Return a map of products.
-     */
+    @SuppressWarnings( "deprecation" )
     @GET
     @Path( "multipleProperties" )
     @FlatPackResponse( MultiplePropertiesBean.class )
@@ -257,8 +236,8 @@ public class DemoResource
         bean.setBooleanBoxed( false );
         bean.setEnumProperty( TestEnum.FOUR );
         bean.setUuidProperty( UUID.fromString( "99999999-9999-9999-9999-999999999999" ) );
-        // bean.setCharPrimitive( '\u00e7' );
-        // bean.setCharBoxed( '\u00e8' );
+        bean.setCharPrimitive( '\u00e7' );
+        bean.setCharBoxed( '\u00e8' );
 
         ChildBean child1 = new ChildBean();
         child1.setUuid( UUID.fromString( "4de76f27-2bed-49d3-b624-4b0697cfc53f" ) );
@@ -284,7 +263,10 @@ public class DemoResource
         bean.setMapEntityToString( mapEntityToString );
 
         bean.setDateJdk( new Date( new Date( 112, 7, 18, 15, 45, 56 ).getTime() + 543 ) );
-        bean.setDateJoda( new LocalDateTime( 2011, 3, 14, 21, 56, 23, 996 ) );
+        bean.setSqlDate( new java.sql.Date( new Date( 112, 7, 18, 15, 45, 56 ).getTime() + 544 ) );
+        bean.setSqlTime( new Time( new Date( 112, 7, 18, 15, 45, 56 ).getTime() + 545 ) );
+        bean.setSqlTimestamp( new Timestamp( new Date( 112, 7, 18, 15, 45, 56 ).getTime() + 546 ) );
+        // bean.setDateJoda( new LocalDateTime( 2011, 3, 14, 21, 56, 23, 996 ) );
 
         return bean;
     }

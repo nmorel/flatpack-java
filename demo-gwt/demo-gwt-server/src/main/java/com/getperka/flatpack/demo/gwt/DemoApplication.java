@@ -71,7 +71,7 @@ public class DemoApplication
          * At least one TypeSource is required. The TypeSources associated with a FlatPack stack determine the complete
          * set of entity types that can be processed. This SearchTypeSource scans the classpath for HasUuid subtypes.
          */
-        .addTypeSource( new SearchTypeSource( "com.getperka.flatpack.demo.gwt" ) ).withPrettyPrint( false )
+        .addTypeSource( new SearchTypeSource( "com.getperka.flatpack.demo.gwt" ) ).withPrettyPrint( true )
         /*
          * A PrincipalMapper is optional and, if present, enables the use principal-based property access restrictions
          * whereby certain Principals are allowed to mutate only specific entities. This can be used, for example, to
