@@ -8,9 +8,9 @@ package com.getperka.flatpack.codexes;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.TypeLiteral;
@@ -39,7 +40,7 @@ import com.google.inject.TypeLiteral;
  * <p>
  * Dates are always written as an ISO8601 time. Dates may be read as a number of milliseconds since
  * the epoch or something approximating an ISO8601 date-time string.
- * 
+ *
  * @param <D> the concrete type of Date to instantiate.
  */
 public class DateCodex<D extends Date> extends ValueCodex<D> {
@@ -57,7 +58,7 @@ public class DateCodex<D extends Date> extends ValueCodex<D> {
 
   @Override
   public Type describe() {
-    return new Type.Builder().withJsonKind(JsonKind.STRING).build();
+    return new Type.Builder().withJsonKind(JsonKind.STRING).withTypeHint( TypeHint.create( constructor.getDeclaringClass() ) ).build();
   }
 
   @Override
