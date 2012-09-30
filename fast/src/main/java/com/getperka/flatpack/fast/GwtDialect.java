@@ -39,7 +39,6 @@ import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
 import com.getperka.flatpack.ext.Property;
 import com.getperka.flatpack.ext.Type;
-import com.getperka.flatpack.ext.TypeHint;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
@@ -170,6 +169,42 @@ public class GwtDialect
 
     protected String toCodexString( Type type )
     {
+        // Allow a TypeHint to override any interpretation of the Type
+        if ( type.getTypeHint() != null )
+        {
+            String typeHint = type.getTypeHint().getValue();
+
+            StringBuilder builder = new StringBuilder( "BaseCodexFactory.get()." );
+
+            if ( java.util.Date.class.getCanonicalName().equals( typeHint ) )
+            {
+                builder.append( "date" );
+            }
+            else if ( java.sql.Date.class.getCanonicalName().equals( typeHint ) )
+            {
+                builder.append( "sqlDate" );
+            }
+            else if ( Time.class.getCanonicalName().equals( typeHint ) )
+            {
+                builder.append( "sqlTime" );
+            }
+            else if ( Timestamp.class.getCanonicalName().equals( typeHint ) )
+            {
+                builder.append( "sqlTimestamp" );
+            }
+            else if ( UUID.class.getCanonicalName().equals( typeHint ) )
+            {
+                builder.append( "uuid" );
+            }
+            else
+            {
+                // all other types like byte, integer, bigdecimal, etc.
+                builder.append( toLowerCamel( typeHint.substring( typeHint.lastIndexOf( '.' ) + 1 ) ) );
+            }
+            builder.append( "Codex()" );
+            return builder.toString();
+        }
+
         switch ( type.getJsonKind() )
         {
             case ANY:
@@ -208,43 +243,6 @@ public class GwtDialect
                 if ( type.getName() != null )
                 {
                     return "BaseCodexFactory.get()." + type.getName() + "Codex()";
-                }
-
-                // Look for a type hint
-                TypeHint hint = type.getTypeHint();
-                if ( hint != null )
-                {
-                    // ToStringCodex like BigDecimalCodex, BigIntegerCodex, TypeHintCodex
-                    String value = hint.getValue();
-
-                    StringBuilder builder = new StringBuilder( "BaseCodexFactory.get()." );
-
-                    if ( java.util.Date.class.getCanonicalName().equals( value ) )
-                    {
-                        builder.append( "date" );
-                    }
-                    else if ( java.sql.Date.class.getCanonicalName().equals( value ) )
-                    {
-                        builder.append( "sqlDate" );
-                    }
-                    else if ( Time.class.getCanonicalName().equals( value ) )
-                    {
-                        builder.append( "sqlTime" );
-                    }
-                    else if ( Timestamp.class.getCanonicalName().equals( value ) )
-                    {
-                        builder.append( "sqlTimestamp" );
-                    }
-                    else if ( UUID.class.getCanonicalName().equals( value ) )
-                    {
-                        builder.append( "uuid" );
-                    }
-                    else
-                    {
-                        builder.append( toLowerCamel( value.substring( value.lastIndexOf( '.' ) + 1 ) ) );
-                    }
-                    builder.append( "Codex()" );
-                    return builder.toString();
                 }
 
                 // Otherwise it must be a plain string
