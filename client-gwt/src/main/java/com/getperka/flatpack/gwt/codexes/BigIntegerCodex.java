@@ -3,6 +3,7 @@ package com.getperka.flatpack.gwt.codexes;
 import java.math.BigInteger;
 
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
+import com.getperka.flatpack.gwt.ext.SerializationContext;
 
 public class BigIntegerCodex
     extends NumberCodex<BigInteger>
@@ -41,6 +42,12 @@ public class BigIntegerCodex
     protected BigInteger readStringNotNull( String value )
     {
         return new BigInteger( value );
+    }
+
+    @Override
+    public void writeNotNull( BigInteger object, SerializationContext context )
+    {
+        context.getWriter().value( object.toString() );
     }
 
 }
