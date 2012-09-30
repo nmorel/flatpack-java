@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,7 +35,7 @@ import com.google.inject.TypeLiteral;
 
 /**
  * Primitive numberic support.
- * 
+ *
  * @param <N> the boxed Number type
  */
 public class NumberCodex<N extends Number> extends ValueCodex<N> {
@@ -108,6 +108,10 @@ public class NumberCodex<N extends Number> extends ValueCodex<N> {
 
   @Override
   public void writeNotNull(N object, SerializationContext context) throws IOException {
-    context.getWriter().value(object);
+    if (BigDecimal.class.equals(clazz) || BigInteger.class.equals(clazz)) {
+      context.getWriter().value(object.toString());
+    }else{
+      context.getWriter().value(object);
+    }
   }
 }
