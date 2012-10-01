@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,7 +70,7 @@ import com.google.gson.stream.JsonWriter;
 
 /**
  * Generate API documentation using a Doclet and include it in the project's output.
- * 
+ *
  * @goal apidoc
  * @phase process-sources
  * @threadSafe
@@ -168,7 +168,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * Used to look up Artifacts in the remote repository.
-   * 
+   *
    * @component
    * @required
    * @readonly
@@ -177,7 +177,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * Used to look up Artifacts in the remote repository.
-   * 
+   *
    * @component
    * @required
    * @readonly
@@ -186,7 +186,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * Location of the local repository.
-   * 
+   *
    * @parameter expression="${localRepository}"
    * @readonly
    * @required
@@ -195,7 +195,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * List of Remote Repositories to be used by the resolver.
-   * 
+   *
    * @parameter expression="${project.remoteArtifactRepositories}"
    * @readonly
    * @required
@@ -205,7 +205,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * Used to look up Artifacts in the remote repository.
-   * 
+   *
    * @component
    * @required
    * @readonly
@@ -215,14 +215,14 @@ public class ApidocMojo extends AbstractMojo {
   /**
    * A source directory for extra files to add to the api documentation. If this directory exists,
    * its contents will be included in the generated apidoc.
-   * 
+   *
    * @parameter default-value="${basedir}/src/main/apidoc"
    */
   private File apidocDirectory;
 
   /**
    * The name of the Doclet to execute.
-   * 
+   *
    * @parameter default-value="com.getperka.flatpack.doclets.DocStringsDoclet"
    * @required
    */
@@ -237,7 +237,7 @@ public class ApidocMojo extends AbstractMojo {
 
   /**
    * The destination directory for the generated documentation.
-   * 
+   *
    * @parameter default-value="${project.build.directory}/apidoc"
    */
   private File outputDirectory;
@@ -252,14 +252,14 @@ public class ApidocMojo extends AbstractMojo {
   /**
    * The source directory for the java source files. This path will be used to supply the javadoc
    * tool's input.
-   * 
+   *
    * @parameter default-value="${basedir}/src/main/java"
    */
   private File sourceDirectory;
 
   /**
    * The packages over which the doclet should be executed.
-   * 
+   *
    * @parameter
    * @required
    */
@@ -397,7 +397,7 @@ public class ApidocMojo extends AbstractMojo {
 
     StringBuilder sb = new StringBuilder();
     for (Artifact a : artifacts) {
-      sb.append(":").append(a.getFile().getAbsolutePath());
+      sb.append(File.pathSeparatorChar).append(a.getFile().getAbsolutePath());
     }
 
     args.add("-classpath");
