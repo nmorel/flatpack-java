@@ -1,4 +1,5 @@
 package com.getperka.flatpack.codexes;
+
 /*
  * #%L
  * FlatPack serialization code
@@ -8,9 +9,9 @@ package com.getperka.flatpack.codexes;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +31,7 @@ import com.getperka.flatpack.ext.DeserializationContext;
 import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.SerializationContext;
 import com.getperka.flatpack.ext.Type;
+import com.getperka.flatpack.ext.TypeHint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.inject.TypeLiteral;
@@ -57,7 +59,10 @@ public class DateCodex<D extends Date> extends ValueCodex<D> {
 
   @Override
   public Type describe() {
-    return new Type.Builder().withJsonKind(JsonKind.STRING).build();
+    return new Type.Builder()
+        .withJsonKind(JsonKind.STRING)
+        .withTypeHint(TypeHint.create(constructor.getDeclaringClass()))
+        .build();
   }
 
   @Override
