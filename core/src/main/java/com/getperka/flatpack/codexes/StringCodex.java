@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
  * Support for Strings.
  */
 public class StringCodex extends ValueCodex<String> {
-  StringCodex() {}
+  protected StringCodex() {}
 
   @Override
   public Type describe() {

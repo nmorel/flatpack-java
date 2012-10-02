@@ -40,13 +40,9 @@ import com.google.inject.TypeLiteral;
  * @param <E> the type of enum
  */
 public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
-  private final Class<E> clazz;
+  private Class<E> clazz;
 
-  @Inject
-  @SuppressWarnings("unchecked")
-  EnumCodex(TypeLiteral<E> type) {
-    clazz = (Class<E>) type.getRawType();
-  }
+  protected EnumCodex() {}
 
   @Override
   public Type describe() {
@@ -69,5 +65,11 @@ public class EnumCodex<E extends Enum<E>> extends ValueCodex<E> {
   @Override
   public void writeNotNull(E object, SerializationContext context) throws IOException {
     context.getWriter().value(object.name());
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(TypeLiteral<E> type) {
+    clazz = (Class<E>) type.getRawType();
   }
 }

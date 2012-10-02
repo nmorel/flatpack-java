@@ -36,7 +36,7 @@ import com.google.gson.JsonElement;
 public class DateTimeZoneCodex extends ValueCodex<DateTimeZone> {
   public static final TypeHint HINT = TypeHint.create(DateTimeZone.class);
 
-  DateTimeZoneCodex() {}
+  protected DateTimeZoneCodex() {}
 
   @Override
   public Type describe() {

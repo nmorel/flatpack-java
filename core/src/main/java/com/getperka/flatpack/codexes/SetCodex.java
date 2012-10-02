@@ -29,7 +29,7 @@ import com.getperka.flatpack.util.FlatPackCollections;
  * @param <V> the element type of the set
  */
 public class SetCodex<V> extends CollectionCodex<Set<V>, V> {
-  SetCodex() {}
+  protected SetCodex() {}
 
   @Override
   protected Set<V> newCollection() {

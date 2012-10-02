@@ -45,17 +45,12 @@ public class DynamicCodex extends Codex<Object> {
   private static final Pattern UUID_PATTERN = Pattern
       .compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
-  @Inject
+  // Use Provider to prevent cyclic reference
+  private Provider<ListCodex<Object>> listCodex;
+  private Provider<StringMapCodex<Object>> mapCodex;
   private TypeContext typeContext;
 
-  // Use Provider to prevent cyclic reference
-  @Inject
-  private Provider<ListCodex<Object>> listCodex;
-
-  @Inject
-  private Provider<StringMapCodex<Object>> mapCodex;
-
-  DynamicCodex() {}
+  protected DynamicCodex() {}
 
   @Override
   public Type describe() {
@@ -118,5 +113,13 @@ public class DynamicCodex extends Codex<Object> {
   public void writeNotNull(Object object, SerializationContext context) throws IOException {
     Codex<Object> actual = typeContext.getCodex(object.getClass());
     actual.write(object, context);
+  }
+
+  @Inject
+  void inject(TypeContext typeContext, Provider<ListCodex<Object>> listCodex,
+      Provider<StringMapCodex<Object>> mapCodex) {
+    this.listCodex = listCodex;
+    this.mapCodex = mapCodex;
+    this.typeContext = typeContext;
   }
 }

@@ -30,7 +30,7 @@ import com.getperka.flatpack.util.FlatPackCollections;
  */
 public class ListCodex<V> extends CollectionCodex<List<V>, V> {
 
-  ListCodex() {}
+  protected ListCodex() {}
 
   @Override
   protected List<V> newCollection() {

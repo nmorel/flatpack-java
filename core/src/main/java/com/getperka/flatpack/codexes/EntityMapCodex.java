@@ -41,15 +41,10 @@ import com.google.inject.TypeLiteral;
  * Provides a mapping of entities to arbitrary values.
  */
 public class EntityMapCodex<K extends HasUuid, V> extends Codex<Map<K, V>> {
-  private final EntityCodex<K> keyCodex;
-  private final Codex<V> valueCodex;
+  private EntityCodex<K> keyCodex;
+  private Codex<V> valueCodex;
 
-  @Inject
-  @SuppressWarnings("unchecked")
-  EntityMapCodex(EntityCodex<K> keyCodex, TypeLiteral<V> valueType, TypeContext typeContext) {
-    this.keyCodex = keyCodex;
-    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
-  }
+  protected EntityMapCodex() {}
 
   @Override
   public Type describe() {
@@ -110,6 +105,13 @@ public class EntityMapCodex<K extends HasUuid, V> extends Codex<Map<K, V>> {
       }
     }
     writer.endObject();
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(EntityCodex<K> keyCodex, TypeLiteral<V> valueType, TypeContext typeContext) {
+    this.keyCodex = keyCodex;
+    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
   }
 
 }

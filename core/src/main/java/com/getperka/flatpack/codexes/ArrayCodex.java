@@ -43,15 +43,10 @@ import com.google.inject.TypeLiteral;
  * @param <T> the type of data contained in the array
  */
 public class ArrayCodex<T> extends Codex<T[]> {
-  private final Class<T> elementType;
-  private final Codex<T> valueCodex;
+  private Class<T> elementType;
+  private Codex<T> valueCodex;
 
-  @Inject
-  @SuppressWarnings("unchecked")
-  ArrayCodex(TypeLiteral<T> elementType, TypeContext context) {
-    this.elementType = erase(elementType.getType());
-    this.valueCodex = (Codex<T>) context.getCodex(elementType.getType());
-  }
+  protected ArrayCodex() {}
 
   @Override
   public Type describe() {
@@ -100,5 +95,12 @@ public class ArrayCodex<T> extends Codex<T[]> {
       context.popPath();
     }
     writer.endArray();
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(TypeLiteral<T> elementType, TypeContext context) {
+    this.elementType = erase(elementType.getType());
+    this.valueCodex = (Codex<T>) context.getCodex(elementType.getType());
   }
 }

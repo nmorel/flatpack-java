@@ -41,13 +41,9 @@ import com.google.inject.TypeLiteral;
  * @param <V> the map value type
  */
 public class StringMapCodex<V> extends Codex<Map<String, V>> {
-  private final Codex<V> valueCodex;
+  private Codex<V> valueCodex;
 
-  @Inject
-  @SuppressWarnings("unchecked")
-  StringMapCodex(TypeLiteral<V> valueType, TypeContext typeContext) {
-    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
-  }
+  protected StringMapCodex() {}
 
   @Override
   public Type describe() {
@@ -111,5 +107,11 @@ public class StringMapCodex<V> extends Codex<Map<String, V>> {
       }
     }
     writer.endObject();
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(TypeLiteral<V> valueType, TypeContext typeContext) {
+    this.valueCodex = (Codex<V>) typeContext.getCodex(valueType.getType());
   }
 }

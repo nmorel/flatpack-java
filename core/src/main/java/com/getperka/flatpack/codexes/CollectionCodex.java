@@ -48,7 +48,7 @@ public abstract class CollectionCodex<T extends Collection<V>, V> extends Codex<
    */
   private Codex<V> valueCodex;
 
-  CollectionCodex() {}
+  protected CollectionCodex() {}
 
   @Override
   public Type describe() {
