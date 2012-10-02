@@ -29,7 +29,7 @@ import com.google.gson.JsonElement;
  * Ignores all values.
  */
 public class VoidCodex extends ValueCodex<Void> {
-  VoidCodex() {}
+  protected VoidCodex() {}
 
   @Override
   public Type describe() {

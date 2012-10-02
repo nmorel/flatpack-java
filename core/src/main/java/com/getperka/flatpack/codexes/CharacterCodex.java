@@ -33,7 +33,7 @@ import com.google.gson.JsonPrimitive;
  */
 public class CharacterCodex extends ValueCodex<Character> {
 
-  CharacterCodex() {}
+  protected CharacterCodex() {}
 
   @Override
   public Type describe() {

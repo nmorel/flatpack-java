@@ -32,7 +32,7 @@ import com.google.gson.JsonElement;
  */
 public class BooleanCodex extends ValueCodex<Boolean> {
 
-  BooleanCodex() {}
+  protected BooleanCodex() {}
 
   @Override
   public Type describe() {

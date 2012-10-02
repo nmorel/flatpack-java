@@ -33,10 +33,9 @@ import com.google.gson.JsonElement;
  * Maps Class literals to their payload names and back.
  */
 public class HasUuidClassCodex extends ValueCodex<Class<? extends HasUuid>> {
-  @Inject
   private TypeContext typeContext;
 
-  HasUuidClassCodex() {}
+  protected HasUuidClassCodex() {}
 
   @Override
   public Type describe() {
@@ -54,5 +53,10 @@ public class HasUuidClassCodex extends ValueCodex<Class<? extends HasUuid>> {
   public void writeNotNull(Class<? extends HasUuid> object, SerializationContext context)
       throws Exception {
     context.getWriter().value(typeContext.getPayloadName(object));
+  }
+
+  @Inject
+  void inject(TypeContext typeContext) {
+    this.typeContext = typeContext;
   }
 }

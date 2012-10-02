@@ -59,47 +59,10 @@ import com.google.inject.ProvisionException;
  */
 public class DefaultCodexMapper implements CodexMapper {
 
-  private final Injector injector;
+  private Injector injector;
   private final Map<Class<?>, ValueCodex<?>> simpleCodexes = FlatPackCollections.mapForIteration();
 
-  @Inject
-  DefaultCodexMapper(Injector injector) {
-    this.injector = injector;
-
-    simpleCodexes.put(BigDecimal.class, (NumberCodex<?>) injector.getInstance(
-        Key.get(createType(NumberCodex.class, BigDecimal.class))));
-    simpleCodexes.put(BigInteger.class, (NumberCodex<?>) injector.getInstance(
-        Key.get(createType(NumberCodex.class, BigInteger.class))));
-    simpleCodexes.put(boolean.class, injector.getInstance(BooleanCodex.class));
-    simpleCodexes.put(Boolean.class, injector.getInstance(BooleanCodex.class));
-    simpleCodexes.put(char.class, injector.getInstance(CharacterCodex.class));
-    simpleCodexes.put(Character.class, injector.getInstance(CharacterCodex.class));
-    simpleCodexes.put(Class.class, injector.getInstance(HasUuidClassCodex.class));
-    simpleCodexes.put(DateTimeZone.class, injector.getInstance(DateTimeZoneCodex.class));
-    simpleCodexes.put(JsonElement.class, injector.getInstance(JsonElementCodex.class));
-    simpleCodexes.put(String.class, injector.getInstance(StringCodex.class));
-    simpleCodexes.put(TypeHint.class, injector.getInstance(TypeHintCodex.class));
-    simpleCodexes.put(UUID.class, injector.getInstance(UUIDCodex.class));
-    simpleCodexes.put(void.class, injector.getInstance(VoidCodex.class));
-    simpleCodexes.put(Void.class, injector.getInstance(VoidCodex.class));
-
-    for (Class<?> clazz : BOXED_TYPES) {
-      if (Number.class.isAssignableFrom(clazz)) {
-        @SuppressWarnings("unchecked")
-        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, clazz));
-        simpleCodexes.put(clazz, injector.getInstance(key));
-      }
-    }
-
-    for (Class<?> clazz : PRIMITIVE_TYPES) {
-      Class<?> boxed = box(clazz);
-      if (Number.class.isAssignableFrom(boxed)) {
-        @SuppressWarnings("unchecked")
-        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, boxed));
-        simpleCodexes.put(clazz, injector.getInstance(key));
-      }
-    }
-  }
+  protected DefaultCodexMapper() {}
 
   @Override
   public Codex<?> getCodex(TypeContext context, Type type) {
@@ -163,6 +126,45 @@ public class DefaultCodexMapper implements CodexMapper {
     } catch (ProvisionException ignored) {}
 
     return null;
+  }
+
+  @Inject
+  void inject(Injector injector) {
+    this.injector = injector;
+
+    simpleCodexes.put(BigDecimal.class, (NumberCodex<?>) injector.getInstance(
+        Key.get(createType(NumberCodex.class, BigDecimal.class))));
+    simpleCodexes.put(BigInteger.class, (NumberCodex<?>) injector.getInstance(
+        Key.get(createType(NumberCodex.class, BigInteger.class))));
+    simpleCodexes.put(boolean.class, injector.getInstance(BooleanCodex.class));
+    simpleCodexes.put(Boolean.class, injector.getInstance(BooleanCodex.class));
+    simpleCodexes.put(char.class, injector.getInstance(CharacterCodex.class));
+    simpleCodexes.put(Character.class, injector.getInstance(CharacterCodex.class));
+    simpleCodexes.put(Class.class, injector.getInstance(HasUuidClassCodex.class));
+    simpleCodexes.put(DateTimeZone.class, injector.getInstance(DateTimeZoneCodex.class));
+    simpleCodexes.put(JsonElement.class, injector.getInstance(JsonElementCodex.class));
+    simpleCodexes.put(String.class, injector.getInstance(StringCodex.class));
+    simpleCodexes.put(TypeHint.class, injector.getInstance(TypeHintCodex.class));
+    simpleCodexes.put(UUID.class, injector.getInstance(UUIDCodex.class));
+    simpleCodexes.put(void.class, injector.getInstance(VoidCodex.class));
+    simpleCodexes.put(Void.class, injector.getInstance(VoidCodex.class));
+
+    for (Class<?> clazz : BOXED_TYPES) {
+      if (Number.class.isAssignableFrom(clazz)) {
+        @SuppressWarnings("unchecked")
+        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, clazz));
+        simpleCodexes.put(clazz, injector.getInstance(key));
+      }
+    }
+
+    for (Class<?> clazz : PRIMITIVE_TYPES) {
+      Class<?> boxed = box(clazz);
+      if (Number.class.isAssignableFrom(boxed)) {
+        @SuppressWarnings("unchecked")
+        Key<ValueCodex<?>> key = (Key<ValueCodex<?>>) Key.get(createType(NumberCodex.class, boxed));
+        simpleCodexes.put(clazz, injector.getInstance(key));
+      }
+    }
   }
 
   private Codex<?> getInstance(Class<?> codexType, Type type) {

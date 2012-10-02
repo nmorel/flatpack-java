@@ -51,58 +51,23 @@ import com.google.gson.stream.JsonWriter;
 import com.google.inject.TypeLiteral;
 
 /**
- * @param <T>
+ * Support for reading and writing entities that are known by {@link TypeContext}.
+ * 
+ * @param <T> the type of entity to encode
  */
 public class EntityCodex<T extends HasUuid> extends Codex<T> {
 
-  private final Class<T> clazz;
+  private Class<T> clazz;
   @Inject
   private EntityResolver entityResolver;
   @com.google.inject.Inject(optional = true)
   private Provider<T> provider;
-  private final List<Method> preUnpackMethods;
-  private final List<Method> postUnpackMethods;
+  private List<Method> preUnpackMethods;
+  private List<Method> postUnpackMethods;
   @Inject
   private TypeContext typeContext;
 
-  @Inject
-  EntityCodex(TypeLiteral<T> clazz) {
-    this.clazz = erase(clazz.getType());
-
-    List<Method> pre = new ArrayList<Method>();
-    List<Method> post = new ArrayList<Method>();
-    // Iterate over all methods in the type and then its supertypes
-    for (Class<?> lookAt = this.clazz; lookAt != null; lookAt = lookAt.getSuperclass()) {
-      for (Method m : lookAt.getDeclaredMethods()) {
-        Class<?>[] params = m.getParameterTypes();
-        switch (params.length) {
-          case 0:
-            if (m.isAnnotationPresent(PreUnpack.class)) {
-              m.setAccessible(true);
-              pre.add(m);
-            }
-            if (m.isAnnotationPresent(PostUnpack.class)) {
-              m.setAccessible(true);
-              post.add(m);
-            }
-            break;
-          case 1:
-            if (m.isAnnotationPresent(PreUnpack.class) && params[0].equals(JsonObject.class)) {
-              m.setAccessible(true);
-              pre.add(m);
-            }
-            break;
-        }
-      }
-    }
-    // Reverse the list to call supertype methods first
-    Collections.reverse(pre);
-    Collections.reverse(post);
-    preUnpackMethods = pre.isEmpty() ? Collections.<Method> emptyList() :
-        Collections.unmodifiableList(pre);
-    postUnpackMethods = post.isEmpty() ? Collections.<Method> emptyList() :
-        Collections.unmodifiableList(post);
-  }
+  protected EntityCodex() {}
 
   /**
    * Performs a minimal amount of work to create an empty stub object to fill in later.
@@ -294,6 +259,45 @@ public class EntityCodex<T extends HasUuid> extends Codex<T> {
     } finally {
       context.popPath();
     }
+  }
+
+  @Inject
+  void inject(TypeLiteral<T> clazz) {
+    this.clazz = erase(clazz.getType());
+
+    List<Method> pre = new ArrayList<Method>();
+    List<Method> post = new ArrayList<Method>();
+    // Iterate over all methods in the type and then its supertypes
+    for (Class<?> lookAt = this.clazz; lookAt != null; lookAt = lookAt.getSuperclass()) {
+      for (Method m : lookAt.getDeclaredMethods()) {
+        Class<?>[] params = m.getParameterTypes();
+        switch (params.length) {
+          case 0:
+            if (m.isAnnotationPresent(PreUnpack.class)) {
+              m.setAccessible(true);
+              pre.add(m);
+            }
+            if (m.isAnnotationPresent(PostUnpack.class)) {
+              m.setAccessible(true);
+              post.add(m);
+            }
+            break;
+          case 1:
+            if (m.isAnnotationPresent(PreUnpack.class) && params[0].equals(JsonObject.class)) {
+              m.setAccessible(true);
+              pre.add(m);
+            }
+            break;
+        }
+      }
+    }
+    // Reverse the list to call supertype methods first
+    Collections.reverse(pre);
+    Collections.reverse(post);
+    preUnpackMethods = pre.isEmpty() ? Collections.<Method> emptyList() :
+        Collections.unmodifiableList(pre);
+    postUnpackMethods = post.isEmpty() ? Collections.<Method> emptyList() :
+        Collections.unmodifiableList(post);
   }
 
   private T allocate(UUID uuid, DeserializationContext context, boolean useResolvers) {

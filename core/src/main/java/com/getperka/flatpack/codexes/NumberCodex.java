@@ -39,13 +39,10 @@ import com.google.inject.TypeLiteral;
  * @param <N> the boxed Number type
  */
 public class NumberCodex<N extends Number> extends ValueCodex<N> {
-  private final Class<N> clazz;
+  private Class<N> clazz;
 
   @Inject
-  @SuppressWarnings("unchecked")
-  NumberCodex(TypeLiteral<N> type) {
-    this.clazz = (Class<N>) type.getRawType();
-  }
+  protected NumberCodex() {}
 
   @Override
   public Type describe() {
@@ -113,5 +110,11 @@ public class NumberCodex<N extends Number> extends ValueCodex<N> {
     }else{
       context.getWriter().value(object);
     }
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(TypeLiteral<N> type) {
+    this.clazz = (Class<N>) type.getRawType();
   }
 }

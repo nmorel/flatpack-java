@@ -37,27 +37,9 @@ import com.google.inject.TypeLiteral;
  * String or an Object.
  */
 public class ToStringCodex<T> extends ValueCodex<T> {
-  private final Constructor<T> constructor;
+  private Constructor<T> constructor;
 
-  ToStringCodex(Constructor<T> constructor) {
-    this.constructor = constructor;
-  }
-
-  @Inject
-  @SuppressWarnings("unchecked")
-  ToStringCodex(TypeLiteral<T> type) {
-    Constructor<T> found = null;
-    try {
-      found = (Constructor<T>) type.getRawType().getConstructor(String.class);
-    } catch (NoSuchMethodException e) {}
-    try {
-      found = (Constructor<T>) type.getRawType().getConstructor(Object.class);
-    } catch (NoSuchMethodException e) {}
-    if (found == null) {
-      throw new IllegalArgumentException("No suitable constructors");
-    }
-    constructor = found;
-  }
+  protected ToStringCodex() {}
 
   @Override
   public Type describe() {
@@ -75,5 +57,21 @@ public class ToStringCodex<T> extends ValueCodex<T> {
   @Override
   public void writeNotNull(T object, SerializationContext context) throws IOException {
     context.getWriter().value(object.toString());
+  }
+
+  @Inject
+  @SuppressWarnings("unchecked")
+  void inject(TypeLiteral<T> type) {
+    Constructor<T> found = null;
+    try {
+      found = (Constructor<T>) type.getRawType().getConstructor(String.class);
+    } catch (NoSuchMethodException e) {}
+    try {
+      found = (Constructor<T>) type.getRawType().getConstructor(Object.class);
+    } catch (NoSuchMethodException e) {}
+    if (found == null) {
+      throw new IllegalArgumentException("No suitable constructors");
+    }
+    constructor = found;
   }
 }
