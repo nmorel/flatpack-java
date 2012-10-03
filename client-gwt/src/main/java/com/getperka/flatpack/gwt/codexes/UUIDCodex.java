@@ -30,11 +30,6 @@ import com.getperka.flatpack.gwt.ext.SerializationContext;
 public class UUIDCodex
     extends ValueCodex<UUID>
 {
-
-    public UUIDCodex()
-    {
-    }
-
     @Override
     public UUID readNotNull( Object element, DeserializationContext context )
     {

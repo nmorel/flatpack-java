@@ -65,14 +65,13 @@ public class StringMapCodex<V>
     /*-{
 		for ( var key in element) {
 			if (element.hasOwnProperty(key)) {
-				var object = element[key];
+				var object = this.@com.getperka.flatpack.gwt.codexes.StringMapCodex::getObject(Lcom/google/gwt/core/client/JavaScriptObject;Ljava/lang/String;)(element, key);
 				this.@com.getperka.flatpack.gwt.codexes.StringMapCodex::readObject(Ljava/lang/String;Ljava/lang/Object;Ljava/util/Map;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;)(key, object, toReturn, context);
 			}
 		}
     }-*/;
 
-    private void readObject( String key, Object object, Map<String, V> toReturn,
-                             DeserializationContext context )
+    private void readObject( String key, Object object, Map<String, V> toReturn, DeserializationContext context )
     {
         context.pushPath( "[" + key + "]" );
         try

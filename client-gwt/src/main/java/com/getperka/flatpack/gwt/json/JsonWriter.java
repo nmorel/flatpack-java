@@ -35,7 +35,7 @@ import java.util.List;
  * {@link #value} method or by nesting other objects or arrays. Finally close the object using {@link #endObject()}.
  * </ul>
  * <h3>Example</h3> Suppose we'd like to encode a stream of messages such as the following:
- * 
+ *
  * <pre>
  * {@code
  * [
@@ -59,9 +59,9 @@ import java.util.List;
  *   }
  * ]}
  * </pre>
- * 
+ *
  * This code encodes the above structure:
- * 
+ *
  * <pre>
  * {@code
  *   public void writeJsonStream(OutputStream out, List<Message> messages) throws IOException {
@@ -70,7 +70,7 @@ import java.util.List;
  *     writeMessagesArray(writer, messages);
  *     writer.close();
  *   }
- * 
+ *
  *   public void writeMessagesArray(JsonWriter writer, List<Message> messages) throws IOException {
  *     writer.beginArray();
  *     for (Message message : messages) {
@@ -78,7 +78,7 @@ import java.util.List;
  *     }
  *     writer.endArray();
  *   }
- * 
+ *
  *   public void writeMessage(JsonWriter writer, Message message) throws IOException {
  *     writer.beginObject();
  *     writer.name("id").value(message.getId());
@@ -93,14 +93,14 @@ import java.util.List;
  *     writeUser(writer, message.getUser());
  *     writer.endObject();
  *   }
- * 
+ *
  *   public void writeUser(JsonWriter writer, User user) throws IOException {
  *     writer.beginObject();
  *     writer.name("name").value(user.getName());
  *     writer.name("followers_count").value(user.getFollowersCount());
  *     writer.endObject();
  *   }
- * 
+ *
  *   public void writeDoublesArray(JsonWriter writer, List<Double> doubles) throws IOException {
  *     writer.beginArray();
  *     for (Double value : doubles) {
@@ -112,7 +112,7 @@ import java.util.List;
  * <p>
  * Each {@code JsonWriter} may be used to write a single JSON stream. Instances of this class are not thread safe. Calls
  * that would result in a malformed JSON string will fail with an {@link IllegalStateException}.
- * 
+ *
  * @author Jesse Wilson
  * @since 1.6
  */
@@ -204,7 +204,7 @@ public class JsonWriter
      * Sets the indentation string to be repeated for each level of indentation in the encoded document. If
      * {@code indent.isEmpty()} the encoded document will be compact. Otherwise the encoded document will be more
      * human-readable.
-     * 
+     *
      * @param indent a string containing only whitespace.
      */
     public final void setIndent( String indent )
@@ -281,7 +281,7 @@ public class JsonWriter
 
     /**
      * Begins encoding a new array. Each call to this method must be paired with a call to {@link #endArray}.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter beginArray()
@@ -292,7 +292,7 @@ public class JsonWriter
 
     /**
      * Ends encoding the current array.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter endArray()
@@ -302,7 +302,7 @@ public class JsonWriter
 
     /**
      * Begins encoding a new object. Each call to this method must be paired with a call to {@link #endObject}.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter beginObject()
@@ -313,7 +313,7 @@ public class JsonWriter
 
     /**
      * Ends encoding the current object.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter endObject()
@@ -379,7 +379,7 @@ public class JsonWriter
 
     /**
      * Encodes the property name.
-     * 
+     *
      * @param name the name of the forthcoming value. May not be null.
      * @return this writer.
      */
@@ -413,7 +413,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code value}.
-     * 
+     *
      * @param value the literal string value, or null to encode a null literal.
      * @return this writer.
      */
@@ -431,7 +431,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code null}.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter nullValue()
@@ -455,7 +455,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code value}.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter value( boolean value )
@@ -468,7 +468,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code value}.
-     * 
+     *
      * @param value a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
      * @return this writer.
      */
@@ -486,7 +486,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code value}.
-     * 
+     *
      * @return this writer.
      */
     public JsonWriter value( long value )
@@ -499,7 +499,7 @@ public class JsonWriter
 
     /**
      * Encodes {@code value}.
-     * 
+     *
      * @param value a finite value. May not be {@link Double#isNaN() NaNs} or {@link Double#isInfinite() infinities}.
      * @return this writer.
      */
@@ -532,7 +532,7 @@ public class JsonWriter
     /**
      * Flushes and closes this writerhttp://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html#syntax and the
      * underlying Writer.
-     * 
+     *
      * @throws IOException if the JSON document is incomplete.
      */
     public void close()
@@ -619,7 +619,7 @@ public class JsonWriter
     /**
      * Inserts any necessary separators and whitespace before a literal value, inline array, or inline object. Also
      * adjusts the stack to expect either a closing bracket or another element.
-     * 
+     *
      * @param root true if the value is a new array or object, the two values permitted as top-level elements.
      */
     @SuppressWarnings( "fallthrough" )
@@ -665,5 +665,13 @@ public class JsonWriter
     public String toString()
     {
         return out.toString();
+    }
+
+    /**
+     * @return the underlying {@link StringBuilder
+     */
+    public StringBuilder getOut()
+    {
+        return out;
     }
 }

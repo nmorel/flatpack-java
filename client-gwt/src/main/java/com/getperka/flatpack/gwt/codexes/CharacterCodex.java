@@ -41,16 +41,22 @@ public class CharacterCodex
     @Override
     public Character readNotNull( Object element, DeserializationContext context )
     {
-        if ( !( element instanceof String ) )
+        if ( element instanceof String )
         {
-            throw new IllegalArgumentException( "element is not a String : " + element.getClass().getName() );
+            String string = (String) element;
+            if ( string.length() != 1 )
+            {
+                throw new IllegalArgumentException( "Can't convert the string '" + string + "' to a character" );
+            }
+            return string.charAt( 0 );
         }
-        String string = (String) element;
-        if ( string.length() != 1 )
+
+        if ( element instanceof Double )
         {
-            throw new IllegalArgumentException( "Can't convert the string '" + string + "' to a character" );
+            return (char) ( (Double) element ).intValue();
         }
-        return string.charAt( 0 );
+
+        throw new IllegalArgumentException( "element is not a String or a Double : " + element.getClass().getName() );
     }
 
     @Override

@@ -46,7 +46,7 @@ public class JsonElementCodex
     @Override
     public void writeNotNull( JavaScriptObject object, SerializationContext context )
     {
-        context.getWriter().value( stringify( object ) );
+        context.getWriter().getOut().append( stringify( object ) );
     }
 
     private final native String stringify( JavaScriptObject object )

@@ -45,7 +45,7 @@ public class VoidCodex
     public Void readNotNull( Object element, DeserializationContext context )
         throws Exception
     {
-        return null;
+        throw new IllegalArgumentException( "VoidCodex only accepts null value" );
     }
 
     @Override

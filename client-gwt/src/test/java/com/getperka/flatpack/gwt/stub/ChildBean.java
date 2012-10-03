@@ -7,6 +7,16 @@ public class ChildBean
 {
     private String child;
 
+    public ChildBean()
+    {
+
+    }
+
+    public ChildBean( String child )
+    {
+        this.child = child;
+    }
+
     public String getChild()
     {
         return child;
