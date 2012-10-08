@@ -285,13 +285,13 @@ public class RbDialect implements Dialect {
             }
 
             else if ("properties".equals(propertyName)) {
-              Map<String, Property> propertyMap = new HashMap<String, Property>();
+              List<Property> properties = new ArrayList<Property>();
               for (Property p : entity.getProperties()) {
                 if (!p.isEmbedded()) {
-                  propertyMap.put(p.getName(), p);
+                  properties.add(p);
                 }
               }
-              return propertyMap;
+              return properties;
             }
 
             else if ("entityProperties".equals(propertyName)) {
