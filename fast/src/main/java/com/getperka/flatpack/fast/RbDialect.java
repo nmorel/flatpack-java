@@ -284,16 +284,39 @@ public class RbDialect implements Dialect {
               return requireNameForType(entity.getTypeName());
             }
 
+            else if ("properties".equals(propertyName)) {
+              Map<String, Property> propertyMap = new HashMap<String, Property>();
+              for (Property p : entity.getProperties()) {
+                if (!p.isEmbedded()) {
+                  propertyMap.put(p.getName(), p);
+                }
+              }
+              return propertyMap;
+            }
+
             else if ("entityProperties".equals(propertyName)) {
 
               Map<String, Property> propertyMap = new HashMap<String, Property>();
               for (Property p : entity.getProperties()) {
+
                 // TODO if we decide to encode enum types, we'll want to remove the second condition
                 if (p.getType().getName() != null && p.getType().getEnumValues() == null) {
                   propertyMap.put(p.getName(), p);
                 }
               }
 
+              return propertyMap.values();
+            }
+
+            else if ("embeddedEntityProperties".equals(propertyName)) {
+              Map<String, Property> propertyMap = new HashMap<String, Property>();
+              for (Property p : entity.getProperties()) {
+                if (p.getType().getName() != null &&
+                  p.getType().getEnumValues() == null && p.isEmbedded()) {
+
+                  propertyMap.put(p.getName(), p);
+                }
+              }
               return propertyMap.values();
             }
 
