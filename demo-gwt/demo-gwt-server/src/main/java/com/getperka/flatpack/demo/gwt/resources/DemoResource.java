@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
-package com.getperka.flatpack.demo.gwt;
+package com.getperka.flatpack.demo.gwt.resources;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -42,6 +42,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -54,8 +55,16 @@ import javax.ws.rs.ext.Providers;
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.client.dto.ApiDescription;
+import com.getperka.flatpack.demo.gwt.model.ChildBean;
+import com.getperka.flatpack.demo.gwt.model.MultiplePropertiesBean;
+import com.getperka.flatpack.demo.gwt.model.Product;
+import com.getperka.flatpack.demo.gwt.model.TestEnum;
+import com.getperka.flatpack.demo.gwt.persistence.Database;
+import com.getperka.flatpack.demo.gwt.persistence.FakeDatabase;
 import com.getperka.flatpack.jersey.ApiDescriber;
 import com.getperka.flatpack.jersey.FlatPackResponse;
+import com.google.inject.Inject;
+import com.google.inject.persist.Transactional;
 
 /**
  * In jax-rs parlance, a Resource contains mappings from HTTP paths to individual methods. The container will process
@@ -65,7 +74,7 @@ import com.getperka.flatpack.jersey.FlatPackResponse;
 @Produces( MediaType.APPLICATION_JSON )
 public class DemoResource
 {
-    private final FakeDatabase db;
+    private final Database db;
 
     /**
      * Injected by the container and provides access to providers set up by {@link DemoApplication}.
@@ -73,7 +82,8 @@ public class DemoResource
     @Context
     Providers providers;
 
-    public DemoResource( FakeDatabase db )
+    @Inject
+    public DemoResource( Database db )
     {
         this.db = db;
     }
@@ -116,9 +126,21 @@ public class DemoResource
     @GET
     @Path( "products" )
     @FlatPackResponse( { List.class, Product.class } )
-    public List<Product> productsGet()
+    @Transactional
+    public List<Product> products()
     {
         return db.get( Product.class );
+    }
+
+    /**
+     * Return a map of products.
+     */
+    @GET
+    @Path( "products/{id}" )
+    @FlatPackResponse( Product.class )
+    public Product product( @PathParam( "id" ) String id )
+    {
+        return db.get( Product.class, id );
     }
 
     /**
@@ -188,22 +210,6 @@ public class DemoResource
             map.put( product, product );
         }
         return map;
-    }
-
-    /**
-     * Return a map of products.
-     */
-    @GET
-    @Path( "single" )
-    @FlatPackResponse( Product.class )
-    public Product singleProductGet()
-    {
-        List<Product> products = productsGet();
-        if ( products == null || products.isEmpty() )
-        {
-            return null;
-        }
-        return products.get( 0 );
     }
 
     /**

@@ -22,11 +22,17 @@
     <jetty-maven-plugin.version>8.1.4.v20120524</jetty-maven-plugin.version>
 
     <!-- Dependencies version -->
-    <gwt.version>2.5.0-rc1</gwt.version>
+    <gwt.version>2.5.0-rc2</gwt.version>
     <flatpack.version>${project.version}</flatpack.version>
-    <jersey.version>1.13</jersey.version>
+    <jersey.version>1.14</jersey.version>
     <servlet-api.version>2.5</servlet-api.version>
-    <hibernate-validator.version>4.2.0.Final</hibernate-validator.version>
+    <guice.version>3.0</guice.version>
+    <guava.version>13.0.1</guava.version>
+    <hibernate-validator.version>4.3.0.Final</hibernate-validator.version>
+    <hibernate.version>4.1.7.Final</hibernate.version>
+    <hsqldb.version>2.2.8</hsqldb.version>
+    <slf4j.version>1.7.1</slf4j.version>
+    <logback.version>1.0.6</logback.version>
   </properties>
 
   <dependencyManagement>
@@ -87,8 +93,8 @@
         <version>${jersey.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-guice</artifactId>
         <version>${jersey.version}</version>
       </dependency>
 
@@ -99,6 +105,81 @@
         <version>${hibernate-validator.version}</version>
         <scope>runtime</scope>
       </dependency>
+
+      <!-- Guava -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava-gwt</artifactId>
+        <version>${guava.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- Guice -->
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-servlet</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-persist</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+
+       <!-- Hibernate dependencies -->
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <version>${hibernate.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-c3p0</artifactId>
+        <version>${hibernate.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>${hsqldb.version}</version>
+      </dependency>
+
+      <!-- Dependencies for logs -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 

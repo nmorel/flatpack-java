@@ -1,0 +1,27 @@
+<configuration>
+
+  <contextName>DemoGWT</contextName>
+
+  <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+    <resetJUL>true</resetJUL>
+  </contextListener>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%-5level] %logger.%method\(%line\) : %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.getperka.flatpack.demo.gwt" level="DEBUG" />
+
+  <!-- Hibernate -->
+  <!-- Log les requetes SQL si level a DEBUG -->
+  <logger name="org.hibernate.SQL" level="DEBUG"/>
+  <!-- Log les parametres ? des requetes SQL si level TRACE -->
+  <logger name="org.hibernate.type" level="WARN"/>
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>
