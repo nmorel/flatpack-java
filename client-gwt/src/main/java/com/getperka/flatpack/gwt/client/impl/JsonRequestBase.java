@@ -19,6 +19,7 @@
  */
 package com.getperka.flatpack.gwt.client.impl;
 
+import com.getperka.flatpack.gwt.client.Api;
 import com.getperka.flatpack.gwt.client.StatusCodeException;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestBuilder.Method;
@@ -32,10 +33,12 @@ import com.google.gwt.http.client.Response;
 public class JsonRequestBase<R extends JsonRequestBase<R>>
     extends RequestBase<R, String, String>
 {
+    private final Api api;
 
-    protected JsonRequestBase( ApiBase api, Method method, String path, boolean hasPayload, Object... args )
+    protected JsonRequestBase( Api api, Method method, String path, Object... args )
     {
-        super( api, method, path, hasPayload, args );
+        super( method, path, args );
+        this.api = api;
     }
 
     @Override
@@ -59,6 +62,12 @@ public class JsonRequestBase<R extends JsonRequestBase<R>>
     @Override
     protected void writeEntity( RequestBuilder requestBuilder )
     {
+    }
+
+    @Override
+    protected Api getApi()
+    {
+        return api;
     }
 
 }

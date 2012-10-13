@@ -2,16 +2,18 @@ package com.getperka.flatpack.gwt.client.impl;
 
 import com.getperka.flatpack.gwt.Packer;
 import com.getperka.flatpack.gwt.Unpacker;
-import com.getperka.flatpack.gwt.client.Api;
+import com.getperka.flatpack.gwt.client.FlatPackApi;
 import com.getperka.flatpack.gwt.ext.TypeContext;
 import com.google.gwt.http.client.RequestBuilder;
 
 public class ApiBase
-    implements Api
+    implements FlatPackApi
 {
     private final Packer packer;
 
     private final Unpacker unpacker;
+
+    private String serverBase;
 
     public ApiBase( TypeContext typeContext )
     {
@@ -23,7 +25,8 @@ public class ApiBase
     /**
      * Hook point for altering a {@link RequestBuilder} before it is sent.
      */
-    protected RequestBuilder filter( RequestBuilder requestBuilder )
+    @Override
+    public RequestBuilder filter( RequestBuilder requestBuilder )
     {
         return requestBuilder;
     }
@@ -31,28 +34,21 @@ public class ApiBase
     @Override
     public String getServerBase()
     {
-        return "/resources";
+        return serverBase;
     }
 
-    @Override
     public void setServerBase( String serverBase )
     {
-        // TODO Auto-generated method stub
-
+        this.serverBase = serverBase;
     }
 
     @Override
-    public void setVerbose( boolean verbose )
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     public Packer getPacker()
     {
         return packer;
     }
 
+    @Override
     public Unpacker getUnpacker()
     {
         return unpacker;

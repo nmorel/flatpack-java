@@ -20,6 +20,7 @@
 package com.getperka.flatpack.gwt.client.impl;
 
 import com.getperka.flatpack.gwt.FlatPackEntity;
+import com.getperka.flatpack.gwt.client.FlatPackApi;
 import com.getperka.flatpack.gwt.client.FlatPackRequest;
 import com.getperka.flatpack.gwt.client.StatusCodeException;
 import com.getperka.flatpack.gwt.codexes.Codex;
@@ -31,15 +32,16 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, S, X>, S, X>
     extends RequestBase<R, S, FlatPackEntity<X>>
     implements FlatPackRequest<R, S, X>
 {
+    private final FlatPackApi api;
     private final Codex<S> sentCodex;
     private FlatPackEntity<S> toSend;
     private final Codex<X> returnCodex;
 
-    protected FlatPackRequestBase( ApiBase api, Method method, String path, boolean hasPayload,
-                                   Codex<S> sentCodex, Codex<X> returnCodex, Object... args )
+    protected FlatPackRequestBase( ApiBase api, Method method, String path, Codex<S> sentCodex, Codex<X> returnCodex,
+                                   Object... args )
     {
-
-        super( api, method, path, hasPayload, args );
+        super( method, path, args );
+        this.api = api;
         this.sentCodex = sentCodex;
         this.returnCodex = returnCodex;
     }
@@ -90,5 +92,11 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, S, X>, S, X>
         }
 
         requestBuilder.setRequestData( getApi().getPacker().pack( getEntity(), sentCodex ) );
+    }
+
+    @Override
+    protected FlatPackApi getApi()
+    {
+        return api;
     }
 }

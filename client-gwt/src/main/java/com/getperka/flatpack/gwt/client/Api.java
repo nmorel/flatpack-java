@@ -19,7 +19,8 @@
  */
 package com.getperka.flatpack.gwt.client;
 
-import java.util.logging.Logger;
+import com.google.gwt.http.client.RequestBuilder;
+
 
 /**
  * A base interface for generated FlatPack API accessors.
@@ -33,13 +34,8 @@ public interface Api
     String getServerBase();
 
     /**
-     * Set the base URI used to access the server.
+     * Hook point for altering a {@link RequestBuilder} before it is sent.
      */
-    void setServerBase( String serverBase );
-
-    /**
-     * Enable verbose output via a {@link Logger}.
-     */
-    void setVerbose( boolean verbose );
+    RequestBuilder filter( RequestBuilder requestBuilder );
 
 }

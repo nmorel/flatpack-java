@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +36,6 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
-import com.getperka.flatpack.ext.Property;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.util.FlatPackCollections;
 
@@ -64,27 +62,9 @@ public class GwtDialect
         }
 
         Map<String, EntityDescription> allEntities = FlatPackCollections.mapForIteration();
-        for ( EntityDescription entity : api.getEntities() )
-        {
-            allEntities.put( entity.getTypeName(), entity );
-            for ( Iterator<Property> it = entity.getProperties().iterator(); it.hasNext(); )
-            {
-                Property prop = it.next();
-                if ( "uuid".equals( prop.getName() ) )
-                {
-                    // Crop the UUID property
-                    it.remove();
-                }
-                else if ( !prop.getEnclosingTypeName().equals( entity.getTypeName() ) )
-                {
-                    // Remove properties not declared in the current type
-                    it.remove();
-                }
-            }
+        for (EntityDescription entity : api.getEntities()) {
+          addEntity( allEntities, entity );
         }
-        // Ensure that the "real" implementations are used
-        allEntities.remove( "baseHasUuid" );
-        allEntities.remove( "hasUuid" );
 
         // Render entities + codex
         for ( EntityDescription entity : allEntities.values() )

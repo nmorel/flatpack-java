@@ -149,21 +149,8 @@ public class JavaDialect implements Dialect {
 
     Map<String, EntityDescription> allEntities = FlatPackCollections.mapForIteration();
     for (EntityDescription entity : api.getEntities()) {
-      allEntities.put(entity.getTypeName(), entity);
-      for (Iterator<Property> it = entity.getProperties().iterator(); it.hasNext();) {
-        Property prop = it.next();
-        if ("uuid".equals(prop.getName())) {
-          // Crop the UUID property
-          it.remove();
-        } else if (!prop.getEnclosingTypeName().equals(entity.getTypeName())) {
-          // Remove properties not declared in the current type
-          it.remove();
-        }
-      }
+      addEntity( allEntities, entity );
     }
-    // Ensure that the "real" implementations are used
-    allEntities.remove("baseHasUuid");
-    allEntities.remove("hasUuid");
 
     // Render entities
     for (EntityDescription entity : allEntities.values()) {
@@ -203,6 +190,39 @@ public class JavaDialect implements Dialect {
         .add("packageName", packageName)
         .add("namePrefix", namePrefix);
     render(typeSourceST, packageDir, namePrefix + "TypeSource");
+  }
+
+  /**
+   * Adds an entity and its supertype to the given map
+   * @param allEntities map containing all the entities
+   * @param entity Entity to add
+   */
+  protected void addEntity(Map<String, EntityDescription> allEntities, EntityDescription entity) {
+    if(null == entity) {
+      return;
+    }
+
+    String typeName = entity.getTypeName();
+
+    if ("baseHasUuid".equals(typeName) || "hasUuid".equals( typeName )) {
+      // Ensure that the "real" implementations are used
+      return;
+    }
+
+    allEntities.put(typeName, entity);
+    for (Iterator<Property> it = entity.getProperties().iterator(); it.hasNext();) {
+      Property prop = it.next();
+      if ("uuid".equals(prop.getName())) {
+        // Crop the UUID property
+        it.remove();
+      } else if (!prop.getEnclosingTypeName().equals(typeName)) {
+        // Remove properties not declared in the current type
+        it.remove();
+      }
+    }
+
+    // Add the supertype
+    addEntity( allEntities, entity.getSupertype() );
   }
 
   @Override

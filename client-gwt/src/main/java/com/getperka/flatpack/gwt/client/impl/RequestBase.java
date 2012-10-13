@@ -22,6 +22,7 @@ package com.getperka.flatpack.gwt.client.impl;
 import java.util.Collections;
 import java.util.Map;
 
+import com.getperka.flatpack.gwt.client.Api;
 import com.getperka.flatpack.gwt.client.FlatBack;
 import com.getperka.flatpack.gwt.client.Request;
 import com.getperka.flatpack.gwt.client.StatusCodeException;
@@ -31,79 +32,37 @@ import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.URL;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 
 abstract class RequestBase<R extends Request<R, S, X>, S, X>
     implements Request<R, S, X>
 {
-    // private static final Pattern pathArgPattern = Pattern.compile( "[{][^}]*[}]" );
-    private final ApiBase api;
     private final Object[] args;
     private S entity;
     private Map<String, Object> headers = Collections.emptyMap();
     private final Method method;
     private final String path;
     private Map<String, Object> queryParams = Collections.emptyMap();
-    private final boolean hasPayload;
 
-    protected RequestBase( ApiBase api, Method method, String path, boolean hasPayload, Object... args )
+    protected RequestBase( Method method, String path, Object... args )
     {
-        this.api = api;
         this.args = args;
         this.method = method;
         this.path = path;
-        this.hasPayload = hasPayload;
     }
 
     @Override
     public R execute( final FlatBack<X> callback )
     {
-        String replacedPath = path;
+        RequestBuilder requestBuilder = new RequestBuilder( method, buildRequestUrl() );
 
-        // TODO
-        // Replace all {foo} in the path with the args
-        // Matcher m = pathArgPattern.matcher( replacedPath );
-        // int index = 0;
-        // while ( m.find() && index < args.length )
-        // {
-        // replacedPath = m.replaceFirst( args[index++].toString() );
-        // m = pathArgPattern.matcher( replacedPath );
-        // }
-
-        StringBuilder sb = new StringBuilder( replacedPath );
-        // Now add query parameters
-        if ( !queryParams.isEmpty() )
-        {
-            sb.append( "?" );
-            boolean needsAmp = false;
-            for ( Map.Entry<String, Object> entry : queryParams.entrySet() )
-            {
-                if ( needsAmp )
-                {
-                    sb.append( "&" );
-                }
-                else
-                {
-                    needsAmp = true;
-                }
-                // TODO encode ?
-                sb.append( entry.getKey() ).append( "=" )
-                    .append( /* URLEncoder.encode( */entry.getValue().toString()/* , "UTF8" ) */);
-            }
-        }
-
-        String url = api.getServerBase() + sb.toString();
-
-        RequestBuilder requestBuilder = new RequestBuilder( method, url );
-
-        // HttpURLConnection conn = (HttpURLConnection) sendTo.toURL().openConnection();
-        // conn.setDoOutput( hasPayload );
-        // conn.setRequestMethod( method );
         for ( Map.Entry<String, Object> entry : headers.entrySet() )
         {
             requestBuilder.setHeader( entry.getKey(), entry.getValue().toString() );
-            // conn.setRequestProperty( entry.getKey(), entry.getValue().toString() );
         }
-        requestBuilder = api.filter( requestBuilder );
+        requestBuilder = getApi().filter( requestBuilder );
         writeEntity( requestBuilder );
 
         requestBuilder.setCallback( new RequestCallback() {
@@ -138,6 +97,95 @@ abstract class RequestBase<R extends Request<R, S, X>, S, X>
         }
 
         return as();
+    }
+
+    /**
+     * Build the request url
+     *
+     * @return the built url
+     */
+    protected String buildRequestUrl()
+    {
+        StringBuilder sb = new StringBuilder( null == getApi().getServerBase() ? "" : getApi().getServerBase() );
+
+        // Replace arguments
+        replaceArgs( path, sb );
+
+        // Now add query parameters
+        addQueryParameters( sb );
+
+        return sb.toString();
+    }
+
+    /**
+     * Replace the path arguments
+     *
+     * @param path
+     * @return the path with replaced arguments
+     */
+    protected void replaceArgs( String path, StringBuilder sb )
+    {
+        if ( null == args || args.length == 0 )
+        {
+            sb.append( path );
+            return;
+        }
+
+        RegExp regExp = RegExp.compile( "[{][^}]*[}]", "g" );
+
+        int argsIndex = 0;
+        int fromIndex = 0;
+        int length = path.length();
+        MatchResult result;
+
+        while ( fromIndex < length && argsIndex < args.length )
+        {
+            // Find the next match
+            result = regExp.exec( path );
+            if ( result == null )
+            {
+                // No more matches
+                break;
+            }
+            int index = result.getIndex();
+            String match = result.getGroup( 0 );
+
+            // Append the characters leading up to the match
+            sb.append( path.substring( fromIndex, index ) );
+            // Append the argument
+            sb.append( args[argsIndex++] );
+
+            // Skip past the matched string
+            fromIndex = index + match.length();
+            regExp.setLastIndex( fromIndex );
+        }
+
+        // Append the tail of the string
+        if ( fromIndex < length )
+        {
+            sb.append( path.substring( fromIndex ) );
+        }
+    }
+
+    protected void addQueryParameters( StringBuilder sb )
+    {
+        if ( !queryParams.isEmpty() )
+        {
+            sb.append( "?" );
+            boolean needsAmp = false;
+            for ( Map.Entry<String, Object> entry : queryParams.entrySet() )
+            {
+                if ( needsAmp )
+                {
+                    sb.append( "&" );
+                }
+                else
+                {
+                    needsAmp = true;
+                }
+                sb.append( entry.getKey() ).append( "=" ).append( URL.encodeQueryString( entry.getValue().toString() ) );
+            }
+        }
     }
 
     public Object getEntity()
@@ -182,10 +230,7 @@ abstract class RequestBase<R extends Request<R, S, X>, S, X>
     protected abstract X decodeResponse( Response response )
         throws StatusCodeException;
 
-    protected ApiBase getApi()
-    {
-        return api;
-    }
+    protected abstract Api getApi();
 
     /**
      * Returns {@code true} for a 2XX series response code.

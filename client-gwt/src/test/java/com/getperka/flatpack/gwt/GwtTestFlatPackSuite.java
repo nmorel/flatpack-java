@@ -3,6 +3,7 @@ package com.getperka.flatpack.gwt;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import com.getperka.flatpack.gwt.client.impl.RequestBaseTestGwt;
 import com.getperka.flatpack.gwt.codexes.BooleanCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.CharacterCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.CollectionCodexTestGwt;
@@ -43,6 +44,9 @@ public class GwtTestFlatPackSuite
         // Packer/Unpacker
         suite.addTestSuite( PackerTestGwt.class );
         suite.addTestSuite( UnpackerTestGwt.class );
+
+        // Client Api
+        suite.addTestSuite( RequestBaseTestGwt.class );
 
         return suite;
     }
