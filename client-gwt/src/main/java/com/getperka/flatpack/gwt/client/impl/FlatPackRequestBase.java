@@ -69,15 +69,17 @@ public class FlatPackRequestBase<R extends FlatPackRequest<R, S, X>, S, X>
     protected FlatPackEntity<X> decodeResponse( Response response )
         throws StatusCodeException
     {
+        FlatPackEntity<X> entity = getApi().getUnpacker().unpack( response.getText(), returnCodex );
+
         int statusCode = response.getStatusCode();
         if ( isOk( statusCode ) )
         {
-            return getApi().getUnpacker().unpack( response.getText(), returnCodex );
+            return entity;
         }
         else
         {
             StatusCodeException sce = new StatusCodeException( statusCode );
-            sce.setEntity( getEntity() );
+            sce.setEntity( entity );
             sce.setResponse( response.getText() );
             throw sce;
         }

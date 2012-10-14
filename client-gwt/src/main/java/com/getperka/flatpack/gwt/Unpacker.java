@@ -29,15 +29,6 @@ public class Unpacker
     {
         logger.finest( "unpacking : " + asJson );
 
-        // Hold temporary state for deserialization
-        DeserializationContext context = new DeserializationContext();
-
-        /*
-         * Decoding is done as a two-pass operation since the runtime type of an allocated object cannot be swizzled.
-         * The per-entity data is held as a semi-reified JavaScriptObject to be passed off to a Codex.
-         */
-        Map<HasUuid, JavaScriptObject> entityData = new LinkedHashMap<HasUuid, JavaScriptObject>();
-
         // The return value
         FlatPackEntity<T> toReturn = new FlatPackEntity<T>();
 
@@ -52,6 +43,15 @@ public class Unpacker
         {
             return toReturn;
         }
+
+        // Hold temporary state for deserialization
+        DeserializationContext context = new DeserializationContext();
+
+        /*
+         * Decoding is done as a two-pass operation since the runtime type of an allocated object cannot be swizzled.
+         * The per-entity data is held as a semi-reified JavaScriptObject to be passed off to a Codex.
+         */
+        Map<HasUuid, JavaScriptObject> entityData = new LinkedHashMap<HasUuid, JavaScriptObject>();
 
         Object value = extractResponse( asJso, context, entityData, toReturn );
 
@@ -72,53 +72,65 @@ public class Unpacker
         return toReturn;
     }
 
+    // TODO metadata, see the other Unpacker
     private final native <T> Object extractResponse( JavaScriptObject object, DeserializationContext context,
-                                                               Map<HasUuid, JavaScriptObject> entityData,
-                                                               FlatPackEntity<T> toReturn )
+                                                     Map<HasUuid, JavaScriptObject> entityData,
+                                                     FlatPackEntity<T> toReturn )
     /*-{
-		var returnValue = null;
-		for ( var key in object) {
-			if (object.hasOwnProperty(key)) {
-				var value = object[key];
-				if (key == "value") {
-					returnValue = value;
-				} else {
-					this.@com.getperka.flatpack.gwt.Unpacker::extractResponse(Ljava/lang/String;Lcom/google/gwt/core/client/JavaScriptObject;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, value, context, entityData, toReturn);
-				}
-			}
-		}
-		return returnValue;
-    }-*/;
+        var returnValue = null;
+        for ( var key in object) {
+            if (object.hasOwnProperty(key)) {
+                if (key == "value") {
 
-    private final <T> void extractResponse( String key, JavaScriptObject value, DeserializationContext context,
-                                            Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
-    {
-        if ( "data".equals( key ) )
-        {
-            // data : { "fooEntity" : [ { ... }, { ... } ]
-            extractData( value, context, entityData, toReturn );
+                    returnValue = object[key];
+
+                } else if (key == "data") {
+
+                    // data : { "fooEntity" : [ { ... }, { ... } ]
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractData(Lcom/google/gwt/core/client/JavaScriptObject;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(object[key], context, entityData, toReturn);
+
+                } else if (key == "errors") {
+
+                    // "errors" : { "path" : "problem", "path2" : "problem2" }
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractErrors(Lcom/google/gwt/core/client/JavaScriptObject;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(object[key], context, entityData, toReturn);
+
+                } else if (key == "warnings") {
+
+                    // "warnings" : { "path" : "problem", "path2" : "problem2" }
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractWarnings(Lcom/google/gwt/core/client/JavaScriptObject;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(object[key], context, entityData, toReturn);
+
+                } else {
+
+                    // Save off any other simple properties
+                    var value = jso[key];
+                    if (value != null) {
+                        var extraData;
+                        var typeValue = typeof (value);
+                        if (typeValue == "number") {
+                            extraData = @java.lang.Double::valueOf(D)(value);
+                        } else if (typeValue == "boolean") {
+                            extraData = @java.lang.Boolean::valueOf(Z)(value);
+                        } else {
+                            extraData = value;
+                        }
+                        this.@com.getperka.flatpack.gwt.Unpacker::extractExtraData(Ljava/lang/String;Ljava/lang/Object;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, extraData, context, entityData, toReturn);
+                    }
+
+                }
+            }
         }
-        else if ( "errors".equals( key ) )
-        {
-            // "errors" : { "path" : "problem", "path2" : "problem2" }
-            extractErrors( value, context, entityData, toReturn );
-        }
-        else if ( isAString( value ) || isANumber( value ) )
-        {
-            // Save off any other simple properties
-            toReturn.putExtraData( key, toString( value ) );
-        }
-    }
+        return returnValue;
+    }-*/;
 
     private final native <T> void extractData( JavaScriptObject data, DeserializationContext context,
                                                Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
     /*-{
-		for ( var key in data) {
-			if (data.hasOwnProperty(key)) {
-				var array = data[key];
-				this.@com.getperka.flatpack.gwt.Unpacker::extractData(Ljava/lang/String;Lcom/google/gwt/core/client/JsArray;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, array, context, entityData, toReturn);
-			}
-		}
+        for ( var key in data) {
+            if (data.hasOwnProperty(key)) {
+                var array = data[key];
+                this.@com.getperka.flatpack.gwt.Unpacker::extractData(Ljava/lang/String;Lcom/google/gwt/core/client/JsArray;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, array, context, entityData, toReturn);
+            }
+        }
     }-*/;
 
     private <T> void extractData( String simpleName, JsArray<JavaScriptObject> entityArray,
@@ -164,15 +176,14 @@ public class Unpacker
     private final native <T> void extractErrors( JavaScriptObject errors, DeserializationContext context,
                                                  Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
     /*-{
-		for ( var key in errors) {
-			if (errors.hasOwnProperty(key)) {
-				var value = errors[key];
-				if (this.@com.getperka.flatpack.gwt.Unpacker::isAString(Lcom/google/gwt/core/client/JavaScriptObject;)(value)
-						|| this.@com.getperka.flatpack.gwt.Unpacker::isANumber(Lcom/google/gwt/core/client/JavaScriptObject;)(value)) {
-					this.@com.getperka.flatpack.gwt.Unpacker::extractError(Ljava/lang/String;Ljava/lang/String;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, value, context, entityData, toReturn);
-				}
-			}
-		}
+        for ( var key in errors) {
+            if (errors.hasOwnProperty(key)) {
+                var value = errors[key];
+                if ((typeof value) == "string") {
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractError(Ljava/lang/String;Ljava/lang/String;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, value, context, entityData, toReturn);
+                }
+            }
+        }
     }-*/;
 
     private <T> void extractError( String key, String value, DeserializationContext context,
@@ -181,19 +192,29 @@ public class Unpacker
         toReturn.addError( key, value );
     }
 
-    private final native boolean isAString( JavaScriptObject object )
+    private final native <T> void extractWarnings( JavaScriptObject errors, DeserializationContext context,
+                                                   Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
     /*-{
-		return (typeof object) == "string";
+        for ( var key in errors) {
+            if (errors.hasOwnProperty(key)) {
+                var value = errors[key];
+                if ((typeof value) == "string") {
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractWarning(Ljava/lang/String;Ljava/lang/String;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(key, value, context, entityData, toReturn);
+                }
+            }
+        }
     }-*/;
 
-    private final native boolean isANumber( JavaScriptObject object )
-    /*-{
-		return (typeof object) == "number";
-    }-*/;
+    private <T> void extractWarning( String key, String value, DeserializationContext context,
+                                     Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
+    {
+        toReturn.addWarning( key, value );
+    }
 
-    private final native String toString( JavaScriptObject object )
-    /*-{
-		return object;
-    }-*/;
+    private <T> void extractExtraData( String key, Object value, DeserializationContext context,
+                                       Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
+    {
+        toReturn.putExtraData( key, value.toString() );
+    }
 
 }

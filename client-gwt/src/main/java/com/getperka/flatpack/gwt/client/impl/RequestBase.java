@@ -21,6 +21,9 @@ package com.getperka.flatpack.gwt.client.impl;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
 
 import com.getperka.flatpack.gwt.client.Api;
 import com.getperka.flatpack.gwt.client.FlatBack;
@@ -35,6 +38,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
+import com.google.web.bindery.requestfactory.shared.RequestFactory;
 
 abstract class RequestBase<R extends Request<R, S, X>, S, X>
     implements Request<R, S, X>
@@ -57,6 +61,7 @@ abstract class RequestBase<R extends Request<R, S, X>, S, X>
     public R execute( final FlatBack<X> callback )
     {
         RequestBuilder requestBuilder = new RequestBuilder( method, buildRequestUrl() );
+        requestBuilder.setHeader( "Content-Type", RequestFactory.JSON_CONTENT_TYPE_UTF8 );
 
         for ( Map.Entry<String, Object> entry : headers.entrySet() )
         {
@@ -76,7 +81,22 @@ abstract class RequestBase<R extends Request<R, S, X>, S, X>
                 }
                 catch ( StatusCodeException e )
                 {
-                    callback.onFailure( e );
+                    if ( null != e.getEntity() )
+                    {
+                        Set<ConstraintViolation<?>> violations = e.getEntity().getConstraintViolations();
+                        if ( null != violations && !violations.isEmpty() )
+                        {
+                            callback.onConstraintViolation( violations );
+                        }
+                        else
+                        {
+                            callback.onFailure( e );
+                        }
+                    }
+                    else
+                    {
+                        callback.onFailure( e );
+                    }
                 }
             }
 
