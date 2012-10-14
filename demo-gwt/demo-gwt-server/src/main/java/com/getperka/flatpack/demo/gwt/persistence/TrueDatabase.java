@@ -29,11 +29,13 @@ import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.demo.gwt.model.Product;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.persist.Transactional;
 
 /**
  * This is just a simple, in-memory datastructure to hold the sample data. In reality, you would likely use a JPA
  * implementation.
  */
+@Transactional
 public class TrueDatabase
     implements Database
 {

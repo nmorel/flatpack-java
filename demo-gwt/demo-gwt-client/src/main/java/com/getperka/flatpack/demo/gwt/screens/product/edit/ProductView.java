@@ -5,12 +5,16 @@ import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface EditProductView
+public interface ProductView
     extends IsWidget
 {
     interface Presenter
     {
+        void validate();
 
+        void cancel();
+
+        void modify();
     }
 
     void setPresenter( Presenter presenter );

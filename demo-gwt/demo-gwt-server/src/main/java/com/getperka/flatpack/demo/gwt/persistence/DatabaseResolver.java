@@ -24,6 +24,6 @@ public class DatabaseResolver
     public <T extends HasUuid> T resolve( Class<T> clazz, UUID uuid )
         throws Exception
     {
-        return entityManager.get().find( clazz, uuid.toString() );
+        return entityManager.get().find( clazz, uuid );
     }
 }

@@ -37,6 +37,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -64,7 +65,6 @@ import com.getperka.flatpack.demo.gwt.persistence.FakeDatabase;
 import com.getperka.flatpack.jersey.ApiDescriber;
 import com.getperka.flatpack.jersey.FlatPackResponse;
 import com.google.inject.Inject;
-import com.google.inject.persist.Transactional;
 
 /**
  * In jax-rs parlance, a Resource contains mappings from HTTP paths to individual methods. The container will process
@@ -126,7 +126,6 @@ public class DemoResource
     @GET
     @Path( "products" )
     @FlatPackResponse( { List.class, Product.class } )
-    @Transactional
     public List<Product> products()
     {
         return db.get( Product.class );

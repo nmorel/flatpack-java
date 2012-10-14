@@ -7,19 +7,19 @@ import java.util.UUID;
 import com.getperka.flatpack.demo.gwt.mvp.BasePlaceWithParameters;
 import com.getperka.flatpack.demo.gwt.mvp.TokenEnum;
 
-public class EditProductPlace
+public class ConsultProductPlace
     extends BasePlaceWithParameters
 {
     private static final String PRODUCT_ID_KEY = "id";
 
     private UUID id;
 
-    public EditProductPlace()
+    public ConsultProductPlace()
     {
 
     }
 
-    public EditProductPlace( UUID id )
+    public ConsultProductPlace( UUID id )
     {
         this.id = id;
     }
@@ -63,7 +63,7 @@ public class EditProductPlace
     @Override
     public TokenEnum getToken()
     {
-        return TokenEnum.PRODUCT_EDIT;
+        return TokenEnum.PRODUCT_CONSULT;
     }
 
 }
