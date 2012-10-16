@@ -53,6 +53,7 @@ public class GuiceServletConfig
                 bind( EntityResolver.class ).to( DatabaseResolver.class ).in( Scopes.SINGLETON );
 
                 bind( FlatPackProvider.class ).in( Scopes.SINGLETON );
+                bind( RollbackExceptionMapper.class ).in( Scopes.SINGLETON );
 
                 serve( "/resources/*" ).with( GuiceContainer.class );
 

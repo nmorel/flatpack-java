@@ -30,14 +30,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -48,13 +43,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Providers;
 
 import com.getperka.flatpack.FlatPack;
-import com.getperka.flatpack.FlatPackEntity;
 import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.demo.gwt.model.ChildBean;
 import com.getperka.flatpack.demo.gwt.model.MultiplePropertiesBean;
@@ -109,7 +101,7 @@ public class DemoResource
      * mapping information is derived from the method annotation {@link GET} and the {@link Path} annotation. Because
      * multiple methods (e.g. {@link POST}, {@link PUT}) may be bound to the same path, but with different methods or
      * media types, a suggested coding style is to add the discriminators to the end of a descriptive method name.
-     *
+     * 
      * @param name inserted into the return payload
      */
     @GET
@@ -151,38 +143,14 @@ public class DemoResource
      */
     @PUT
     @Path( "products" )
-    @FlatPackResponse( Void.class )
-    public Response productsPut( List<Product> products )
+    public void productsPut( List<Product> products )
     {
-        FlatPackEntity<Void> toReturn = FlatPackEntity.nullResponse();
-        Status status = Status.CREATED;
-
-        /*
-         * Call the JSR 303 validator on the entity. In a real system, this might normally be part of the database
-         * flush.
-         */
-        Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        // validation is done by jsr-303 and is invoked by hibernate. In case of exception, the RollbackExceptionMapper
+        // will map the violations into FlatPack entity
         for ( Product product : products )
         {
-            Set<ConstraintViolation<Product>> violations = validator.validate( product );
-            if ( violations.isEmpty() )
-            {
-                db.persist( product );
-            }
-            else
-            {
-                status = Status.BAD_REQUEST;
-                toReturn.addConstraintViolations( violations );
-            }
+            db.persist( product );
         }
-
-        /*
-         * Full control over the response value is possible by explicitly building a Response object. In this case, we
-         * want to return a 201 status code and an empty return value. If we were using a JSR-303 Validator, any
-         * ConstraintViolations could be added to the FlatPackEntity by calling addConstraintViolations(), which will
-         * map the violations into the errors segment of the response.
-         */
-        return Response.status( status ).entity( toReturn ).build();
     }
 
     /**
