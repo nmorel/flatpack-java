@@ -36,11 +36,6 @@ public class SerializationContext
 
     private final Map<HasUuid, Void> entities = FlatPackCollections.mapForIteration();
 
-    // TODO
-    // @Inject
-    // @LastModifiedTime
-    // private DateTime lastModifiedTime;
-
     private TraversalMode traversalMode;
 
     private JsonWriter writer;
@@ -68,28 +63,7 @@ public class SerializationContext
      */
     public Set<HasUuid> getEntities()
     {
-        // if ( lastModifiedTime.getMillis() == 0 )
-        // {
         return entities.keySet();
-        // }
-        // Set<HasUuid> toReturn = FlatPackCollections.setForIteration();
-        // for ( HasUuid entity : entities.keySet() )
-        // {
-        // if ( entity instanceof HasTimestamps )
-        // {
-        // HasTimestamps ts = (HasTimestamps) entity;
-        // DateTime lastModified = ts.getUpdatedAt() == null ? ts.getCreatedAt() : ts.getUpdatedAt();
-        // if ( lastModifiedTime.isBefore( lastModified ) )
-        // {
-        // toReturn.add( entity );
-        // }
-        // }
-        // else
-        // {
-        // toReturn.add( entity );
-        // }
-        // }
-        // return toReturn;
     }
 
     /**
