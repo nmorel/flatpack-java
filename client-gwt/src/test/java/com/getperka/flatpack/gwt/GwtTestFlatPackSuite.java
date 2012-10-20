@@ -10,6 +10,7 @@ import com.getperka.flatpack.gwt.codexes.CollectionCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.DateCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.EntityCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.EnumCodexTestGwt;
+import com.getperka.flatpack.gwt.codexes.ImpliedPropertySetterTestGwt;
 import com.getperka.flatpack.gwt.codexes.JsonElementCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.MapCodexTestGwt;
 import com.getperka.flatpack.gwt.codexes.NumberCodexTestGwt;
@@ -40,6 +41,9 @@ public class GwtTestFlatPackSuite
         suite.addTestSuite( JsonElementCodexTestGwt.class );
         suite.addTestSuite( MapCodexTestGwt.class );
         suite.addTestSuite( EntityCodexTestGwt.class );
+        
+        // Implied property
+        suite.addTestSuite( ImpliedPropertySetterTestGwt.class );
 
         // Packer/Unpacker
         suite.addTestSuite( PackerTestGwt.class );

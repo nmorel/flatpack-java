@@ -90,6 +90,8 @@ public class Unpacker
             }
         }
 
+        context.runPostWork();
+
         return toReturn;
     }
 

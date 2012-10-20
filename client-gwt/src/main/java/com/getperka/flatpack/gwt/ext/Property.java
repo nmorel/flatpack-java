@@ -52,6 +52,7 @@ public abstract class Property<T, V>
     private String docString;
     private String enclosingTypeName;
     private boolean embedded;
+    private Property<?, ?> implied;
     private String name;
     private boolean suppressDefaultValue;
     private boolean primitive;
@@ -116,6 +117,14 @@ public abstract class Property<T, V>
     }
 
     /**
+     * When a new value is assigned to the current property in some instance, the implied property of
+     * the new value should also be updated with the current instance.
+     */
+    public Property<?, ?> getImpliedProperty() {
+      return implied;
+    }
+
+    /**
      * If {@code true}, non-null properties that contain the property type's default value will not be serialized. For
      * example, integer properties whose values are {@code 0} will not be serialized.
      */
@@ -154,6 +163,14 @@ public abstract class Property<T, V>
     public void setEmbedded( boolean embedded )
     {
         this.embedded = embedded;
+    }
+
+    /**
+     * Use for late fixups of implied properties when the OneToMany property is examined after the
+     * ManyToOne relationship.
+     */
+    public void setImpliedProperty(Property<?, ?> implied) {
+      this.implied = implied;
     }
 
     public void setEnclosingTypeName( String enclosingTypeName )

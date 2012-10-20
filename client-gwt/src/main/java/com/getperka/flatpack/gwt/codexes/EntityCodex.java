@@ -182,20 +182,11 @@ public abstract class EntityCodex<T extends HasUuid>
             }
 
             // Perhaps set the other side of a OneToMany relationship
-            // TODO
-            // Property impliedPropery = prop.getImpliedProperty();
-            // if ( impliedPropery != null && value != null )
-            // {
-            // // Ensure that any linked property is also mutable
-            // if ( !impliedPropery.maySet( roles ) || !checkAccess( value, context ) )
-            // {
-            // context.addWarning( object,
-            // "Ignoring property %s because the inverse relationship (%s) may not be set", prop.getName(),
-            // impliedPropery.getName() );
-            // return;
-            // }
-            // context.addPostWork( new ImpliedPropertySetter( context, impliedPropery, value, object ) );
-            // }
+            Property<?, ?> impliedProperty = prop.getImpliedProperty();
+            if ( impliedProperty != null && value != null )
+            {
+                context.addPostWork( new ImpliedPropertySetter( context, impliedProperty, value, object ) );
+            }
 
             // Set the value
             prop.setValue( object, value );
