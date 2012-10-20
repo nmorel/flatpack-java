@@ -41,7 +41,6 @@ public class FakeDatabase
 
     public FakeDatabase()
     {
-        // TODO: initialize from fake data
         Product p1 = new Product();
         p1.setName( "Name1" );
         p1.setNotes( "Notes1" );

@@ -34,6 +34,18 @@ class EntityMetadata
     extends BaseHasUuid
 {
 
+    private static EntityMetadataCodex CODEX_INSTANCE;
+
+    static EntityMetadataCodex getCodex()
+    {
+        if ( null == CODEX_INSTANCE )
+        {
+            CODEX_INSTANCE = new EntityMetadataCodex();
+            CODEX_INSTANCE.init();
+        }
+        return CODEX_INSTANCE;
+    }
+
     static class EntityMetadataCodex
         extends EntityCodex<EntityMetadata>
     {
@@ -41,7 +53,7 @@ class EntityMetadata
         @Override
         protected void initProperties( List<Property<EntityMetadata, ?>> properties )
         {
-            properties.add( new Property<EntityMetadata, Boolean>( "isPersistent", new BooleanCodex() ) {
+            properties.add( new Property<EntityMetadata, Boolean>( "persistent", new BooleanCodex() ) {
 
                 @Override
                 public Boolean getValue( EntityMetadata object )

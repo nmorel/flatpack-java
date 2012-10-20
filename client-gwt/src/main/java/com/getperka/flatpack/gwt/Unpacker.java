@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.PersistenceAware;
+import com.getperka.flatpack.client.impl.BasePersistenceAware;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
@@ -69,10 +71,28 @@ public class Unpacker
             toReturn.addWarning( entry.getKey().toString(), entry.getValue() );
         }
 
+        // Process metadata
+        for ( EntityMetadata meta : toReturn.getMetadata() )
+        {
+            if ( meta.isPersistent() )
+            {
+                HasUuid entity = context.getEntity( meta.getUuid() );
+                if ( entity instanceof BasePersistenceAware )
+                {
+                    ( (BasePersistenceAware) entity ).markPersistent();
+                    // TODO find a better way to achieve this without casting to the implementation. Maybe an event bus created for the unpack operation.
+                    ( (BasePersistenceAware) entity ).postUnpack();
+                }
+                else if ( entity instanceof PersistenceAware )
+                {
+                    ( (PersistenceAware) entity ).markPersistent();
+                }
+            }
+        }
+
         return toReturn;
     }
 
-    // TODO metadata, see the other Unpacker
     private final native <T> Object extractResponse( JavaScriptObject object, DeserializationContext context,
                                                      Map<HasUuid, JavaScriptObject> entityData,
                                                      FlatPackEntity<T> toReturn )
@@ -86,8 +106,13 @@ public class Unpacker
 
                 } else if (key == "data") {
 
-                    // data : { "fooEntity" : [ { ... }, { ... } ]
+                    // "data" : { "fooEntity" : [ { ... }, { ... } ]
                     this.@com.getperka.flatpack.gwt.Unpacker::extractData(Lcom/google/gwt/core/client/JavaScriptObject;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(object[key], context, entityData, toReturn);
+
+                } else if (key == "metadata") {
+
+                    // "metadata" : { "uuid" : "5ade6c3d-8ee4-4cc0-8077-80f46af2bb00", "persistent" : true } ]
+                    this.@com.getperka.flatpack.gwt.Unpacker::extractMetadata(Lcom/google/gwt/core/client/JsArray;Lcom/getperka/flatpack/gwt/ext/DeserializationContext;Ljava/util/Map;Lcom/getperka/flatpack/gwt/FlatPackEntity;)(object[key], context, entityData, toReturn);
 
                 } else if (key == "errors") {
 
@@ -170,6 +195,25 @@ public class Unpacker
         finally
         {
             context.popPath();
+        }
+    }
+
+    private <T> void extractMetadata( JsArray<JavaScriptObject> metadataArray, DeserializationContext context,
+                                      Map<HasUuid, JavaScriptObject> entityData, FlatPackEntity<T> toReturn )
+    {
+        if ( metadataArray.length() == 0 )
+        {
+            return;
+        }
+
+        EntityCodex<EntityMetadata> metaCodex = EntityMetadata.getCodex();
+
+        for ( int i = 0; i < metadataArray.length(); i++ )
+        {
+            EntityMetadata meta = new EntityMetadata();
+            JavaScriptObject entityAsJso = metadataArray.get( i );
+            metaCodex.readProperties( meta, entityAsJso, context );
+            toReturn.addMetadata( meta );
         }
     }
 

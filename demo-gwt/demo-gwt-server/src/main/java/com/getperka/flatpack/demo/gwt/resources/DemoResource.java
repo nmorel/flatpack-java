@@ -143,6 +143,7 @@ public class DemoResource
      */
     @PUT
     @Path( "products" )
+    @FlatPackResponse( Void.class )
     public void productsPut( List<Product> products )
     {
         // validation is done by jsr-303 and is invoked by hibernate. In case of exception, the RollbackExceptionMapper

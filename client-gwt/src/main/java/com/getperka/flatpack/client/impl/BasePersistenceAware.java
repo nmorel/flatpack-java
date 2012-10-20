@@ -55,7 +55,7 @@ public class BasePersistenceAware extends BaseHasUuid implements PersistenceAwar
   }
 
   // TODO @PostUnpack
-  void postUnpack() {
+  public void postUnpack() {
     dirtyProperties.clear();
   }
 }

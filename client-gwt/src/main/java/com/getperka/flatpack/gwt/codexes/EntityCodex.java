@@ -21,9 +21,11 @@ package com.getperka.flatpack.gwt.codexes;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.Property;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
@@ -64,14 +66,14 @@ public abstract class EntityCodex<T extends HasUuid>
 
     /**
      * Initialize the list of properties
-     *
+     * 
      * @param properties the list of properties to fill
      */
     protected abstract void initProperties( List<Property<T, ?>> properties );
 
     /**
      * Performs a minimal amount of work to create an empty stub object to fill in later.
-     *
+     * 
      * @param element a JsonObject containing a {@code uuid} property. If {@code null}, a randomly-generated UUID will
      * be assigned to the allocated object
      * @param context this method will call {@link DeserializationContext#putEntity} to store the newly-allocated entity
@@ -302,9 +304,23 @@ public abstract class EntityCodex<T extends HasUuid>
     private void traverse( T object, boolean isEmbedded, SerializationContext context, JsonWriter writer )
         throws Exception
     {
-
         if ( object == null )
+        {
             return;
+        }
+
+        Set<String> dirtyPropertyNames;
+        if ( object instanceof PersistenceAware )
+        {
+            dirtyPropertyNames = FlatPackCollections.setForIteration();
+            // Always write out uuid
+            dirtyPropertyNames.add( "uuid" );
+            dirtyPropertyNames.addAll( ( (PersistenceAware) object ).dirtyPropertyNames() );
+        }
+        else
+        {
+            dirtyPropertyNames = null;
+        }
 
         // Write all properties
         for ( Property<T, ?> prop : properties )
@@ -316,6 +332,11 @@ public abstract class EntityCodex<T extends HasUuid>
             }
             // Don't emit a redundant uuid property
             if ( isEmbedded && "uuid".equals( prop.getName() ) )
+            {
+                continue;
+            }
+            // Skip clean properties
+            if ( dirtyPropertyNames != null && !dirtyPropertyNames.contains( prop.getName() ) )
             {
                 continue;
             }

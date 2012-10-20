@@ -11,7 +11,6 @@ import javax.validation.ConstraintViolation;
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.PersistenceMapper;
-import com.getperka.flatpack.gwt.EntityMetadata.EntityMetadataCodex;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
@@ -30,7 +29,7 @@ public class Packer
     {
         this.typeContext = typeContext;
 
-        // TODO
+        // TODO it seems we don't need this mapper on client side
         this.persistenceMapper = new PersistenceMapper() {
 
             @Override
@@ -116,7 +115,7 @@ public class Packer
         // Write metadata for any entities
         if ( !persistent.isEmpty() )
         {
-            EntityCodex<EntityMetadata> metaCodex = new EntityMetadataCodex();
+            EntityCodex<EntityMetadata> metaCodex = EntityMetadata.getCodex();
             json.name( metaCodex.getName() );
             json.beginArray();
             for ( HasUuid toWrite : persistent )

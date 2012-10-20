@@ -7,6 +7,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import com.getperka.flatpack.Configuration;
 import com.getperka.flatpack.demo.gwt.persistence.Database;
 import com.getperka.flatpack.demo.gwt.persistence.DatabaseResolver;
+import com.getperka.flatpack.demo.gwt.persistence.DemoPersistenceMapper;
 import com.getperka.flatpack.demo.gwt.persistence.TrueDatabase;
 import com.getperka.flatpack.demo.gwt.resources.DemoResource;
 import com.getperka.flatpack.ext.EntityResolver;
@@ -82,7 +83,8 @@ public class GuiceServletConfig
                          */
                         .addTypeSource(
                             new SearchTypeSource( "com.getperka.flatpack.client.dto", "com.getperka.flatpack.ext",
-                                "com.getperka.flatpack.demo.gwt.model" ) ).withPrettyPrint( true )
+                                "com.getperka.flatpack.demo.gwt.model" ) )
+                        .addPersistenceMapper( new DemoPersistenceMapper() ).withPrettyPrint( true )
                 /*
                  * A PrincipalMapper is optional and, if present, enables the use principal-based property access
                  * restrictions whereby certain Principals are allowed to mutate only specific entities. This can be
