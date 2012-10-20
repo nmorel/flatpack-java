@@ -226,20 +226,43 @@ entityCodexDeclaration() ::= <%
  * Generate a property for entity codex.
  */
 propertyCodex(property, entity) ::= <<
-// Property <property.name>
-com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\> <property.name>Property =
-  new com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\>( "<property.name>", <property.type.codex> ) {
-    @Override
-    public <property.type> getValue( <entity.simpleName> object ) {
-      return object.get<property.getterName>();
-    }
+{
+  // Property <property.name>
+  com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\> <property.name>Property =
+    new com.getperka.flatpack.gwt.ext.Property\<<entity.simpleName>, <property.type>\>( "<property.name>", <property.type.codex> ) {
+      @Override
+      public <property.type> getValue( <entity.simpleName> object ) {
+        return object.get<property.getterName>();
+      }
 
-    @Override
-    public void setValue( <entity.simpleName> object, <property.type> value ) {
-      object.set<property.getterName>( value );
-    }
-  };
-properties.add( <property.name>Property );
+      @Override
+      public void setValue( <entity.simpleName> object, <property.type> value ) {
+        object.set<property.getterName>( value );
+      }
+    };
+  <property.name>Property.setDeepTraversalOnly(<property.deepTraversalOnly>);
+  <property.name>Property.setEmbedded(<property.embedded>);
+  <property.name>Property.setEnclosingTypeName(getName());
+  <property.name>Property.setSuppressDefaultValue(<property.suppressDefaultValue>);
+<if(property.impliedProperty)>
+  // Implied property <property.impliedProperty.name>
+  com.getperka.flatpack.gwt.ext.Property\<<property.type.impliedType>, <property.impliedProperty.type>\> <property.impliedProperty.name>ImpliedProperty = 
+    new com.getperka.flatpack.gwt.ext.Property\<<property.type.impliedType>, <property.impliedProperty.type>\>( "<property.impliedProperty.name>", <property.impliedProperty.type.codex> ) {
+      @Override
+      public <property.impliedProperty.type> getValue( <property.type.impliedType> object ) {
+        return object.get<property.impliedProperty.getterName>();
+      }
+
+      @Override
+      public void setValue( <property.type.impliedType> object, <property.impliedProperty.type> value ) {
+        object.set<property.impliedProperty.getterName>( value );
+      }
+    };
+  <property.impliedProperty.name>ImpliedProperty.setEnclosingTypeName("<property.impliedProperty.enclosingTypeName>");
+  <property.name>Property.setImpliedProperty(<property.impliedProperty.name>ImpliedProperty);
+<endif>
+  properties.add( <property.name>Property );
+}
 >>
 
 /**

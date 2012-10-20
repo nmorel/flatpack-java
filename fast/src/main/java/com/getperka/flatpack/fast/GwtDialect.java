@@ -36,6 +36,7 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
 
 import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.client.dto.EntityDescription;
+import com.getperka.flatpack.ext.JsonKind;
 import com.getperka.flatpack.ext.Type;
 import com.getperka.flatpack.util.FlatPackCollections;
 
@@ -62,8 +63,9 @@ public class GwtDialect
         }
 
         Map<String, EntityDescription> allEntities = FlatPackCollections.mapForIteration();
-        for (EntityDescription entity : api.getEntities()) {
-          addEntity( allEntities, entity );
+        for ( EntityDescription entity : api.getEntities() )
+        {
+            addEntity( allEntities, entity );
         }
 
         // Render entities + codex
@@ -126,7 +128,20 @@ public class GwtDialect
                 Type type = (Type) o;
                 if ( "codex".equals( propertyName ) )
                 {
+                    // Transform a type to its associated codex
                     return toCodexString( type );
+                }
+                else if ( "impliedType".equals( propertyName ) )
+                {
+                    // For implied property, we need the entity type and not the enclosing collection
+                    if ( JsonKind.LIST.equals( type.getJsonKind() ) )
+                    {
+                        return toTypeString( type.getListElement() );
+                    }
+                    else
+                    {
+                        return toTypeString( type );
+                    }
                 }
                 return super.getProperty( interp, self, o, property, propertyName );
             };
@@ -273,6 +288,11 @@ public class GwtDialect
         {
             return string.substring( 0, 1 ).toLowerCase() + string.substring( 1 );
         }
+    }
+
+    protected String toImpliedTypeString( Type type )
+    {
+        return null;
     }
 
 }

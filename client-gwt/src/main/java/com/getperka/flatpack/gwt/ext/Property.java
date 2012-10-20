@@ -45,11 +45,6 @@ public abstract class Property<T, V>
 
     private Codex<V> codex;
     private boolean deepTraversalOnly;
-    /**
-     * This property is mutable by external callers. It's kind of a hack to allow the describe endpoint to lazily add
-     * the doc strings.
-     */
-    private String docString;
     private String enclosingTypeName;
     private boolean embedded;
     private Property<?, ?> implied;
@@ -78,9 +73,12 @@ public abstract class Property<T, V>
         return codex;
     }
 
-    public String getDocString()
+    /**
+     * Returns {@code true} if the Property should be included only during a deep traversal.
+     */
+    public boolean isDeepTraversalOnly()
     {
-        return docString;
+        return deepTraversalOnly;
     }
 
     /**
@@ -89,6 +87,23 @@ public abstract class Property<T, V>
     public String getEnclosingTypeName()
     {
         return enclosingTypeName;
+    }
+
+    /**
+     * Returns {@code true} if an entity Property's properties should be emitted into the owning entity's properties.
+     */
+    public boolean isEmbedded()
+    {
+        return embedded;
+    }
+
+    /**
+     * When a new value is assigned to the current property in some instance, the implied property of the new value
+     * should also be updated with the current instance.
+     */
+    public Property<?, ?> getImpliedProperty()
+    {
+        return implied;
     }
 
     /**
@@ -101,30 +116,6 @@ public abstract class Property<T, V>
     }
 
     /**
-     * Returns {@code true} if the Property should be included only during a deep traversal.
-     */
-    public boolean isDeepTraversalOnly()
-    {
-        return deepTraversalOnly;
-    }
-
-    /**
-     * Returns {@code true} if an entity Property's properties should be emitted into the owning entity's properties.
-     */
-    public boolean isEmbedded()
-    {
-        return embedded;
-    }
-
-    /**
-     * When a new value is assigned to the current property in some instance, the implied property of
-     * the new value should also be updated with the current instance.
-     */
-    public Property<?, ?> getImpliedProperty() {
-      return implied;
-    }
-
-    /**
      * If {@code true}, non-null properties that contain the property type's default value will not be serialized. For
      * example, integer properties whose values are {@code 0} will not be serialized.
      */
@@ -133,9 +124,53 @@ public abstract class Property<T, V>
         return suppressDefaultValue;
     }
 
-    public void setDocString( String docString )
+    public boolean isPrimitive()
     {
-        this.docString = docString;
+        return primitive;
+    }
+
+    public void setCodex( Codex<V> codex )
+    {
+        this.codex = codex;
+    }
+
+    public void setDeepTraversalOnly( boolean deepTraversalOnly )
+    {
+        this.deepTraversalOnly = deepTraversalOnly;
+    }
+
+    public void setEnclosingTypeName( String enclosingTypeName )
+    {
+        this.enclosingTypeName = enclosingTypeName;
+    }
+
+    public void setEmbedded( boolean embedded )
+    {
+        this.embedded = embedded;
+    }
+
+    /**
+     * Use for late fixups of implied properties when the OneToMany property is examined after the ManyToOne
+     * relationship.
+     */
+    public void setImpliedProperty( Property<?, ?> implied )
+    {
+        this.implied = implied;
+    }
+
+    public void setName( String name )
+    {
+        this.name = name;
+    }
+
+    public void setSuppressDefaultValue( boolean suppressDefaultValue )
+    {
+        this.suppressDefaultValue = suppressDefaultValue;
+    }
+
+    public void setPrimitive( boolean primitive )
+    {
+        this.primitive = primitive;
     }
 
     /**
@@ -153,53 +188,5 @@ public abstract class Property<T, V>
         return super.defaultUuid();
         // TODO won't work in GWT
         // return UUID.nameUUIDFromBytes((getEnclosingTypeName() + "." + getName()).getBytes(UTF8));
-    }
-
-    public void setDeepTraversalOnly( boolean deepTraversalOnly )
-    {
-        this.deepTraversalOnly = deepTraversalOnly;
-    }
-
-    public void setEmbedded( boolean embedded )
-    {
-        this.embedded = embedded;
-    }
-
-    /**
-     * Use for late fixups of implied properties when the OneToMany property is examined after the
-     * ManyToOne relationship.
-     */
-    public void setImpliedProperty(Property<?, ?> implied) {
-      this.implied = implied;
-    }
-
-    public void setEnclosingTypeName( String enclosingTypeName )
-    {
-        this.enclosingTypeName = enclosingTypeName;
-    }
-
-    public void setName( String name )
-    {
-        this.name = name;
-    }
-
-    public void setCodex( Codex<V> codex )
-    {
-        this.codex = codex;
-    }
-
-    public void setSuppressDefaultValue( boolean suppressDefaultValue )
-    {
-        this.suppressDefaultValue = suppressDefaultValue;
-    }
-
-    public boolean isPrimitive()
-    {
-        return primitive;
-    }
-
-    public void setPrimitive( boolean primitive )
-    {
-        this.primitive = primitive;
     }
 }

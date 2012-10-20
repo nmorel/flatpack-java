@@ -53,20 +53,23 @@ class EntityMetadata
         @Override
         protected void initProperties( List<Property<EntityMetadata, ?>> properties )
         {
-            properties.add( new Property<EntityMetadata, Boolean>( "persistent", new BooleanCodex() ) {
+            Property<EntityMetadata, Boolean> persistentProperty =
+                new Property<EntityMetadata, Boolean>( "persistent", new BooleanCodex(), true ) {
 
-                @Override
-                public Boolean getValue( EntityMetadata object )
-                {
-                    return object.isPersistent();
-                }
+                    @Override
+                    public Boolean getValue( EntityMetadata object )
+                    {
+                        return object.isPersistent();
+                    }
 
-                @Override
-                public void setValue( EntityMetadata object, Boolean value )
-                {
-                    object.setPersistent( value );
-                }
-            } );
+                    @Override
+                    public void setValue( EntityMetadata object, Boolean value )
+                    {
+                        object.setPersistent( value );
+                    }
+                };
+            persistentProperty.setEnclosingTypeName( getName() );
+            properties.add( persistentProperty );
         }
 
         @Override

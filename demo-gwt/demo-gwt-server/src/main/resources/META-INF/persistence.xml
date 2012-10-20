@@ -7,6 +7,7 @@
   <persistence-unit name="demoDb">
 
     <class>com.getperka.flatpack.demo.gwt.model.Product</class>
+    <class>com.getperka.flatpack.demo.gwt.model.ChildBean</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
     <properties>

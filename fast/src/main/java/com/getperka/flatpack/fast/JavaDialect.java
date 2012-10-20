@@ -273,48 +273,7 @@ public class JavaDialect implements Dialect {
       @Override
       public String toString(Object o, String formatString, Locale locale) {
         Type type = (Type) o;
-        return toString(type);
-      }
-
-      protected String toString(Type type) {
-        // Allow a TypeHint to override any interpretation of the Type
-        if (type.getTypeHint() != null) {
-          return type.getTypeHint().getValue();
-        }
-
-        switch (type.getJsonKind()) {
-          case ANY:
-            return JsonElement.class.getCanonicalName();
-          case BOOLEAN:
-            return Boolean.class.getCanonicalName();
-          case DOUBLE:
-            return Double.class.getCanonicalName();
-          case INTEGER:
-            return Integer.class.getCanonicalName();
-          case LIST:
-            return List.class.getCanonicalName() + "<" + toString(type.getListElement()) + ">";
-          case MAP:
-            return Map.class.getCanonicalName() + "<" + toString(type.getMapKey()) + ","
-              + toString(type.getMapValue()) + ">";
-          case NULL:
-            return Void.class.getCanonicalName();
-          case STRING: {
-            // Look for the presence of enum values
-            if (type.getEnumValues() != null) {
-              // Register a referenced enum
-              usedEnums.add(type);
-              return typePrefix + upcase(type.getName());
-            }
-            // Any other named type must be an entity type
-            if (type.getName() != null) {
-              // Allow type to be overridden
-              return typePrefix + upcase(type.getName());
-            }
-            // Otherwise it must be a plain string
-            return String.class.getCanonicalName();
-          }
-        }
-        throw new UnsupportedOperationException("Unknown JsonKind " + type.getJsonKind());
+        return toTypeString(type);
       }
     });
     group.registerModelAdaptor(EndpointDescription.class, new ObjectModelAdaptor() {
@@ -562,5 +521,46 @@ public class JavaDialect implements Dialect {
     writer.setLineWidth(80);
     enumST.write(writer);
     fileWriter.close();
+  }
+
+  protected String toTypeString(Type type) {
+    // Allow a TypeHint to override any interpretation of the Type
+    if (type.getTypeHint() != null) {
+      return type.getTypeHint().getValue();
+    }
+
+    switch (type.getJsonKind()) {
+      case ANY:
+        return JsonElement.class.getCanonicalName();
+      case BOOLEAN:
+        return Boolean.class.getCanonicalName();
+      case DOUBLE:
+        return Double.class.getCanonicalName();
+      case INTEGER:
+        return Integer.class.getCanonicalName();
+      case LIST:
+        return List.class.getCanonicalName() + "<" + toTypeString(type.getListElement()) + ">";
+      case MAP:
+        return Map.class.getCanonicalName() + "<" + toTypeString(type.getMapKey()) + ","
+          + toTypeString(type.getMapValue()) + ">";
+      case NULL:
+        return Void.class.getCanonicalName();
+      case STRING: {
+        // Look for the presence of enum values
+        if (type.getEnumValues() != null) {
+          // Register a referenced enum
+          usedEnums.add(type);
+          return typePrefix + upcase(type.getName());
+        }
+        // Any other named type must be an entity type
+        if (type.getName() != null) {
+          // Allow type to be overridden
+          return typePrefix + upcase(type.getName());
+        }
+        // Otherwise it must be a plain string
+        return String.class.getCanonicalName();
+      }
+    }
+    throw new UnsupportedOperationException("Unknown JsonKind " + type.getJsonKind());
   }
 }

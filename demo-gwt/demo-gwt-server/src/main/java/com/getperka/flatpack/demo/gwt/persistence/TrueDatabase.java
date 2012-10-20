@@ -26,6 +26,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.demo.gwt.model.ChildBean;
 import com.getperka.flatpack.demo.gwt.model.Product;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -45,17 +46,22 @@ public class TrueDatabase
     public TrueDatabase( Provider<EntityManager> entityManager )
     {
         this.entityManager = entityManager;
+        
+        ChildBean child = new ChildBean();
+        child.setChild( "Chilie" );
 
         Product p1 = new Product();
         p1.setName( "Name1" );
         p1.setNotes( "Notes1" );
         p1.setPrice( new BigDecimal( 199.00 ) );
+        p1.setChild( child );
         persist( p1 );
 
         Product p2 = new Product();
         p2.setName( "Name2" );
         p2.setNotes( "Notes2" );
         p2.setPrice( new BigDecimal( 149.99 ) );
+        p2.setChild( child );
         persist( p2 );
     }
 
