@@ -1,7 +1,9 @@
 package com.getperka.flatpack.demo.gwt.screens.product.list;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.getperka.flatpack.demo.gwt.gen.BaseEntity;
 import com.getperka.flatpack.demo.gwt.gen.GenApi;
 import com.getperka.flatpack.demo.gwt.gen.Product;
 import com.getperka.flatpack.demo.gwt.mvp.BaseActivity;
@@ -36,12 +38,21 @@ public class ListProductActivity
     {
         view.setPresenter( this );
 
-        requestApi.productsGet().execute( new FlatBack<FlatPackEntity<List<Product>>>() {
+        // Should use productsGet but it is to demonstrate the inheritance support      
+        requestApi.entitiesGet().execute( new FlatBack<FlatPackEntity<List<BaseEntity>>>() {
 
             @Override
-            public void onSuccess( FlatPackEntity<List<Product>> result )
+            public void onSuccess( FlatPackEntity<List<BaseEntity>> result )
             {
-                view.setProducts( result.getValue() );
+                List<Product> products = new ArrayList<Product>();
+                for ( BaseEntity entity : result.getValue() )
+                {
+                    if ( entity instanceof Product )
+                    {
+                        products.add( (Product) entity );
+                    }
+                }
+                view.setProducts( products );
             }
         } );
 

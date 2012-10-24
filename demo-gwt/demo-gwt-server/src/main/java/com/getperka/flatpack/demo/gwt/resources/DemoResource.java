@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import javax.ws.rs.ext.Providers;
 
 import com.getperka.flatpack.FlatPack;
 import com.getperka.flatpack.client.dto.ApiDescription;
+import com.getperka.flatpack.demo.gwt.model.BaseEntity;
 import com.getperka.flatpack.demo.gwt.model.ChildBean;
 import com.getperka.flatpack.demo.gwt.model.MultiplePropertiesBean;
 import com.getperka.flatpack.demo.gwt.model.Product;
@@ -243,5 +245,29 @@ public class DemoResource
         // bean.setDateJoda( new LocalDateTime( 2011, 3, 14, 21, 56, 23, 996 ) );
 
         return bean;
+    }
+
+    /**
+     * Return all the entities from the db.
+     */
+    @GET
+    @Path( "entities" )
+    @FlatPackResponse( { List.class, BaseEntity.class } )
+    public List<BaseEntity> entities()
+    {
+        List<BaseEntity> list = new ArrayList<BaseEntity>( db.get( Product.class ) );
+        list.addAll( db.get( ChildBean.class ) );
+        return list;
+    }
+
+    /**
+     * Stores or updates any entity.
+     */
+    @PUT
+    @Path( "entities" )
+    @FlatPackResponse( Void.class )
+    public void entitiesPut( BaseEntity entity )
+    {
+        db.persist( entity );
     }
 }

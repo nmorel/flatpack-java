@@ -1,6 +1,7 @@
 package com.getperka.flatpack.demo.gwt.mvp;
 
 import com.getperka.flatpack.demo.gwt.screens.error.ErrorPlace;
+import com.getperka.flatpack.demo.gwt.screens.product.edit.ConsultProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.CreateProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.EditProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductPlace;
@@ -14,21 +15,24 @@ public enum TokenEnum
         {
             return new ListProductPlace();
         }
-    },PRODUCT_CONSULT( "product/consult", true )
+    },
+    PRODUCT_CONSULT( "product/consult", true )
     {
         @Override
         public BasePlace createNewPlace()
         {
-            return new EditProductPlace();
+            return new ConsultProductPlace();
         }
-    },PRODUCT_CREATE( "product/create", false )
+    },
+    PRODUCT_CREATE( "product/create", false )
     {
         @Override
         public BasePlace createNewPlace()
         {
             return new CreateProductPlace();
         }
-    },PRODUCT_EDIT( "product/edit", true )
+    },
+    PRODUCT_EDIT( "product/edit", true )
     {
         @Override
         public BasePlace createNewPlace()

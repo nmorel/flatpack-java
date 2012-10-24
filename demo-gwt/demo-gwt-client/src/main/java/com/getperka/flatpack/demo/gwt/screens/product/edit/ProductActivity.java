@@ -1,7 +1,5 @@
 package com.getperka.flatpack.demo.gwt.screens.product.edit;
 
-import java.util.Collections;
-
 import com.getperka.flatpack.demo.gwt.gen.GenApi;
 import com.getperka.flatpack.demo.gwt.gen.Product;
 import com.getperka.flatpack.demo.gwt.mvp.BaseActivity;
@@ -103,10 +101,13 @@ public class ProductActivity
     @Override
     public void validate()
     {
+        // Problem with the flush here which set all the properties even if they didn't change. The current
+        // implementation of dirty properties doesn't look if the value has really changed and set the property as
+        // dirty
         Product product = driver.flush();
         if ( !driver.hasErrors() )
         {
-            requestApi.productsPut( Collections.singletonList( product ) ).execute(
+            requestApi.entitiesPut( product ).execute(
                 new FlatBack<FlatPackEntity<Void>>() {
 
                     @Override

@@ -307,7 +307,7 @@ private class <end.javaNameUpcase>Impl
     extends <names.FlatPackRequestBase>\<<end.javaNameUpcase>, <if(end.entity)><end.entity><else>Void<endif>, <end.returnType>\>
     implements <end.javaNameUpcase> {
   public <end.javaNameUpcase>Impl(Object... args) {
-    super(<namePrefix>Api.this, com.google.gwt.http.client.RequestBuilder.<end.method>, "<end.pathDecoded>", <if(end.entity)><end.entity.codex><else>BaseCodexFactory.get().voidCodex()<endif>, <end.returnType.codex>, args);
+    super(<namePrefix>Api.this, com.google.gwt.http.client.RequestBuilder.<end.method>, "<end.pathDecoded>", <if(end.entity)><end.entity.codexApi><else>BaseCodexFactory.get().voidCodex()<endif>, <end.returnType.codexApi>, args);
   }
   <end.queryParameters:endpointQueryParameterImpl(); separator="\n">
 }

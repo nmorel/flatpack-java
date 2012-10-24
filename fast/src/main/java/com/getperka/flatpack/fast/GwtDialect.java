@@ -48,10 +48,14 @@ public class GwtDialect
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
+    private static String namePrefix;
+
     @Override
     public void generate( ApiDescription api, File outputDir )
         throws IOException
     {
+        namePrefix = upcase( packageName.substring( packageName.lastIndexOf( '.' ) + 1 ) );
+
         STGroup group = loadGroup( "gwt.stg" );
         loadConcreteTypeMap();
 
@@ -82,6 +86,14 @@ public class GwtDialect
             render( entityST, packageDir, simpleName );
 
             // Render EntityCodex
+            // We add the properties of the supertypes to generate them
+            EntityDescription supertype = entity.getSupertype();
+            while ( null != supertype && !"baseHasUuid".equals( supertype.getTypeName() )
+                && !"hasUuid".equals( supertype.getTypeName() ) )
+            {
+                entity.getProperties().addAll( supertype.getProperties() );
+                supertype = supertype.getSupertype();
+            }
             ST entityCodexST =
                 group.getInstanceOf( "entityCodex" ).add( "entity", entity ).add( "packageName", packageName );
             render( entityCodexST, packageDir, simpleName + "Codex" );
@@ -94,8 +106,6 @@ public class GwtDialect
 
             render( enumST, packageDir, typePrefix + upcase( enumType.getName() ) );
         }
-
-        String namePrefix = upcase( packageName.substring( packageName.lastIndexOf( '.' ) + 1 ) );
 
         // Render the Api convenience class
         ST apiST =
@@ -129,7 +139,12 @@ public class GwtDialect
                 if ( "codex".equals( propertyName ) )
                 {
                     // Transform a type to its associated codex
-                    return toCodexString( type );
+                    return toCodexString( type, false );
+                }
+                else if ( "codexApi".equals( propertyName ) )
+                {
+                    // Transform a type to its associated codex
+                    return toCodexString( type, true );
                 }
                 else if ( "impliedType".equals( propertyName ) )
                 {
@@ -162,7 +177,7 @@ public class GwtDialect
         return "gwt";
     }
 
-    protected String toCodexString( Type type )
+    protected String toCodexString( Type type, boolean api )
     {
         // Allow a TypeHint to override any interpretation of the Type
         if ( type.getTypeHint() != null )
@@ -211,18 +226,18 @@ public class GwtDialect
             case INTEGER:
                 return "BaseCodexFactory.get().integerCodex()";
             case LIST:
-                return "BaseCodexFactory.get().listCodex(" + toCodexString( type.getListElement() ) + ")";
+                return "BaseCodexFactory.get().listCodex(" + toCodexString( type.getListElement(), api ) + ")";
             case MAP:
                 if ( null == type.getMapKey().getTypeHint() && null == type.getMapKey().getEnumValues()
                     && null == type.getMapKey().getName() )
                 {
-                    return "BaseCodexFactory.get().stringMapCodex(" + toCodexString( type.getMapValue() ) + ")";
+                    return "BaseCodexFactory.get().stringMapCodex(" + toCodexString( type.getMapValue(), api ) + ")";
                 }
                 else
                 {
                     // EntityMapCodex
-                    return "BaseCodexFactory.get().entityMapCodex(" + toCodexString( type.getMapKey() ) + ","
-                        + toCodexString( type.getMapValue() ) + ")";
+                    return "BaseCodexFactory.get().entityMapCodex(" + toCodexString( type.getMapKey(), api ) + ","
+                        + toCodexString( type.getMapValue(), api ) + ")";
                 }
             case NULL:
                 return "BaseCodexFactory.get().voidCodex()";
@@ -237,7 +252,17 @@ public class GwtDialect
                 // Any other named type must be an entity type
                 if ( type.getName() != null )
                 {
-                    return "BaseCodexFactory.get()." + type.getName() + "Codex()";
+                    if ( api )
+                    {
+                        // For the api, we give a DynamicEntityCodex so we can retrieve dynamically the correct entity
+                        // codex. It is used for inheritance in the packer for the scan method.
+                        return namePrefix + "Api.this.<" + typeToClassName( type.getName() )
+                            + ">getDynamicEntityCodex()";
+                    }
+                    else
+                    {
+                        return "BaseCodexFactory.get()." + type.getName() + "Codex()";
+                    }
                 }
 
                 // Otherwise it must be a plain string

@@ -8,6 +8,24 @@
   <g:HTMLPanel>
     <table>
       <tr>
+        <td>Id :</td>
+        <td>
+          <g:ValueLabel ui:field='uuid' />
+        </td>
+      </tr>
+      <tr>
+        <td>Creation date :</td>
+        <td>
+          <g:DateLabel ui:field='creationDate' />
+        </td>
+      </tr>
+      <tr>
+        <td>Last modification :</td>
+        <td>
+          <g:DateLabel ui:field='modificationDate' />
+        </td>
+      </tr>
+      <tr>
         <td>Name :</td>
         <td>
           <e:ValueBoxEditorDecorator ui:field='name'>
