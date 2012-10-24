@@ -1,6 +1,5 @@
 package com.getperka.flatpack.demo.gwt.screens.product.list;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.getperka.flatpack.demo.gwt.gen.BaseEntity;
@@ -12,6 +11,8 @@ import com.getperka.flatpack.demo.gwt.screens.product.edit.CreateProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductView.Presenter;
 import com.getperka.flatpack.gwt.FlatPackEntity;
 import com.getperka.flatpack.gwt.client.FlatBack;
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.web.bindery.event.shared.EventBus;
@@ -38,23 +39,21 @@ public class ListProductActivity
     {
         view.setPresenter( this );
 
-        // Should use productsGet but it is to demonstrate the inheritance support      
-        requestApi.entitiesGet().execute( new FlatBack<FlatPackEntity<List<BaseEntity>>>() {
+        // Should use productsGet but it is to demonstrate the inheritance support
+        requestApi.entitiesGet().withEntityName( Product.typeName() )
+            .execute( new FlatBack<FlatPackEntity<List<BaseEntity>>>() {
 
-            @Override
-            public void onSuccess( FlatPackEntity<List<BaseEntity>> result )
-            {
-                List<Product> products = new ArrayList<Product>();
-                for ( BaseEntity entity : result.getValue() )
+                @Override
+                public void onSuccess( FlatPackEntity<List<BaseEntity>> result )
                 {
-                    if ( entity instanceof Product )
-                    {
-                        products.add( (Product) entity );
-                    }
+                    view.setProducts( Lists.transform( result.getValue(), new Function<BaseEntity, Product>() {
+                        public Product apply( BaseEntity entry )
+                        {
+                            return (Product) entry;
+                        }
+                    } ) );
                 }
-                view.setProducts( products );
-            }
-        } );
+            } );
 
         panel.setWidget( view );
     }

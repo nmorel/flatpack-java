@@ -48,6 +48,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Providers;
 
 import com.getperka.flatpack.FlatPack;
+import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.client.dto.ApiDescription;
 import com.getperka.flatpack.demo.gwt.model.BaseEntity;
 import com.getperka.flatpack.demo.gwt.model.ChildBean;
@@ -82,6 +83,11 @@ public class DemoResource
         this.db = db;
     }
 
+    private FlatPack getFlatPack()
+    {
+        return providers.getContextResolver( FlatPack.class, MediaType.WILDCARD_TYPE ).getContext( FlatPack.class );
+    }
+
     /**
      * Provide a description of the entities and service methods defined by the web service. Providing an endpoint like
      * this is optional, but allows you to use FastTool to automatically generate client access libraries.
@@ -92,9 +98,7 @@ public class DemoResource
     public ApiDescription describeGet()
         throws IOException
     {
-        FlatPack flatpack =
-            providers.getContextResolver( FlatPack.class, MediaType.WILDCARD_TYPE ).getContext( FlatPack.class );
-        ApiDescriber api = new ApiDescriber( flatpack, Arrays.asList( DemoResource.class.getMethods() ) );
+        ApiDescriber api = new ApiDescriber( getFlatPack(), Arrays.asList( DemoResource.class.getMethods() ) );
         return api.describe();
     }
 
@@ -248,16 +252,28 @@ public class DemoResource
     }
 
     /**
-     * Return all the entities from the db.
+     * Return all the entities from the db or only the type specified in entityName.
+     * 
+     * @param entityName payload entity name as used by flatpack
      */
+    @SuppressWarnings( "unchecked" )
     @GET
     @Path( "entities" )
     @FlatPackResponse( { List.class, BaseEntity.class } )
-    public List<BaseEntity> entities()
+    public List<BaseEntity> entities( @QueryParam( "entityName" ) String entityName )
     {
-        List<BaseEntity> list = new ArrayList<BaseEntity>( db.get( Product.class ) );
-        list.addAll( db.get( ChildBean.class ) );
-        return list;
+        Class<? extends HasUuid> entityClass =
+            null == entityName ? null : getFlatPack().getTypeContext().getClass( entityName );
+        if ( null == entityClass || !BaseEntity.class.isAssignableFrom( entityClass ) )
+        {
+            List<BaseEntity> allEntities = new ArrayList<BaseEntity>( db.get( Product.class ) );
+            allEntities.addAll( db.get( ChildBean.class ) );
+            return allEntities;
+        }
+        else
+        {
+            return db.get( (Class<BaseEntity>) entityClass );
+        }
     }
 
     /**
