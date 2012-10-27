@@ -18,11 +18,11 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Plugins version -->
-    <gwt-maven-plugin.version>2.5.0-rc1</gwt-maven-plugin.version>
+    <gwt-maven-plugin.version>2.5.0-rc2</gwt-maven-plugin.version>
     <jetty-maven-plugin.version>8.1.4.v20120524</jetty-maven-plugin.version>
 
     <!-- Dependencies version -->
-    <gwt.version>2.5.0-rc2</gwt.version>
+    <gwt.version>2.5.0</gwt.version>
     <flatpack.version>${project.version}</flatpack.version>
     <jersey.version>1.14</jersey.version>
     <servlet-api.version>2.5</servlet-api.version>
@@ -136,7 +136,7 @@
         <version>${guice.version}</version>
       </dependency>
 
-       <!-- Hibernate dependencies -->
+      <!-- Hibernate dependencies -->
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
@@ -237,6 +237,11 @@
             <dependency>
               <groupId>com.google.gwt</groupId>
               <artifactId>gwt-servlet</artifactId>
+              <version>${gwt.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>com.google.gwt</groupId>
+              <artifactId>gwt-codeserver</artifactId>
               <version>${gwt.version}</version>
             </dependency>
           </dependencies>

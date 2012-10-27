@@ -19,10 +19,10 @@
 
   <properties>
     <!-- Plugins version -->
-    <gwt-maven-plugin.version>2.5.0-rc1</gwt-maven-plugin.version>
+    <gwt-maven-plugin.version>2.5.0-rc2</gwt-maven-plugin.version>
 
     <!-- Dependencies version -->
-    <gwt.version>2.5.0-rc2</gwt.version>
+    <gwt.version>2.5.0</gwt.version>
   </properties>
 
   <dependencies>
@@ -109,6 +109,11 @@
           <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-servlet</artifactId>
+            <version>${gwt.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>com.google.gwt</groupId>
+            <artifactId>gwt-codeserver</artifactId>
             <version>${gwt.version}</version>
           </dependency>
         </dependencies>
