@@ -31,7 +31,7 @@ public class UnpackerTestGwt
         throws Exception
     {
         typeContextMock = new TestTypeContext();
-        unpacker = new Unpacker( typeContextMock );
+        unpacker = FlatPack.builder( typeContextMock ).create().getUnpacker();
     }
 
     public void testUnpackVoid()

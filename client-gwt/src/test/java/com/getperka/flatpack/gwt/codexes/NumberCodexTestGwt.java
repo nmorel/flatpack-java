@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 public class NumberCodexTestGwt
@@ -121,7 +120,7 @@ public class NumberCodexTestGwt
 
         try
         {
-            codex.readNotNull( "er", new DeserializationContext() );
+            codex.readNotNull( "er", deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

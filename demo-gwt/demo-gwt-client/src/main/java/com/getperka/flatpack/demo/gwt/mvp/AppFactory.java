@@ -1,6 +1,7 @@
 package com.getperka.flatpack.demo.gwt.mvp;
 
 import com.getperka.flatpack.demo.gwt.gen.GenApi;
+import com.getperka.flatpack.demo.gwt.gen.GenTypeContext;
 import com.getperka.flatpack.demo.gwt.screens.error.ErrorActivity;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.ConsultProductViewImpl;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.CreateAndEditProductViewImpl;
@@ -10,6 +11,7 @@ import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductActivity;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductView;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductViewImpl;
+import com.getperka.flatpack.gwt.FlatPack;
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.PlaceController;
@@ -42,6 +44,8 @@ public class AppFactory
     private final ActivityManager activityManager;
 
     private final SimplePanel display;
+
+    private FlatPack flatPack;
 
     private GenApi requestApi;
 
@@ -81,11 +85,20 @@ public class AppFactory
         return display;
     }
 
+    public FlatPack getFlatPack()
+    {
+        if ( null == flatPack )
+        {
+            flatPack = FlatPack.builder( new GenTypeContext() ).withPrettyPrint( true ).withVerbose( true ).create();
+        }
+        return flatPack;
+    }
+
     public GenApi getRequestApi()
     {
         if ( null == requestApi )
         {
-            requestApi = new GenApi();
+            requestApi = new GenApi( getFlatPack() );
             requestApi.setServerBase( "/resources" );
         }
         return requestApi;

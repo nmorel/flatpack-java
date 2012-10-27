@@ -1,13 +1,16 @@
 package com.getperka.flatpack.gwt;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PersistenceAware;
 import com.getperka.flatpack.client.impl.BasePersistenceAware;
+import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
@@ -20,16 +23,25 @@ public class Unpacker
 {
     private static Logger logger = Logger.getLogger( "Unpacker" );
 
-    private TypeContext typeContext;
+    private final TypeContext typeContext;
+    private final boolean ignoreUnresolvableTypes;
+    private final boolean verbose;
+    private final List<EntityResolver> resolvers;
 
-    public Unpacker( TypeContext typeContext )
+    Unpacker( TypeContext typeContext, boolean ignoreUnresolvableTypes, boolean verbose, List<EntityResolver> resolvers )
     {
         this.typeContext = typeContext;
+        this.ignoreUnresolvableTypes = ignoreUnresolvableTypes;
+        this.verbose = verbose;
+        this.resolvers = resolvers;
     }
 
     public <T> FlatPackEntity<T> unpack( String asJson, Codex<T> returnCodex )
     {
-        logger.finest( "unpacking : " + asJson );
+        if ( verbose && logger.isLoggable( Level.INFO ) )
+        {
+            logger.info( "Incoming payload:\n" + asJson );
+        }
 
         // The return value
         FlatPackEntity<T> toReturn = new FlatPackEntity<T>();
@@ -47,7 +59,7 @@ public class Unpacker
         }
 
         // Hold temporary state for deserialization
-        DeserializationContext context = new DeserializationContext();
+        DeserializationContext context = new DeserializationContext( resolvers );
 
         /*
          * Decoding is done as a two-pass operation since the runtime type of an allocated object cannot be swizzled.
@@ -80,7 +92,8 @@ public class Unpacker
                 if ( entity instanceof BasePersistenceAware )
                 {
                     ( (BasePersistenceAware) entity ).markPersistent();
-                    // TODO find a better way to achieve this without casting to the implementation. Maybe an event bus created for the unpack operation.
+                    // TODO find a better way to achieve this without casting to the implementation. Maybe an event bus
+                    // created for the unpack operation.
                     ( (BasePersistenceAware) entity ).postUnpack();
                 }
                 else if ( entity instanceof PersistenceAware )
@@ -172,17 +185,21 @@ public class Unpacker
             Class<? extends HasUuid> clazz = typeContext.getClass( simpleName );
             if ( null == clazz )
             {
-                logger.warning( "Could not find the class corresponding to '" + simpleName
-                    + "'. Did you configure the TypeContext ?" );
-                return;
+                if ( ignoreUnresolvableTypes )
+                {
+                    return;
+                }
+                else
+                {
+                    throw new UnsupportedOperationException( "Cannot resolve type " + simpleName );
+                }
             }
 
             EntityCodex<?> codex = typeContext.getCodex( clazz );
             if ( null == codex )
             {
-                logger.warning( "Could not find the entity codex corresponding to the class '" + clazz.getName()
-                    + "'. Did you configure the TypeContext ?" );
-                return;
+                throw new UnsupportedOperationException( "Cannot find codex for type " + simpleName + " and class "
+                    + clazz.getName() );
             }
 
             // Take the n-many property objects and stash them for later decoding

@@ -35,7 +35,7 @@ public class PackerTestGwt
         throws Exception
     {
         typeContextMock = new TestTypeContext();
-        packer = new Packer( typeContextMock );
+        packer = FlatPack.builder( typeContextMock ).create().getPacker();
     }
 
     public void testPackSingleMultiplePropertiesBean()

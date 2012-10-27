@@ -1,12 +1,12 @@
 package com.getperka.flatpack.gwt.client.impl;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.gwt.FlatPack;
 import com.getperka.flatpack.gwt.Packer;
 import com.getperka.flatpack.gwt.Unpacker;
 import com.getperka.flatpack.gwt.client.FlatPackApi;
 import com.getperka.flatpack.gwt.codexes.DynamicEntityCodex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
-import com.getperka.flatpack.gwt.ext.TypeContext;
 import com.google.gwt.http.client.RequestBuilder;
 
 public class ApiBase
@@ -15,17 +15,17 @@ public class ApiBase
     private final Packer packer;
 
     private final Unpacker unpacker;
-    
-    private final  DynamicEntityCodex<HasUuid> dynamicEntityCodex;
+
+    private final DynamicEntityCodex<HasUuid> dynamicEntityCodex;
 
     private String serverBase;
 
-    public ApiBase( TypeContext typeContext )
+    public ApiBase( FlatPack flatPack )
     {
         super();
-        this.packer = new Packer( typeContext );
-        this.unpacker = new Unpacker( typeContext );
-        this.dynamicEntityCodex = new DynamicEntityCodex<HasUuid>( typeContext );
+        this.packer = flatPack.getPacker();
+        this.unpacker = flatPack.getUnpacker();
+        this.dynamicEntityCodex = new DynamicEntityCodex<HasUuid>( flatPack.getTypeContext() );
     }
 
     /**
@@ -59,7 +59,7 @@ public class ApiBase
     {
         return unpacker;
     }
-    
+
     @SuppressWarnings( "unchecked" )
     public <T extends HasUuid> EntityCodex<T> getDynamicEntityCodex()
     {

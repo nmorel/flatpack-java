@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.validation.ConstraintViolation;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.PersistenceAware;
-import com.getperka.flatpack.PersistenceMapper;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.codexes.EntityCodex;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
@@ -22,33 +22,27 @@ public class Packer
 {
     private static Logger logger = Logger.getLogger( "Packer" );
 
-    private PersistenceMapper persistenceMapper;
-    private TypeContext typeContext;
+    private final TypeContext typeContext;
+    private final boolean prettyPrint;
+    private final boolean verbose;
 
-    public Packer( TypeContext typeContext )
+    Packer( TypeContext typeContext, boolean prettyPrint, boolean verbose )
     {
         this.typeContext = typeContext;
-
-        // TODO it seems we don't need this mapper on client side
-        this.persistenceMapper = new PersistenceMapper() {
-
-            @Override
-            public boolean isPersisted( HasUuid entity )
-            {
-                return false;
-            }
-
-            @Override
-            public boolean canPersist( Class<? extends HasUuid> entityType )
-            {
-                return false;
-            }
-        };
+        this.prettyPrint = prettyPrint;
+        this.verbose = verbose;
     }
 
     public <T> String pack( FlatPackEntity<T> entity, Codex<T> codex )
     {
-        SerializationContext context = new SerializationContext( new JsonWriter( new StringBuilder() ) );
+        JsonWriter json = new JsonWriter( new StringBuilder() );
+        json.setSerializeNulls( false );
+        if ( prettyPrint )
+        {
+            json.setIndent( "  " );
+        }
+
+        SerializationContext context = new SerializationContext( json );
 
         if ( entity.getTraversalMode().isSparse() )
         {
@@ -63,7 +57,6 @@ public class Packer
             codex.scan( entity.getValue(), context );
         }
 
-        JsonWriter json = context.getWriter();
         json.beginObject();
         // value : ['type', 'uuid']
         json.name( "value" );
@@ -102,10 +95,6 @@ public class Packer
             json.beginArray();
             for ( HasUuid toWrite : entry.getValue() )
             {
-                if ( persistenceMapper.isPersisted( toWrite ) )
-                {
-                    persistent.add( toWrite );
-                }
                 entityCodex.writeProperties( toWrite, context );
             }
             json.endArray();
@@ -155,7 +144,12 @@ public class Packer
 
         context.runPostWork();
 
-        return json.toString();
+        String result = json.toString();
+        if ( verbose && logger.isLoggable( Level.INFO ) )
+        {
+            logger.info( "Outgoing payload:\n" + result );
+        }
+        return result;
     }
 
     /**

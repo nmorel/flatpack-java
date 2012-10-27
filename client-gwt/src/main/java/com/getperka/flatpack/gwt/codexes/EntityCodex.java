@@ -262,21 +262,21 @@ public abstract class EntityCodex<T extends HasUuid>
 
         // TODO ?
         // Possibly delegate to injected resolvers
-        // if ( useResolvers )
-        // {
-        // try
-        // {
-        // toReturn = entityResolver.resolve( clazz, uuid );
-        // }
-        // catch ( Exception e )
-        // {
-        // context.fail( e );
-        // }
-        // if ( toReturn != null )
-        // {
-        // resolved = true;
-        // }
-        // }
+        if ( useResolvers )
+        {
+            try
+            {
+                toReturn = context.getEntityResolver().resolve( getEntityClass(), uuid );
+            }
+            catch ( Exception e )
+            {
+                context.fail( e );
+            }
+            if ( toReturn != null )
+            {
+                resolved = true;
+            }
+        }
 
         // Otherwise try to construct a new instance
         if ( toReturn == null )
@@ -288,6 +288,8 @@ public abstract class EntityCodex<T extends HasUuid>
         context.putEntity( uuid, toReturn, resolved );
         return toReturn;
     }
+
+    protected abstract Class<T> getEntityClass();
 
     protected abstract T createInstance();
 

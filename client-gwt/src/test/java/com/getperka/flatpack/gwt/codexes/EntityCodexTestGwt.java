@@ -21,7 +21,7 @@ public class EntityCodexTestGwt
     {
         EntityCodex<MultiplePropertiesBean> codex = TestCodexFactory.get().multiplePropertiesBeanCodex();
 
-        DeserializationContext deserialization = new DeserializationContext();
+        DeserializationContext deserialization = deserializationContext();
 
         MultiplePropertiesBean readValue = codex.read( "15a1bf22-f764-4e4e-abc2-81146df9f54f", deserialization );
         assertNotNull( readValue );
@@ -75,7 +75,7 @@ public class EntityCodexTestGwt
         assertFalse( obj.containsKey( "sqlDate" ) );
         assertTrue( obj.containsKey( "date" ) );
 
-        DeserializationContext deserialization = new DeserializationContext();
+        DeserializationContext deserialization = deserializationContext();
         MultiplePropertiesBean deserializedValue = codex.allocate( obj.getJavaScriptObject(), deserialization );
         codex.readProperties( deserializedValue, obj.getJavaScriptObject(), deserialization );
 
@@ -95,7 +95,7 @@ public class EntityCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

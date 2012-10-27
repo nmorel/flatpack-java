@@ -40,4 +40,10 @@ public class ChildBeanCodex
         return new ChildBean();
     }
 
+    @Override
+    protected Class<ChildBean> getEntityClass()
+    {
+        return ChildBean.class;
+    }
+
 }

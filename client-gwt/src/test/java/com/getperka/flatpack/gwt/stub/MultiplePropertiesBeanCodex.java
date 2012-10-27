@@ -445,7 +445,9 @@ public class MultiplePropertiesBeanCodex
                 object.setDate( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, java.sql.Date>( "sqlDate", TestCodexFactory.get().sqlDateCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, java.sql.Date>( "sqlDate", TestCodexFactory.get()
+            .sqlDateCodex() )
+        {
 
             @Override
             public java.sql.Date getValue( MultiplePropertiesBean object )
@@ -473,7 +475,9 @@ public class MultiplePropertiesBeanCodex
                 object.setSqlTime( value );
             }
         } );
-        properties.add( new Property<MultiplePropertiesBean, Timestamp>( "sqlTimestamp", TestCodexFactory.get().sqlTimestampCodex() ) {
+        properties.add( new Property<MultiplePropertiesBean, Timestamp>( "sqlTimestamp", TestCodexFactory.get()
+            .sqlTimestampCodex() )
+        {
 
             @Override
             public Timestamp getValue( MultiplePropertiesBean object )
@@ -499,6 +503,12 @@ public class MultiplePropertiesBeanCodex
     protected MultiplePropertiesBean createInstance()
     {
         return new MultiplePropertiesBean();
+    }
+
+    @Override
+    protected Class<MultiplePropertiesBean> getEntityClass()
+    {
+        return MultiplePropertiesBean.class;
     }
 
 }

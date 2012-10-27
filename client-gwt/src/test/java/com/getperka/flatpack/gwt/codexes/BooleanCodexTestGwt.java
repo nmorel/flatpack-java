@@ -3,7 +3,6 @@ package com.getperka.flatpack.gwt.codexes;
 import java.util.Collections;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 public class BooleanCodexTestGwt
@@ -25,8 +24,8 @@ public class BooleanCodexTestGwt
         throws Exception
     {
         Codex<Boolean> codex = TestCodexFactory.get().booleanCodex();
-        assertTrue( codex.readNotNull( Double.valueOf( 1 ), new DeserializationContext() ) );
-        assertFalse( codex.readNotNull( Double.valueOf( 0 ), new DeserializationContext() ) );
+        assertTrue( codex.readNotNull( Double.valueOf( 1 ), deserializationContext() ) );
+        assertFalse( codex.readNotNull( Double.valueOf( 0 ), deserializationContext() ) );
     }
 
     public void testDefaultValue()
@@ -40,13 +39,14 @@ public class BooleanCodexTestGwt
         assertFalse( codex.isDefaultValue( Boolean.TRUE ) );
     }
 
-    public void testIncorrectType() throws Exception
+    public void testIncorrectType()
+        throws Exception
     {
         Codex<Boolean> codex = TestCodexFactory.get().booleanCodex();
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

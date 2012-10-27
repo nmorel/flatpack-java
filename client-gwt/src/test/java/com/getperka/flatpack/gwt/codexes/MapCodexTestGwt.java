@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.ChildBean;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 import com.getperka.flatpack.util.FlatPackCollections;
@@ -77,7 +76,7 @@ public class MapCodexTestGwt
 
         try
         {
-            codexString.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codexString.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -90,7 +89,7 @@ public class MapCodexTestGwt
 
         try
         {
-            codexEntity.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codexEntity.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

@@ -208,6 +208,12 @@ import com.getperka.flatpack.gwt.codexes.*;
     return new <entity.simpleName>();
   }
 
+  @Override
+  protected Class\<<entity.simpleName>\> getEntityClass()
+  {
+    return <entity.simpleName>.class;
+  }
+
 }
 >>
 
@@ -273,12 +279,9 @@ api(api, packageName, namePrefix, apiIsPublic) ::= <<
 package <packageName>;
 
 <if(apiIsPublic)>public<endif> class <namePrefix>Api extends <names.ApiBase> {
-  public <namePrefix>Api() {
-    super(new <namePrefix>TypeContext());
-  }
 
-  public <namePrefix>Api(com.getperka.flatpack.gwt.ext.TypeContext typeContext) {
-    super(typeContext);
+  public <namePrefix>Api(com.getperka.flatpack.gwt.FlatPack flatPack) {
+    super(flatPack);
   }
 
   <api.endpoints:endpoint(); separator="\n">

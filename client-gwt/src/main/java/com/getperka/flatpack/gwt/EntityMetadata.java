@@ -84,6 +84,12 @@ class EntityMetadata
             return new EntityMetadata();
         }
 
+        @Override
+        protected Class<EntityMetadata> getEntityClass()
+        {
+            return EntityMetadata.class;
+        }
+
     }
 
     private boolean isPersistent;

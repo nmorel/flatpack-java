@@ -1,8 +1,10 @@
 package com.getperka.flatpack.gwt;
 
+import java.util.Collections;
 import java.util.Set;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.gwt.codexes.Codex;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
@@ -21,13 +23,19 @@ public abstract class FlatPackTestCase
         return "com.getperka.flatpack.gwt.FlatPackTest";
     }
 
-    protected SerializationContext serializationContext(StringBuilder out) {
-        JsonWriter json = new JsonWriter(out);
-        json.setLenient(true);
-        json.setIndent("  ");
-        json.setSerializeNulls(false);
+    protected SerializationContext serializationContext( StringBuilder out )
+    {
+        JsonWriter json = new JsonWriter( out );
+        json.setLenient( true );
+        json.setIndent( "  " );
+        json.setSerializeNulls( false );
         return new SerializationContext( json );
-      }
+    }
+
+    protected DeserializationContext deserializationContext()
+    {
+        return new DeserializationContext( Collections.<EntityResolver> emptyList() );
+    }
 
     protected <T> T testCodex( Codex<T> codex, T value )
     {
@@ -46,12 +54,15 @@ public abstract class FlatPackTestCase
             scanned.addAll( serialization.getEntities() );
         }
 
-        DeserializationContext deserialization = new DeserializationContext();
+        DeserializationContext deserialization = deserializationContext();
         T deserializedValue = codex.read( getObjectFromSerializedString( out.toString() ), deserialization );
-        if (value == null) {
-          assertNull(deserializedValue);
-        } else {
-          assertEquals(value, deserializedValue);
+        if ( value == null )
+        {
+            assertNull( deserializedValue );
+        }
+        else
+        {
+            assertEquals( value, deserializedValue );
         }
         return deserializedValue;
     }

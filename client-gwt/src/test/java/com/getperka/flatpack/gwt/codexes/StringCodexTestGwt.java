@@ -3,7 +3,6 @@ package com.getperka.flatpack.gwt.codexes;
 import java.util.Collections;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 public class StringCodexTestGwt
@@ -26,7 +25,7 @@ public class StringCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import com.getperka.flatpack.BaseHasUuid;
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.Property;
 
 public class ImpliedPropertySetterTestGwt
@@ -90,6 +89,12 @@ public class ImpliedPropertySetterTestGwt
             return new A();
         }
 
+        @Override
+        protected Class<A> getEntityClass()
+        {
+            return A.class;
+        }
+
     }
 
     private static class CodexB
@@ -111,6 +116,12 @@ public class ImpliedPropertySetterTestGwt
         protected B createInstance()
         {
             return new B();
+        }
+
+        @Override
+        protected Class<B> getEntityClass()
+        {
+            return B.class;
         }
 
     }
@@ -221,7 +232,7 @@ public class ImpliedPropertySetterTestGwt
         propAInB.setImpliedProperty( propBInA );
 
         // test that the setter can create a list
-        ImpliedPropertySetter setter = new ImpliedPropertySetter( new DeserializationContext(), propAListInB, b, a );
+        ImpliedPropertySetter setter = new ImpliedPropertySetter( deserializationContext(), propAListInB, b, a );
         setter.call();
         assertEquals( 1, b.getaList().size() );
         assertSame( a, b.getaList().get( 0 ) );
@@ -235,19 +246,19 @@ public class ImpliedPropertySetterTestGwt
         assertSame( a2, b.getaList().get( 1 ) );
         
         // test that the setter can set the implied value to each element of a list
-        setter = new ImpliedPropertySetter( new DeserializationContext(), propBInA, Arrays.asList( a, a2 ), b );
+        setter = new ImpliedPropertySetter( deserializationContext(), propBInA, Arrays.asList( a, a2 ), b );
         setter.call();
         assertSame(b, a.getB());
         assertSame(b, a2.getB());
         
         // test with a Set
-        setter =  new ImpliedPropertySetter( new DeserializationContext(), propASetInB, b, a );
+        setter =  new ImpliedPropertySetter( deserializationContext(), propASetInB, b, a );
         setter.call();
         assertEquals( 1, b.getaSet().size() );
         assertSame( a, b.getaSet().iterator().next());
         
         // test one to one
-        setter =  new ImpliedPropertySetter( new DeserializationContext(), propAInB, b, a );
+        setter =  new ImpliedPropertySetter( deserializationContext(), propAInB, b, a );
         setter.call();
         assertSame( a, b.getA());
     }

@@ -75,4 +75,11 @@ public class DynamicEntityCodex<T extends HasUuid>
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    protected Class<T> getEntityClass()
+    {
+        // Should never be called
+        throw new UnsupportedOperationException();
+    }
+
 }

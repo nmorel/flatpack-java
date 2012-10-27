@@ -3,7 +3,6 @@ package com.getperka.flatpack.gwt.codexes;
 import java.util.Collections;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 public class CharacterCodexTestGwt
@@ -25,7 +24,7 @@ public class CharacterCodexTestGwt
         throws Exception
     {
         Codex<Character> codex = TestCodexFactory.get().characterCodex();
-        assertEquals( 'e', codex.readNotNull( Double.valueOf( (int) 'e' ), new DeserializationContext() ).charValue() );
+        assertEquals( 'e', codex.readNotNull( Double.valueOf( (int) 'e' ), deserializationContext() ).charValue() );
     }
 
     public void testCharacterDefaultValue()
@@ -38,13 +37,14 @@ public class CharacterCodexTestGwt
         assertFalse( codex.isDefaultValue( 'e' ) );
     }
 
-    public void testCharacterIncorrectType() throws Exception
+    public void testCharacterIncorrectType()
+        throws Exception
     {
         Codex<Character> codex = TestCodexFactory.get().characterCodex();
 
         try
         {
-            codex.readNotNull( "er", new DeserializationContext() );
+            codex.readNotNull( "er", deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )
@@ -53,7 +53,7 @@ public class CharacterCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

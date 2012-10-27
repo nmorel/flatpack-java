@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.UUID;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 public class UUIDCodexTestGwt
@@ -26,7 +25,7 @@ public class UUIDCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

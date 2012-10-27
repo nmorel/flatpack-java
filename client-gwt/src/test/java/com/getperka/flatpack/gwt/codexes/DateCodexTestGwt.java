@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Date;
 
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 
 @SuppressWarnings( "deprecation" )
@@ -23,7 +22,7 @@ public class DateCodexTestGwt
         testCodex( codex, now );
         testCodex( codex, null );
 
-        assertEquals( now, codex.readNotNull( Double.valueOf( now.getTime() ), new DeserializationContext() ) );
+        assertEquals( now, codex.readNotNull( Double.valueOf( now.getTime() ), deserializationContext() ) );
     }
 
     public void testSqlDate()
@@ -38,7 +37,7 @@ public class DateCodexTestGwt
         testCodex( codex, null );
 
         assertEquals( new java.sql.Date( now.getTime() ),
-            codex.readNotNull( Double.valueOf( now.getTime() ), new DeserializationContext() ) );
+            codex.readNotNull( Double.valueOf( now.getTime() ), deserializationContext() ) );
     }
 
     public void testSqlTime()
@@ -53,7 +52,7 @@ public class DateCodexTestGwt
         testCodex( codex, null );
 
         assertEquals( new java.sql.Time( now.getTime() ),
-            codex.readNotNull( Double.valueOf( now.getTime() ), new DeserializationContext() ) );
+            codex.readNotNull( Double.valueOf( now.getTime() ), deserializationContext() ) );
     }
 
     public void testSqlTimestamp()
@@ -68,7 +67,7 @@ public class DateCodexTestGwt
         testCodex( codex, null );
 
         assertEquals( new java.sql.Timestamp( now.getTime() ),
-            codex.readNotNull( Double.valueOf( now.getTime() ), new DeserializationContext() ) );
+            codex.readNotNull( Double.valueOf( now.getTime() ), deserializationContext() ) );
     }
 
     public void testIncorrectType()
@@ -78,7 +77,7 @@ public class DateCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

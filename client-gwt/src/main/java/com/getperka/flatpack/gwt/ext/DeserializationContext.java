@@ -20,11 +20,13 @@
 package com.getperka.flatpack.gwt.ext;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.util.FlatPackCollections;
 
 /**
@@ -33,18 +35,37 @@ import com.getperka.flatpack.util.FlatPackCollections;
 public class DeserializationContext
     extends BaseContext
 {
+    private final CompositeEntityResolver resolver;
 
     private final Map<UUID, HasUuid> entities = FlatPackCollections.mapForLookup();
     private final Map<HasUuid, Set<Property<?, ?>>> modified = FlatPackCollections.mapForLookup();
     private final Set<UUID> resolved = FlatPackCollections.setForLookup();
 
-    public DeserializationContext()
+    public DeserializationContext( List<EntityResolver> resolvers )
     {
+        this.resolver = new CompositeEntityResolver( resolvers );
+    }
+
+    /**
+     * Add an additional {@link EntityResolver} which will be queried before any previously-added resolvers.
+     */
+    public DeserializationContext addEntityResolver( EntityResolver resolver )
+    {
+        this.resolver.addEntityResolver( resolver );
+        return this;
+    }
+
+    /**
+     * @return the resolver
+     */
+    public EntityResolver getEntityResolver()
+    {
+        return resolver;
     }
 
     /**
      * Record the modification of an entity's property.
-     *
+     * 
      * @return {@code true} if the Property had not been previously marked as modified
      */
     public boolean addModified( HasUuid entity, Property<?, ?> property )
@@ -60,7 +81,7 @@ public class DeserializationContext
 
     /**
      * Retrieve an entity previously provided to {@link #putEntity}.
-     *
+     * 
      * @return the requested entity or {@code null} if an entity with that UUID has not been provided to
      * {@link #putEntity(UUID, HasUuid, boolean)}
      */
@@ -81,7 +102,7 @@ public class DeserializationContext
     /**
      * Stores an entity to be identified by a UUID. This method will call {@link HasUuid#setUuid(UUID)} on the provided
      * entity.
-     *
+     * 
      * @param uuid the UUID to assign to the entity
      * @param entity the entity to store in the context
      * @param resolved {@code true} if the instance was retrieved from an EntityResolver

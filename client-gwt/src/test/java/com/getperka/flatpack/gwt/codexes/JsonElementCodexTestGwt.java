@@ -31,7 +31,7 @@ public class JsonElementCodexTestGwt
         codex.scan( value, serialization );
         codex.write( value, serialization );
 
-        DeserializationContext deserialization = new DeserializationContext();
+        DeserializationContext deserialization = deserializationContext();
         JavaScriptObject deserializedValue = codex.read( value, deserialization );
 
         assertEquals( array, new JSONArray( deserializedValue ) );
@@ -46,7 +46,7 @@ public class JsonElementCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )

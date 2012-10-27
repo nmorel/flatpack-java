@@ -8,7 +8,6 @@ import java.util.Set;
 
 import com.getperka.flatpack.HasUuid;
 import com.getperka.flatpack.gwt.FlatPackTestCase;
-import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.stub.ChildBean;
 import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 import com.getperka.flatpack.util.FlatPackCollections;
@@ -101,7 +100,7 @@ public class CollectionCodexTestGwt
 
         try
         {
-            codex.readNotNull( Collections.EMPTY_LIST, new DeserializationContext() );
+            codex.readNotNull( Collections.EMPTY_LIST, deserializationContext() );
             fail();
         }
         catch ( IllegalArgumentException e )
