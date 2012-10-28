@@ -149,7 +149,7 @@ public class JavaDialect implements Dialect {
 
     Map<String, EntityDescription> allEntities = FlatPackCollections.mapForIteration();
     for (EntityDescription entity : api.getEntities()) {
-      addEntity( allEntities, entity );
+      addEntity(allEntities, entity);
     }
 
     // Render entities
@@ -192,19 +192,29 @@ public class JavaDialect implements Dialect {
     render(typeSourceST, packageDir, namePrefix + "TypeSource");
   }
 
+  @Override
+  public String getDialectName() {
+    return "java";
+  }
+
   /**
-   * Adds an entity and its supertype to the given map
-   * @param allEntities map containing all the entities
-   * @param entity Entity to add
+   * Adds an entity and its supertypes to a map. The properties defined by the entity will be pruned
+   * so that the entity contains only its declared properties.
+   * 
+   * @param allEntities an accumulator map of entity payload names to descriptions
+   * @param entity the entity to add
    */
   protected void addEntity(Map<String, EntityDescription> allEntities, EntityDescription entity) {
-    if(null == entity) {
+    if (entity == null) {
       return;
     }
 
     String typeName = entity.getTypeName();
 
-    if ("baseHasUuid".equals(typeName) || "hasUuid".equals( typeName )) {
+    if (allEntities.containsKey(typeName)) {
+      // Already processed
+      return;
+    } else if ("baseHasUuid".equals(typeName) || "hasUuid".equals(typeName)) {
       // Ensure that the "real" implementations are used
       return;
     }
@@ -222,12 +232,7 @@ public class JavaDialect implements Dialect {
     }
 
     // Add the supertype
-    addEntity( allEntities, entity.getSupertype() );
-  }
-
-  @Override
-  public String getDialectName() {
-    return "java";
+    addEntity(allEntities, entity.getSupertype());
   }
 
   /**

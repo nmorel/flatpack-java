@@ -51,6 +51,13 @@ module <names.moduleName>
       attr_accessor *PROPERTY_NAMES
       <endif>
       
+      <if(entity.embeddedEntityProperties)>
+      EMBEDDED_PROPERTY_NAMES = [
+        <entity.embeddedEntityProperties:{p | :<p.attrName>}; wrap, separator=",\n">
+      ]
+      attr_accessor *EMBEDDED_PROPERTY_NAMES
+      <endif>
+      
       <if(entity.entityProperties)>
       <entity.entityProperties:{p | require '<p.requireName>'}; wrap, separator="\n">
       TYPE_MAP = {
