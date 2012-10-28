@@ -19,6 +19,7 @@
  */
 package com.getperka.flatpack.gwt;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.getperka.flatpack.ext.EntityResolver;
@@ -78,7 +79,8 @@ public class FlatPack
             FlatPack flatPack = new FlatPack();
             flatPack.typeContext = typeContext;
             flatPack.packer = new Packer( typeContext, prettyPrint, verbose );
-            flatPack.unpacker = new Unpacker( typeContext, ignoreUnresolvableTypes, verbose, resolvers );
+            flatPack.unpacker =
+                new Unpacker( typeContext, ignoreUnresolvableTypes, verbose, Collections.unmodifiableList( resolvers ) );
             return flatPack;
         }
     }

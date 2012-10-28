@@ -8,11 +8,11 @@ import java.util.Date;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import com.getperka.flatpack.gwt.codexes.DynamicEntityCodex;
 import com.getperka.flatpack.gwt.codexes.VoidCodex;
 import com.getperka.flatpack.gwt.ext.TypeContext;
 import com.getperka.flatpack.gwt.stub.ChildBean;
 import com.getperka.flatpack.gwt.stub.MultiplePropertiesBean;
-import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 import com.getperka.flatpack.gwt.stub.TestEnum;
 import com.getperka.flatpack.gwt.stub.TestTypeContext;
 
@@ -43,12 +43,12 @@ public class UnpackerTestGwt
         assertNull( "value should be null", entity.getValue() );
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( { "unchecked", "deprecation" } )
     public void testUnpackSingleMultiplePropertiesBean()
     {
         FlatPackEntity<MultiplePropertiesBean> entity =
-            unpacker
-                .unpack( singleMultiplePropertiesBeanResponse, TestCodexFactory.get().multiplePropertiesBeanCodex() );
+            unpacker.unpack( singleMultiplePropertiesBeanResponse, new DynamicEntityCodex<MultiplePropertiesBean>(
+                typeContextMock ) );
 
         assertEquals( 3, entity.getExtraEntities().size() );
 

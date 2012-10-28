@@ -11,10 +11,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.UUID;
 
+import com.getperka.flatpack.gwt.codexes.DynamicEntityCodex;
 import com.getperka.flatpack.gwt.ext.TypeContext;
 import com.getperka.flatpack.gwt.stub.ChildBean;
 import com.getperka.flatpack.gwt.stub.MultiplePropertiesBean;
-import com.getperka.flatpack.gwt.stub.TestCodexFactory;
 import com.getperka.flatpack.gwt.stub.TestEnum;
 import com.getperka.flatpack.gwt.stub.TestTypeContext;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -38,6 +38,7 @@ public class PackerTestGwt
         packer = FlatPack.builder( typeContextMock ).create().getPacker();
     }
 
+    @SuppressWarnings( "deprecation" )
     public void testPackSingleMultiplePropertiesBean()
     {
         MultiplePropertiesBean bean = new MultiplePropertiesBean();
@@ -100,7 +101,7 @@ public class PackerTestGwt
         FlatPackEntity<MultiplePropertiesBean> entity = new FlatPackEntity<MultiplePropertiesBean>();
         entity.withValue( bean );
 
-        String out = packer.pack( entity, TestCodexFactory.get().multiplePropertiesBeanCodex() );
+        String out = packer.pack( entity, new DynamicEntityCodex<MultiplePropertiesBean>( typeContextMock ) );
 
         // Have to replace the date in the expected result because it depends on the timezone which can change between
         // dev and jenkins box

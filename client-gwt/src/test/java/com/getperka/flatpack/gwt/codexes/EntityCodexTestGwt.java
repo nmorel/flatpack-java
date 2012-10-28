@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
+import com.getperka.flatpack.HasUuid;
+import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.gwt.FlatPackTestCase;
 import com.getperka.flatpack.gwt.ext.DeserializationContext;
 import com.getperka.flatpack.gwt.ext.SerializationContext;
@@ -30,6 +32,37 @@ public class EntityCodexTestGwt
 
         MultiplePropertiesBean reReadValue = codex.read( "15a1bf22-f764-4e4e-abc2-81146df9f54f", deserialization );
         assertSame( reReadValue, readValue );
+    }
+
+    public void testEntityResolver()
+    {
+        EntityCodex<MultiplePropertiesBean> codex = TestCodexFactory.get().multiplePropertiesBeanCodex();
+
+        final MultiplePropertiesBean existingBean = new MultiplePropertiesBean();
+        existingBean.setUuid( UUID.fromString( "15a1bf22-f764-4e4e-abc2-81146df9f54f" ) );
+
+        DeserializationContext deserialization = deserializationContext();
+        deserialization.addEntityResolver( new EntityResolver() {
+
+            @SuppressWarnings( "unchecked" )
+            @Override
+            public <T extends HasUuid> T resolve( Class<T> clazz, UUID uuid )
+                throws Exception
+            {
+                if ( clazz.equals( MultiplePropertiesBean.class )
+                    && UUID.fromString( "15a1bf22-f764-4e4e-abc2-81146df9f54f" ).equals( uuid ) )
+                {
+                    return (T) existingBean;
+                }
+                return null;
+            }
+        } );
+
+        MultiplePropertiesBean readValue = codex.read( "15a1bf22-f764-4e4e-abc2-81146df9f54f", deserialization );
+        assertNotNull( readValue );
+        assertSame( deserialization.getEntity( UUID.fromString( "15a1bf22-f764-4e4e-abc2-81146df9f54f" ) ), readValue );
+        assertSame( existingBean, readValue );
+        assertTrue( deserialization.wasResolved( existingBean ) );
     }
 
     public void testWrite()

@@ -19,6 +19,7 @@
  */
 package com.getperka.flatpack.gwt.ext;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,8 @@ class CompositeEntityResolver
 
     CompositeEntityResolver( List<EntityResolver> resolvers )
     {
-        this.resolvers = resolvers;
+        // instantiating a new list so we can add additional resolvers for a single deserialization
+        this.resolvers = new ArrayList<EntityResolver>( resolvers );
     }
 
     /**

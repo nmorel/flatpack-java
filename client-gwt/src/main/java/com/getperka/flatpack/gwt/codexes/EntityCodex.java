@@ -260,7 +260,6 @@ public abstract class EntityCodex<T extends HasUuid>
         T toReturn = null;
         boolean resolved = false;
 
-        // TODO ?
         // Possibly delegate to injected resolvers
         if ( useResolvers )
         {
