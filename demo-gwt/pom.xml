@@ -44,6 +44,11 @@
         <version>${gwt.version}</version>
         <scope>provided</scope>
       </dependency>
+      <dependency>
+        <groupId>com.google.web.bindery</groupId>
+        <artifactId>requestfactory-server</artifactId>
+        <version>${gwt.version}</version>
+      </dependency>
 
       <!-- FlatPack dependencies -->
       <dependency>
@@ -209,7 +214,6 @@
           <artifactId>gwt-maven-plugin</artifactId>
           <version>${gwt-maven-plugin.version}</version>
           <configuration>
-            <deploy>${project.build.directory}/gwtc/extra</deploy>
             <extra>${project.build.directory}/gwtc/extra</extra>
             <gen>${project.build.directory}/gwtc/gen</gen>
             <workDir>${project.build.directory}/gwtc/work</workDir>

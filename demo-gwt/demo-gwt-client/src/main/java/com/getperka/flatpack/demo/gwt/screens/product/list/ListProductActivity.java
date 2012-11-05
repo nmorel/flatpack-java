@@ -9,8 +9,7 @@ import com.getperka.flatpack.demo.gwt.mvp.BaseActivity;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.ConsultProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.CreateProductPlace;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductView.Presenter;
-import com.getperka.flatpack.gwt.FlatPackEntity;
-import com.getperka.flatpack.gwt.client.FlatBack;
+import com.getperka.flatpack.gwt.client.FlatBackEntity;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.gwt.place.shared.PlaceController;
@@ -40,20 +39,19 @@ public class ListProductActivity
         view.setPresenter( this );
 
         // Should use productsGet but it is to demonstrate the inheritance support
-        requestApi.entitiesGet().withEntityName( Product.typeName() )
-            .execute( new FlatBack<FlatPackEntity<List<BaseEntity>>>() {
+        requestApi.entitiesGet().withEntityName( Product.typeName() ).execute( new FlatBackEntity<List<BaseEntity>>() {
 
-                @Override
-                public void onSuccess( FlatPackEntity<List<BaseEntity>> result )
-                {
-                    view.setProducts( Lists.transform( result.getValue(), new Function<BaseEntity, Product>() {
-                        public Product apply( BaseEntity entry )
-                        {
-                            return (Product) entry;
-                        }
-                    } ) );
-                }
-            } );
+            @Override
+            public void doOnSuccess( List<BaseEntity> result )
+            {
+                view.setProducts( Lists.transform( result, new Function<BaseEntity, Product>() {
+                    public Product apply( BaseEntity entry )
+                    {
+                        return (Product) entry;
+                    }
+                } ) );
+            }
+        } );
 
         panel.setWidget( view );
     }

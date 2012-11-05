@@ -21,6 +21,12 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- RequestFactory for remote logging -->
+    <dependency>
+      <groupId>com.google.web.bindery</groupId>
+      <artifactId>requestfactory-server</artifactId>
+    </dependency>
+
     <!-- Dependencies for logs -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -145,6 +151,12 @@
                     ${basedir}/../../core/target/classes;${basedir}/../../client/target/classes;${basedir}/../../search/target/classes;${basedir}/../../jersey/target/classes
                   </extraClasspath>
                 </webApp>
+                <systemProperties>
+                  <systemProperty>
+                    <name>symbolMapsDirectory</name>
+                    <value>${basedir}/../demo-gwt-client/target/flatpack-demo-gwt-client-${project.version}/WEB-INF/deploy/demo/symbolMaps/</value>
+                  </systemProperty>
+                </systemProperties>
               </configuration>
             </plugin>
           </plugins>

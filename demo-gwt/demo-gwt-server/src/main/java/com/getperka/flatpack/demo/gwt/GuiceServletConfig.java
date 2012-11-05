@@ -14,6 +14,7 @@ import com.getperka.flatpack.ext.EntityResolver;
 import com.getperka.flatpack.jersey.FlatPackProvider;
 import com.getperka.flatpack.jersey.FlatPackResolver;
 import com.getperka.flatpack.search.SearchTypeSource;
+import com.google.gwt.logging.server.StackTraceDeobfuscator;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
@@ -57,6 +58,12 @@ public class GuiceServletConfig
                 bind( RollbackExceptionMapper.class ).in( Scopes.SINGLETON );
 
                 serve( "/resources/*" ).with( GuiceContainer.class );
+
+                // Remote logging
+                bind( StackTraceDeobfuscator.class ).toInstance(
+                    new StackTraceDeobfuscator( System.getProperty( "symbolMapsDirectory" ) ) );
+                bind( RemoteLoggingServlet.class ).in( Scopes.SINGLETON );
+                serve( "/gwtLogging" ).with( RemoteLoggingServlet.class );
 
                 // Persistence
                 install( new JpaPersistModule( "demoDb" ) );

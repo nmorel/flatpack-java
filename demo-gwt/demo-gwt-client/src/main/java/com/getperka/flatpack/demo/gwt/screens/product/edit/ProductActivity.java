@@ -6,8 +6,7 @@ import com.getperka.flatpack.demo.gwt.mvp.BaseActivity;
 import com.getperka.flatpack.demo.gwt.mvp.NoOpVisitor;
 import com.getperka.flatpack.demo.gwt.screens.product.edit.ProductView.Presenter;
 import com.getperka.flatpack.demo.gwt.screens.product.list.ListProductPlace;
-import com.getperka.flatpack.gwt.FlatPackEntity;
-import com.getperka.flatpack.gwt.client.FlatBack;
+import com.getperka.flatpack.gwt.client.FlatBackEntity;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.place.shared.PlaceController;
@@ -69,12 +68,12 @@ public class ProductActivity
     @Override
     public void visitPlace( ConsultProductPlace place )
     {
-        requestApi.productsIdGet( place.getId().toString() ).execute( new FlatBack<FlatPackEntity<Product>>() {
+        requestApi.productsIdGet( place.getId().toString() ).execute( new FlatBackEntity<Product>() {
 
             @Override
-            public void onSuccess( FlatPackEntity<Product> result )
+            public void doOnSuccess( Product result )
             {
-                driver.edit( result.getValue() );
+                driver.edit( result );
             }
         } );
     }
@@ -88,12 +87,12 @@ public class ProductActivity
     @Override
     public void visitPlace( EditProductPlace place )
     {
-        requestApi.productsIdGet( place.getId().toString() ).execute( new FlatBack<FlatPackEntity<Product>>() {
+        requestApi.productsIdGet( place.getId().toString() ).execute( new FlatBackEntity<Product>() {
 
             @Override
-            public void onSuccess( FlatPackEntity<Product> result )
+            public void doOnSuccess( Product result )
             {
-                driver.edit( result.getValue() );
+                driver.edit( result );
             }
         } );
     }
@@ -107,20 +106,19 @@ public class ProductActivity
         Product product = driver.flush();
         if ( !driver.hasErrors() )
         {
-            requestApi.entitiesPut( product ).execute(
-                new FlatBack<FlatPackEntity<Void>>() {
+            requestApi.entitiesPut( product ).execute( new FlatBackEntity<Void>() {
 
-                    @Override
-                    public void onSuccess( FlatPackEntity<Void> result )
-                    {
-                        getCurrentPlace().accept( new BackToPreviousPlaceVisitor() );
-                    }
+                @Override
+                public void doOnSuccess( Void result )
+                {
+                    getCurrentPlace().accept( new BackToPreviousPlaceVisitor() );
+                }
 
-                    public void onConstraintViolation( java.util.Set<javax.validation.ConstraintViolation<?>> violations )
-                    {
-                        driver.setConstraintViolations( violations );
-                    };
-                } );
+                public void onConstraintViolation( java.util.Set<javax.validation.ConstraintViolation<?>> violations )
+                {
+                    driver.setConstraintViolations( violations );
+                };
+            } );
         }
     }
 

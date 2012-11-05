@@ -11,7 +11,7 @@ public abstract class FlatBack<T>
     /**
      * Called when a Request has been successfully executed on the server.
      *
-     * @param response a response of type V
+     * @param response a response of type T
      */
     public abstract void onSuccess( T result );
 
